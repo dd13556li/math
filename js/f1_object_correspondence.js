@@ -163,6 +163,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     fadeInDuration: 300,
                     placementSnapDuration: 200,
                     successCelebration: true
+                },
+                
+                // 觸控拖曳配置
+                touchDragConfig: {
+                    enabled: true,                 // 啟用觸控拖曳
+                    sensitivity: 'high',           // 觸控靈敏度：high, medium, low
+                    createCloneDelay: 50,          // 建立拖曳複製的延遲時間(ms)
+                    visualFeedback: {
+                        dragOpacity: 0.5,          // 拖曳時原物件透明度
+                        cloneScale: 1.1,           // 拖曳複製縮放比例
+                        hoverEffect: true          // 放置區懸停效果
+                    },
+                    selectors: {
+                        draggable: '.draggable-item:not(.static-item)',
+                        dropZone: '.drop-zone, .placement-zone, .source-container'
+                    }
                 }
             },
             
@@ -232,6 +248,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     fadeInDuration: 300,
                     placementSnapDuration: 200,
                     incorrectShake: 300
+                },
+                
+                // 觸控拖曳配置
+                touchDragConfig: {
+                    enabled: true,                 // 啟用觸控拖曳
+                    sensitivity: 'high',           // 觸控靈敏度：high, medium, low
+                    createCloneDelay: 50,          // 建立拖曳複製的延遲時間(ms)
+                    visualFeedback: {
+                        dragOpacity: 0.5,          // 拖曳時原物件透明度
+                        cloneScale: 1.1,           // 拖曳複製縮放比例
+                        hoverEffect: true          // 放置區懸停效果
+                    },
+                    selectors: {
+                        draggable: '.draggable-item:not(.static-item)',
+                        dropZone: '.drop-zone, .placement-zone, .source-container, .quantity-container'
+                    }
                 }
             },
             
@@ -299,6 +331,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     successBounce: true,
                     errorShake: true,
                     hintGlow: true
+                },
+                
+                // 觸控拖曳配置
+                touchDragConfig: {
+                    enabled: true,                 // 啟用觸控拖曳
+                    sensitivity: 'high',           // 觸控靈敏度：high, medium, low
+                    createCloneDelay: 50,          // 建立拖曳複製的延遲時間(ms)
+                    visualFeedback: {
+                        dragOpacity: 0.5,          // 拖曳時原物件透明度
+                        cloneScale: 1.1,           // 拖曳複製縮放比例
+                        hoverEffect: true          // 放置區懸停效果
+                    },
+                    selectors: {
+                        draggable: '.draggable-item:not(.static-item)',
+                        dropZone: '.drop-zone, .placement-zone, .source-container'
+                    }
                 }
             }
         },
@@ -1671,12 +1719,175 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         // =====================================================
+        // 🎯 觸控拖曳管理器 - 配置驅動
+        // =====================================================
+        TouchDragManager: {
+            isInitialized: false,
+            currentConfig: null,
+
+            /**
+             * 初始化觸控拖曳功能
+             * @param {string} difficulty - 難度等級
+             * @param {Object} config - ModeConfig配置
+             */
+            init(difficulty, config) {
+                Game.Debug.logUI('初始化觸控拖曳管理器', difficulty, config.touchDragConfig);
+                
+                if (!config.touchDragConfig?.enabled) {
+                    Game.Debug.logUI('觸控拖曳未啟用', difficulty);
+                    return;
+                }
+
+                // 檢查TouchDragUtility是否可用
+                if (typeof window.TouchDragUtility === 'undefined') {
+                    Game.Debug.logError('TouchDragUtility未載入', 'TouchDragManager.init');
+                    return;
+                }
+
+                this.currentConfig = config.touchDragConfig;
+                
+                // 使用配置驅動的延遲時間
+                const initDelay = this.currentConfig.createCloneDelay || 100;
+                
+                setTimeout(() => {
+                    this.registerDraggableElements(difficulty, config);
+                    this.registerDropZones(difficulty, config);
+                    this.isInitialized = true;
+                    Game.Debug.logUI('觸控拖曳初始化完成', difficulty);
+                }, initDelay);
+            },
+
+            /**
+             * 註冊可拖曳元素
+             */
+            registerDraggableElements(difficulty, config) {
+                const app = document.getElementById('app');
+                const draggableSelector = this.currentConfig.selectors.draggable;
+                
+                Game.Debug.logUI('註冊可拖曳元素', `選擇器: ${draggableSelector}`);
+
+                // 註冊拖曳處理器
+                window.TouchDragUtility.registerDraggable(app, draggableSelector, {
+                    onDragStart: (element, event) => {
+                        Game.Debug.logUserAction('觸控拖曳開始', element.dataset);
+                        // 呼叫現有的handleDragStart邏輯
+                        return Game.handleDragStart({ target: element });
+                    },
+                    onDrop: (draggedElement, dropZone, syntheticEvent) => {
+                        Game.Debug.logUserAction('觸控放置', {
+                            draggedElement: draggedElement.dataset,
+                            dropZone: dropZone.className
+                        });
+                        // 建立合成的drop事件並呼叫現有的handleDrop邏輯
+                        const mockDropEvent = this.createMockDropEvent(draggedElement, dropZone, syntheticEvent);
+                        Game.handleDrop(mockDropEvent);
+                    },
+                    onDragEnd: (element, event) => {
+                        Game.Debug.logUserAction('觸控拖曳結束', element.dataset);
+                        // 呼叫現有的handleDragEnd邏輯
+                        Game.handleDragEnd({ target: element });
+                    }
+                });
+            },
+
+            /**
+             * 註冊放置區
+             */
+            registerDropZones(difficulty, config) {
+                const dropZoneSelector = this.currentConfig.selectors.dropZone;
+                const dropZones = document.querySelectorAll(dropZoneSelector);
+                
+                Game.Debug.logUI('註冊放置區', `找到 ${dropZones.length} 個放置區`);
+
+                dropZones.forEach(zone => {
+                    window.TouchDragUtility.registerDropZone(zone, (draggedElement, dropZone) => {
+                        // 使用配置驅動的驗證邏輯
+                        return this.validateDrop(draggedElement, dropZone, difficulty, config);
+                    });
+                });
+            },
+
+            /**
+             * 建立模擬的drop事件
+             */
+            createMockDropEvent(draggedElement, dropZone, syntheticEvent) {
+                return {
+                    preventDefault: () => {},
+                    target: dropZone,
+                    dataTransfer: {
+                        getData: (type) => {
+                            if (type === 'text/plain') {
+                                return draggedElement.dataset.id || draggedElement.dataset.index || '';
+                            }
+                            if (type === 'icon') {
+                                return draggedElement.dataset.icon || '';
+                            }
+                            return '';
+                        }
+                    },
+                    syntheticTouchDrop: true,
+                    originalTouchEvent: syntheticEvent
+                };
+            },
+
+            /**
+             * 配置驅動的放置驗證
+             */
+            validateDrop(draggedElement, dropZone, difficulty, config) {
+                // 基本驗證：確保不是靜態元素
+                if (draggedElement.classList.contains('static-item')) {
+                    Game.Debug.logUserAction('拒絕拖曳靜態元素', draggedElement.className);
+                    return false;
+                }
+
+                // 基本驗證：確保放置區是有效的
+                const validDropZones = config.touchDragConfig.selectors.dropZone.split(',').map(s => s.trim());
+                const isValidDropZone = validDropZones.some(selector => {
+                    const className = selector.replace('.', '');
+                    return dropZone.classList.contains(className);
+                });
+
+                if (!isValidDropZone) {
+                    Game.Debug.logUserAction('無效的放置區', dropZone.className);
+                    return false;
+                }
+
+                return true;
+            },
+
+            /**
+             * 清理觸控拖曳註冊
+             */
+            cleanup() {
+                if (this.isInitialized && typeof window.TouchDragUtility !== 'undefined') {
+                    // 清理所有註冊的處理器
+                    const app = document.getElementById('app');
+                    if (app) {
+                        window.TouchDragUtility.unregisterDraggable(app);
+                    }
+                    
+                    const dropZones = document.querySelectorAll(this.currentConfig?.selectors?.dropZone || '');
+                    dropZones.forEach(zone => {
+                        window.TouchDragUtility.unregisterDropZone(zone);
+                    });
+
+                    this.isInitialized = false;
+                    this.currentConfig = null;
+                    Game.Debug.logUI('觸控拖曳清理完成');
+                }
+            }
+        },
+
+        // =====================================================
         // Initialization
         // =====================================================
         init() {
             Game.Debug.logGameFlow('遊戲初始化開始');
             
             try {
+                // 【配置驅動】清理觸控拖曳管理器（返回設定時）
+                this.TouchDragManager.cleanup();
+                
                 this.Speech.init();
                 Game.Debug.logGameFlow('語音系統初始化完成');
                 
@@ -1882,6 +2093,15 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // F1 不需要點擊事件監聽器，使用拖拽系統
             Game.Debug.logUI('F1使用拖拽系統，跳過點擊事件綁定');
+            
+            // 【配置驅動】初始化觸控拖曳管理器
+            const config = this.ModeConfig[difficulty];
+            if (config.touchDragConfig?.enabled) {
+                // 清理舊的觸控拖曳註冊（如果有的話）
+                this.TouchDragManager.cleanup();
+                // 初始化新的觸控拖曳功能
+                this.TouchDragManager.init(difficulty, config);
+            }
             
             // 使用事件委託綁定到整個app區域，以處理動態創建的選項按鈕
             Game.Debug.logUI('使用事件委託綁定選項事件', 'app delegated click');
@@ -2121,6 +2341,16 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // 目標區 (targetContainer) 維持動畫結束後的狀態，不再做任何更動
             Game.Debug.logGameFlow('簡單模式操作環境準備完成');
+            
+            // 【配置驅動】重新初始化觸控拖曳功能
+            const config = this.ModeConfig[difficulty];
+            if (config.touchDragConfig?.enabled) {
+                setTimeout(() => {
+                    this.TouchDragManager.cleanup();
+                    this.TouchDragManager.init(difficulty, config);
+                    Game.Debug.logUI('簡單模式觸控拖曳重新初始化完成');
+                }, 200);
+            }
         },
 
         async playDemonstrationAnimation(icon, difficulty, sourceContainer, targetContainer) {
@@ -2432,6 +2662,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 targetCount: this.state.correctAnswer, 
                 totalAvailable: totalItems 
             });
+            
+            // 【配置驱动】重新初始化觸控拖曳功能
+            const config = this.ModeConfig[difficulty];
+            if (config.touchDragConfig?.enabled) {
+                setTimeout(() => {
+                    this.TouchDragManager.cleanup();
+                    this.TouchDragManager.init(difficulty, config);
+                    Game.Debug.logUI('普通模式觸控拖曳重新初始化完成');
+                }, 200);
+            }
         },
 
         renderHardMode(primaryIcon, difficulty) {
@@ -2760,6 +3000,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 numTargetTypes,
                 numDistractorTypes
             });
+            
+            // 【配置驅動】重新初始化觸控拖曳功能
+            const config = this.ModeConfig[difficulty];
+            if (config.touchDragConfig?.enabled) {
+                setTimeout(() => {
+                    this.TouchDragManager.cleanup();
+                    this.TouchDragManager.init(difficulty, config);
+                    Game.Debug.logUI('困難模式觸控拖曳重新初始化完成');
+                }, 200);
+            }
             
             } catch (error) {
                 Game.Debug.logError(error, '困難模式渲染失敗');
