@@ -2382,20 +2382,27 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         setupTouchDrag() {
+            console.log('🎯 setupTouchDrag 被調用，當前 TouchDragUtility 狀態:', !!window.TouchDragUtility);
+            console.log('🎯 window 對象包含的屬性:', Object.keys(window).filter(key => key.includes('TouchDrag')));
+            
             this.waitForTouchDragUtility(() => {
                 this.setupTouchDragActual();
             });
         },
 
         waitForTouchDragUtility(callback, attempts = 0) {
+            console.log(`🎯 等待 TouchDragUtility，嘗試 ${attempts + 1}/20，狀態:`, !!window.TouchDragUtility);
+            
             if (window.TouchDragUtility) {
+                console.log('🎯 TouchDragUtility 已可用，執行回調');
                 callback();
             } else if (attempts < 20) {
                 setTimeout(() => {
                     this.waitForTouchDragUtility(callback, attempts + 1);
                 }, 50);
             } else {
-                console.error('TouchDragUtility 載入超時');
+                console.error('🎯 TouchDragUtility 載入超時，檢查腳本載入順序');
+                console.log('🎯 所有可用的 window 屬性:', Object.keys(window).filter(key => key.toLowerCase().includes('touch')));
             }
         },
 
