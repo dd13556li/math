@@ -1572,6 +1572,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             this.initGameElements();
             this.bindGameEvents();
+            
+            // 重新註冊觸控拖拽區域
+            this.registerTouchDropZones();
         },
 
         initGameElements() {
@@ -2328,6 +2331,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 this.elements.numberContainer.appendChild(numberElement);
             });
+            
+            // 重新註冊觸控拖拽區域（因為新增了numbers）
+            this.registerTouchDropZones();
         },
 
         renderSlots() {
@@ -2352,6 +2358,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 this.elements.answerContainer.appendChild(slot);
             });
+            
+            // 重新註冊觸控拖拽區域（因為新增了slots）
+            this.registerTouchDropZones();
         },
 
         // =====================================================
@@ -2360,12 +2369,133 @@ document.addEventListener('DOMContentLoaded', () => {
         bindDragDropEvents() {
             if (!this.elements.app) return;
 
+            // Traditional mouse drag events
             this.elements.app.addEventListener('dragstart', this.handleDragStart.bind(this));
             this.elements.app.addEventListener('dragend', this.handleDragEnd.bind(this));
             this.elements.app.addEventListener('dragover', this.handleDragOver.bind(this));
             this.elements.app.addEventListener('dragenter', this.handleDragEnter.bind(this));
             this.elements.app.addEventListener('dragleave', this.handleDragLeave.bind(this));
             this.elements.app.addEventListener('drop', this.handleDrop.bind(this));
+            
+            // Touch drag support
+            this.setupTouchDrag();
+        },
+
+        setupTouchDrag() {
+            if (!window.TouchDragUtility) {
+                console.error('TouchDragUtility 不可用');
+                return;
+            }
+            
+            console.log('🎯 開始設置觸控拖拽功能...');
+            console.log('🎯 App元素:', this.elements.app);
+            
+            // Check if draggable elements exist
+            const draggableElements = this.elements.app.querySelectorAll('.number-box:not(.correct)');
+            console.log('🎯 找到可拖拽元素:', draggableElements.length, draggableElements);
+            
+            // Add simple touch test to first element
+            if (draggableElements.length > 0) {
+                const testElement = draggableElements[0];
+                console.log('🎯 添加測試觸控事件到:', testElement);
+                testElement.addEventListener('touchstart', (e) => {
+                    console.log('🎯 測試觸控開始事件觸發!', e);
+                }, { passive: false });
+            }
+            
+            // Register draggable elements
+            window.TouchDragUtility.registerDraggable(
+                this.elements.app,
+                '.number-box:not(.correct)',
+                {
+                    onDragStart: (element, event) => {
+                        console.log('🎯 觸控拖拽開始:', element, event);
+                        
+                        // Check if drag should be allowed
+                        if (element.classList.contains('correct')) {
+                            console.log('🎯 元素已正確，阻止拖拽');
+                            return false;
+                        }
+                        
+                        this.state.draggedElement = element;
+                        const number = element.dataset.value;
+                        
+                        console.log('🎯 設置拖拽元素:', number);
+                        this.Debug.logDragDrop(`開始觸控拖拽數字: ${number}`);
+                        
+                        // 播放數字語音
+                        this.Speech.speak(number);
+                        
+                        return true;
+                    },
+                    onDrop: (draggedElement, dropZone, event) => {
+                        // Ensure draggedElement is set
+                        this.state.draggedElement = draggedElement;
+                        
+                        // Handle touch drop with proper zone detection
+                        const slot = dropZone.closest('.slot');
+                        const numberContainer = dropZone.closest('.number-container');
+                        
+                        this.Debug.logDragDrop(`觸控放置檢測: slot=${!!slot}, numberContainer=${!!numberContainer}, dropZone=${dropZone.className}`);
+                        
+                        if (slot && this.state.draggedElement) {
+                            this.Debug.logDragDrop(`觸控放置到slot: position=${slot.dataset.position}`);
+                            this.handleSlotDrop(slot);
+                        } else if (numberContainer && this.state.draggedElement) {
+                            this.Debug.logDragDrop(`觸控放置到數字容器`);
+                            this.handleNumberContainerDrop();
+                        } else {
+                            this.Debug.logDragDrop(`觸控放置失敗: 找不到有效的放置目標`);
+                        }
+                    },
+                    onDragEnd: (element, event) => {
+                        // Reset dragged element state
+                        if (this.state.draggedElement) {
+                            this.state.draggedElement = null;
+                        }
+                        
+                        // 清除所有拖拽樣式
+                        document.querySelectorAll('.slot.drag-over').forEach(slot => {
+                            slot.classList.remove('drag-over');
+                        });
+                    }
+                }
+            );
+            
+            // Register drop zones
+            this.registerTouchDropZones();
+        },
+
+        registerTouchDropZones() {
+            if (!window.TouchDragUtility) {
+                console.error('TouchDragUtility 不可用於註冊放置區域');
+                return;
+            }
+            
+            console.log('🎯 開始註冊觸控放置區域...');
+            
+            // Register slots as drop zones
+            const slots = this.elements.app.querySelectorAll('.slot');
+            console.log('🎯 找到slots:', slots.length, slots);
+            this.Debug.logDragDrop(`註冊觸控放置區域: 找到 ${slots.length} 個 slots`);
+            
+            slots.forEach((slot, index) => {
+                window.TouchDragUtility.registerDropZone(slot, (draggedElement, dropZone) => {
+                    // Allow drop only if slot doesn't have a correct number
+                    const hasCorrectNumber = dropZone.querySelector('.number-box.correct');
+                    this.Debug.logDragDrop(`檢查slot ${index} 是否可放置: hasCorrectNumber=${!!hasCorrectNumber}`);
+                    return !hasCorrectNumber;
+                });
+            });
+            
+            // Register number container as drop zone
+            const numberContainer = this.elements.app.querySelector('.number-container');
+            if (numberContainer) {
+                this.Debug.logDragDrop('註冊數字容器為放置區域');
+                window.TouchDragUtility.registerDropZone(numberContainer, () => true);
+            } else {
+                this.Debug.logDragDrop('找不到數字容器');
+            }
         },
 
         handleDragStart(event) {
