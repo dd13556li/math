@@ -1,0 +1,1062 @@
+/* =================================================================
+   FILE: css/dark-theme.css - 深色護眼主題
+   ================================================================= */
+
+/* =====================================================
+   深色護眼模式專用樣式
+   ===================================================== */
+
+/* 深色護眼模式 */
+[data-theme="dark"] {
+    /* 主要色彩 - 較為柔和 */
+    --primary-color: #4f8cff;
+    --primary-dark: #3d7ce6;
+    --primary-light: #6ba0ff;
+    --secondary-color: #6c5ce7;
+    --accent-color: #fd79a8;
+    
+    /* 背景色彩 - 深色系 */
+    --background-primary: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+    --background-secondary: #2c3e50;
+    --background-card: #34495e;
+    --background-overlay: rgba(44, 62, 80, 0.95);
+    --background-light: #455a64;
+    
+    /* 文字色彩 - 高對比 */
+    --text-primary: #ecf0f1;
+    --text-secondary: #bdc3c7;
+    --text-muted: #95a5a6;
+    --text-inverse: #2c3e50;
+    
+    /* 邊框和分隔線 - 深色 */
+    --border-color: #34495e;
+    --border-light: #3e4d5e;
+    --border-thick: 3px;
+    --divider-color: #455a64;
+    
+    /* 狀態色彩 - 調整亮度 */
+    --success-color: #00e676;
+    --warning-color: #ffc107; /* 金色警告色，保持金錢區域一致性 */
+    --error-color: #ef5350;
+    --info-color: #42a5f5;
+    
+    /* 深色主題金色漸層 */
+    --ai-gold-gradient: linear-gradient(45deg, #ffc107, #ff9800);
+    
+    /* 陰影 - 更深 */
+    --shadow-light: 0 2px 8px rgba(0,0,0,0.3);
+    --shadow-medium: 0 5px 15px rgba(0,0,0,0.4);
+    --shadow-heavy: 0 15px 35px rgba(0,0,0,0.6);
+    --shadow-orange: 0 4px 12px rgba(79, 140, 255, 0.4);
+    --shadow-green: 0 4px 12px rgba(0, 230, 118, 0.4);
+    --shadow-pink: 0 4px 12px rgba(253, 121, 168, 0.4);
+    
+    /* 圓角設計 */
+    --radius-small: 15px;
+    --radius-medium: 20px;
+    --radius-large: 25px;
+    --radius-round: 50%;
+    
+    /* 動畫 */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+    
+    /* 字體系統 */
+    --font-family-main: 'Helvetica', 'Arial', 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+    --font-family-robot: 'Courier New', 'Monaco', monospace;
+    
+    /* 主題標識 */
+    --theme-name: "dark";
+}
+
+/* =====================================================
+   深色模式專用元素樣式覆蓋
+   ===================================================== */
+
+/* 基本樣式覆蓋 */
+[data-theme="dark"] body {
+    background: var(--background-primary) !important;
+    color: var(--text-primary) !important;
+    transition: all var(--transition-normal);
+    font-family: var(--font-family-main) !important;
+    min-height: 100vh !important;
+}
+
+[data-theme="dark"] html {
+    background: var(--background-primary) !important;
+}
+
+[data-theme="dark"] h1, 
+[data-theme="dark"] h2, 
+[data-theme="dark"] h3, 
+[data-theme="dark"] h4, 
+[data-theme="dark"] h5, 
+[data-theme="dark"] h6 {
+    color: var(--text-primary) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 遊戲容器 */
+[data-theme="dark"] #game-container {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border-radius: var(--radius-large) !important;
+    box-shadow: var(--shadow-medium) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    transition: all var(--transition-normal);
+}
+
+[data-theme="dark"] #menu-container {
+    background: var(--background-card) !important;
+    border: var(--border-thick) solid var(--border-light) !important;
+    box-shadow: var(--shadow-medium) !important;
+    border-radius: var(--radius-large) !important;
+}
+
+/* 設定及測驗畫面 */
+[data-theme="dark"] #setup-area {
+    background: var(--background-card) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] #game-container h1 {
+    background: var(--background-secondary) !important;
+    color: var(--text-primary) !important;
+    padding: 20px !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-medium) !important;
+    text-align: center !important;
+    margin-bottom: 25px !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .setup-section h2 {
+    color: var(--text-primary) !important;
+    background: var(--background-light) !important;
+    padding: 12px 15px !important;
+    border-radius: var(--radius-medium) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    box-shadow: var(--shadow-light) !important;
+    margin-bottom: 15px !important;
+}
+
+[data-theme="dark"] #category-selection, 
+[data-theme="dark"] #difficulty-selection, 
+[data-theme="dark"] #mode-selection,
+[data-theme="dark"] #pair-selection, 
+[data-theme="dark"] #main-category-selection, 
+[data-theme="dark"] #item-selection {
+    background: var(--background-light) !important;
+    padding: 20px !important;
+    border-radius: var(--radius-medium) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    box-shadow: var(--shadow-light) !important;
+}
+
+/* 按鈕系統 */
+[data-theme="dark"] .start-btn, 
+[data-theme="dark"] .btn, 
+[data-theme="dark"] .button, 
+[data-theme="dark"] .primary-btn {
+    background: linear-gradient(145deg, var(--primary-color), var(--primary-dark)) !important;
+    color: var(--text-inverse) !important;
+    border: var(--border-thick) solid var(--primary-dark) !important;
+    border-radius: var(--radius-medium) !important;
+    padding: 15px 30px !important;
+    font-weight: bold !important;
+    font-size: 1.1em !important;
+    box-shadow: var(--shadow-orange) !important;
+    transition: all var(--transition-fast) !important;
+    cursor: pointer !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    transform: translateY(0) !important;
+}
+
+[data-theme="dark"] .start-btn:hover, 
+[data-theme="dark"] .btn:hover, 
+[data-theme="dark"] .button:hover, 
+[data-theme="dark"] .primary-btn:hover {
+    background: linear-gradient(145deg, var(--primary-light), var(--primary-color)) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(79, 140, 255, 0.4) !important;
+}
+
+/* 選擇按鈕 - 深色模式 */
+[data-theme="dark"] .selection-btn, 
+[data-theme="dark"] .choice-btn {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-small) !important;
+    padding: 10px 25px !important;
+    transition: all var(--transition-normal) !important;
+    box-shadow: var(--shadow-light) !important;
+    font-weight: bold !important;
+    font-size: 1.1em !important;
+}
+
+/* 遊戲選項按鈕 - 深色模式 */
+[data-theme="dark"] .option-btn {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    padding: 20px !important;
+    transition: all var(--transition-normal) !important;
+    box-shadow: var(--shadow-light) !important;
+    font-weight: bold !important;
+    font-size: 2em !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 280px !important;
+    min-height: 140px !important;
+}
+
+[data-theme="dark"] .selection-btn:hover, 
+[data-theme="dark"] .choice-btn:hover, 
+[data-theme="dark"] .option-btn:hover {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-orange) !important;
+}
+
+[data-theme="dark"] .selection-btn.active, 
+[data-theme="dark"] .choice-btn.active, 
+[data-theme="dark"] .option-btn.active {
+    background: linear-gradient(145deg, var(--success-color), #4caf50) !important;
+    color: var(--text-inverse) !important;
+    border-color: var(--success-color) !important;
+    box-shadow: var(--shadow-green) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+/* 深色主題 - 返回主選單按鈕 */
+[data-theme="dark"] .back-to-menu-btn {
+    background: linear-gradient(135deg, var(--accent-color), #e84393) !important;
+    color: var(--text-inverse) !important;
+    border: 2px solid var(--accent-color) !important;
+    border-radius: var(--radius-large) !important;
+    padding: 12px 25px !important;
+    font-size: 1.1em !important;
+    font-weight: bold !important;
+    box-shadow: var(--shadow-pink) !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}
+
+[data-theme="dark"] .back-to-menu-btn:hover {
+    background: linear-gradient(135deg, #e84393, var(--accent-color)) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: 0 6px 15px rgba(253, 121, 168, 0.4) !important;
+}
+
+/* 深色主題 - 遊戲結束按鈕 */
+[data-theme="dark"] .play-again-btn,
+[data-theme="dark"] .main-menu-btn {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 15px 30px !important;
+    border: none !important;
+    border-radius: var(--radius-large) !important;
+    font-size: 1.1em !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+    min-width: 160px !important;
+    justify-content: center !important;
+}
+
+[data-theme="dark"] .play-again-btn {
+    background: linear-gradient(135deg, var(--success-color), #4caf50) !important;
+    color: var(--text-inverse) !important;
+    box-shadow: var(--shadow-green) !important;
+}
+
+[data-theme="dark"] .play-again-btn:hover {
+    background: linear-gradient(135deg, #4caf50, var(--success-color)) !important;
+    box-shadow: 0 6px 20px rgba(0, 230, 118, 0.6) !important;
+    transform: translateY(-2px) !important;
+}
+
+[data-theme="dark"] .main-menu-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-light)) !important;
+    color: var(--text-inverse) !important;
+    box-shadow: var(--shadow-orange) !important;
+}
+
+[data-theme="dark"] .main-menu-btn:hover {
+    background: linear-gradient(135deg, var(--primary-light), var(--primary-color)) !important;
+    box-shadow: 0 6px 20px rgba(79, 140, 255, 0.6) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* 面板和容器 */
+[data-theme="dark"] .game-panel, 
+[data-theme="dark"] .result-panel, 
+[data-theme="dark"] .settings-panel, 
+[data-theme="dark"] .question-panel,
+[data-theme="dark"] .info-panel, 
+[data-theme="dark"] .control-panel, 
+[data-theme="dark"] .status-panel,
+[data-theme="dark"] .content-box, 
+[data-theme="dark"] .info-box, 
+[data-theme="dark"] .message-box, 
+[data-theme="dark"] .alert-box,
+[data-theme="dark"] .quiz-container, 
+[data-theme="dark"] .test-container, 
+[data-theme="dark"] .exam-container {
+    background: var(--background-card) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 輸入框 */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    transition: all var(--transition-normal);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+    border-color: var(--primary-color) !important;
+    outline: none;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 8px rgba(79, 140, 255, 0.3) !important;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+    color: var(--text-muted);
+}
+
+/* 表格 */
+[data-theme="dark"] table {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+}
+
+[data-theme="dark"] th {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border-bottom: var(--border-thick) solid var(--border-color) !important;
+}
+
+[data-theme="dark"] td {
+    border-bottom: 1px solid var(--border-light) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 連結 */
+[data-theme="dark"] a {
+    color: var(--primary-color) !important;
+    transition: color var(--transition-fast);
+    text-decoration: none !important;
+}
+
+[data-theme="dark"] a:hover {
+    color: var(--primary-light) !important;
+    text-shadow: 0 1px 3px rgba(79, 140, 255, 0.3) !important;
+}
+
+/* 深色模式下的圖片調整 */
+[data-theme="dark"] img:not(.theme-img-preserve) {
+    filter: brightness(0.9) contrast(1.1);
+    transition: filter var(--transition-normal);
+}
+
+[data-theme="dark"] img:not(.theme-img-preserve):hover {
+    filter: brightness(1) contrast(1.2);
+}
+
+/* 深色模式下的滾動條 */
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 8px;
+    background-color: var(--background-secondary);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: var(--radius-small);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-color);
+}
+
+/* =====================================================
+   無障礙設計增強
+   ===================================================== */
+
+/* 高對比模式支援 */
+@media (prefers-contrast: high) {
+    [data-theme="dark"] {
+        --border-color: #ffffff;
+        --text-primary: #ffffff;
+        --text-secondary: #cccccc;
+    }
+}
+
+/* 深色主題 - 吸管工具樣式 */
+[data-theme="dark"] .color-picker-tool {
+    background: var(--info-color) !important;
+    color: var(--text-inverse) !important;
+    box-shadow: var(--shadow-light) !important;
+}
+
+[data-theme="dark"] .color-picker-tool:hover {
+    background: var(--primary-color) !important;
+    box-shadow: var(--shadow-orange) !important;
+}
+
+[data-theme="dark"] .color-picker-tool.active {
+    background: var(--accent-color) !important;
+}
+
+[data-theme="dark"] .color-info-display {
+    background: var(--background-light) !important;
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .color-code {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .color-sample {
+    border: 1px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .copy-color-btn {
+    background: var(--primary-color) !important;
+    color: var(--text-inverse) !important;
+}
+
+[data-theme="dark"] .copy-color-btn:hover {
+    background: var(--primary-light) !important;
+}
+
+[data-theme="dark"] .color-picker-highlight {
+    outline: 3px solid var(--accent-color) !important;
+}
+
+[data-theme="dark"] .color-picker-highlight::after {
+    background: rgba(253, 121, 168, 0.15) !important;
+}
+
+/* 減少動畫模式 */
+@media (prefers-reduced-motion: reduce) {
+    [data-theme="dark"] * {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    [data-theme="dark"] .color-picker-tool.active {
+        animation: none !important;
+    }
+}
+
+/* =====================================================
+   單元6深色模式專用樣式覆蓋
+   ===================================================== */
+
+/* 基本背景和容器 */
+[data-theme="dark"] .task-description,
+[data-theme="dark"] .unified-task-frame,
+[data-theme="dark"] .product-showcase,
+[data-theme="dark"] .product-selection-area,
+[data-theme="dark"] .payment-selection-area,
+[data-theme="dark"] .shopping-cart-area,
+[data-theme="dark"] .wallet-area,
+[data-theme="dark"] .wallet-area-bottom,
+[data-theme="dark"] .payment-area,
+[data-theme="dark"] .transaction-summary,
+[data-theme="dark"] .change-check-area,
+[data-theme="dark"] .question-result,
+[data-theme="dark"] .result-card {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+}
+
+/* 新布局專用樣式 */
+[data-theme="dark"] .target-item-display,
+[data-theme="dark"] .selected-item-display {
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-secondary) 100%) !important;
+    border: 2px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .item-name {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .item-price {
+    color: var(--warning-color) !important;
+}
+
+/* 選擇按鈕和互動元素 */
+[data-theme="dark"] .selection-btn {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .selection-btn.active {
+    background: var(--primary-color) !important;
+    color: var(--text-inverse) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* 金錢項目和互動物件 */
+[data-theme="dark"] .money-item,
+[data-theme="dark"] .change-money {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--success-color) !important;
+}
+
+/* 選中的商品項目 */
+[data-theme="dark"] .product-item.selected {
+    background: var(--background-secondary) !important;
+    border-color: var(--success-color) !important;
+}
+
+/* 購物車項目 */
+[data-theme="dark"] .cart-item {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 按鈕懸停狀態 */
+[data-theme="dark"] .selection-btn:hover:not(.disabled) {
+    background: var(--background-secondary) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* 禁用按鈕 */
+[data-theme="dark"] .selection-btn.disabled {
+    background: var(--background-light) !important;
+    color: var(--text-muted) !important;
+}
+
+/* 錢包內容區域漸層 */
+[data-theme="dark"] .wallet-content {
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-secondary) 100%) !important;
+    border: 2px solid var(--success-color) !important;
+}
+
+/* 找錢驗證背景 */
+[data-theme="dark"] .change-verification {
+    background: linear-gradient(135deg, var(--background-primary) 0%, var(--background-secondary) 100%) !important;
+}
+
+/* 次要按鈕 */
+[data-theme="dark"] .secondary-btn {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+}
+
+[data-theme="dark"] .secondary-btn:hover {
+    background: var(--background-secondary) !important;
+    border-color: var(--primary-color) !important;
+}
+
+/* 付款摘要區域 */
+[data-theme="dark"] .payment-summary {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 付款區域漸層 */
+[data-theme="dark"] .payment-zone {
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-secondary) 100%) !important;
+    border-color: var(--warning-color) !important;
+}
+
+[data-theme="dark"] .payment-zone.drag-over {
+    background: linear-gradient(135deg, var(--background-secondary) 0%, var(--warning-color) 100%) !important;
+    border-color: var(--warning-color) !important;
+}
+
+/* 商店找錢區域 */
+[data-theme="dark"] .store-change {
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-secondary) 100%) !important;
+    border-color: var(--warning-color) !important;
+}
+
+/* 成就訊息 */
+[data-theme="dark"] .achievement-message {
+    background: linear-gradient(135deg, var(--warning-color) 0%, var(--ai-gold-gradient) 100%) !important;
+    color: var(--text-inverse) !important;
+}
+
+/* 商店老闆對話框背景 */
+[data-theme="dark"] .store-keeper-speech::before {
+    background: var(--background-card) !important;
+}
+
+/* 提示消息 */
+[data-theme="dark"] .hint-message {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+    color: var(--text-inverse) !important;
+}
+
+/* 無障礙高對比模式邊框 */
+@media (prefers-contrast: high) {
+    [data-theme="dark"] .hint-message {
+        border: 2px solid var(--text-inverse) !important;
+    }
+}
+
+/* =====================================================
+   Unit1-Unit5遊戲頁面深色模式專用樣式
+   ===================================================== */
+
+/* 基本遊戲區域容器 */
+[data-theme="dark"] #question-area,
+[data-theme="dark"] #feedback-area,
+[data-theme="dark"] #options-area,
+[data-theme="dark"] #answer-area,
+[data-theme="dark"] #result-area,
+[data-theme="dark"] #game-area,
+[data-theme="dark"] #quiz-area,
+[data-theme="dark"] #test-area {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-medium) !important;
+    padding: 20px !important;
+    margin: 15px 0 !important;
+}
+
+/* 遊戲描述和任務區域 */
+[data-theme="dark"] .task-description,
+[data-theme="dark"] .question-description,
+[data-theme="dark"] .game-description {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+    padding: 20px !important;
+}
+
+/* 答案反饋區域 */
+[data-theme="dark"] .answer-feedback-area,
+[data-theme="dark"] .feedback-content,
+[data-theme="dark"] .result-feedback {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+}
+
+/* 商品選擇區域 */
+[data-theme="dark"] .product-selection-area,
+[data-theme="dark"] .options-container,
+[data-theme="dark"] .choices-container {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+    padding: 20px !important;
+}
+
+/* 遊戲統計和進度區域 */
+[data-theme="dark"] .game-stats,
+[data-theme="dark"] .progress-area,
+[data-theme="dark"] .score-area,
+[data-theme="dark"] .timer-area {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+    padding: 15px !important;
+}
+
+/* 數字輸入容器 (Unit5特有) */
+[data-theme="dark"] .number-input-container,
+[data-theme="dark"] .input-container,
+[data-theme="dark"] .calculator-container {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+/* 錢幣拖放區域 (Unit4, Unit5) */
+[data-theme="dark"] .money-drop-area,
+[data-theme="dark"] .drop-zone,
+[data-theme="dark"] .payment-zone,
+[data-theme="dark"] .money-container {
+    background: linear-gradient(135deg, var(--background-light) 0%, var(--background-secondary) 100%) !important;
+    border: 3px dashed var(--warning-color) !important;
+    border-radius: var(--radius-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+/* 錢幣項目 */
+[data-theme="dark"] .money-item,
+[data-theme="dark"] .coin-item,
+[data-theme="dark"] .bill-item {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--success-color) !important;
+    border-radius: var(--radius-small) !important;
+    box-shadow: var(--shadow-light) !important;
+}
+
+/* 商品項目 */
+[data-theme="dark"] .product-item,
+[data-theme="dark"] .item-card,
+[data-theme="dark"] .choice-item {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+    transition: all var(--transition-normal) !important;
+}
+
+[data-theme="dark"] .product-item:hover,
+[data-theme="dark"] .item-card:hover,
+[data-theme="dark"] .choice-item:hover {
+    background: var(--background-secondary) !important;
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-orange) !important;
+}
+
+[data-theme="dark"] .product-item.selected,
+[data-theme="dark"] .item-card.selected,
+[data-theme="dark"] .choice-item.selected {
+    background: linear-gradient(145deg, var(--success-color), #4caf50) !important;
+    color: var(--text-inverse) !important;
+    border-color: var(--success-color) !important;
+    box-shadow: var(--shadow-green) !important;
+}
+
+/* 彈出視窗和模態框 */
+[data-theme="dark"] .popup,
+[data-theme="dark"] .modal,
+[data-theme="dark"] .dialog,
+[data-theme="dark"] .number-input-popup {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-large) !important;
+    box-shadow: var(--shadow-heavy) !important;
+}
+
+/* 遊戲標題和標頭 */
+[data-theme="dark"] .game-title,
+[data-theme="dark"] .quiz-title,
+[data-theme="dark"] .unit-title {
+    background: var(--background-secondary) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-medium) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* 標題欄深色模式 */
+[data-theme="dark"] .title-bar {
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%) !important;
+    color: var(--text-primary) !important;
+    border-bottom: 2px solid var(--border-color) !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+[data-theme="dark"] .title-bar-left,
+[data-theme="dark"] .title-bar-center,
+[data-theme="dark"] .title-bar-right {
+    color: var(--text-primary) !important;
+}
+
+/* 遊戲內容區域 */
+[data-theme="dark"] .game-content,
+[data-theme="dark"] .quiz-content,
+[data-theme="dark"] .test-content {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+}
+
+/* 答案選項 */
+[data-theme="dark"] .answer-option,
+[data-theme="dark"] .quiz-option,
+[data-theme="dark"] .test-option {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-small) !important;
+    box-shadow: var(--shadow-light) !important;
+    transition: all var(--transition-normal) !important;
+}
+
+[data-theme="dark"] .answer-option:hover,
+[data-theme="dark"] .quiz-option:hover,
+[data-theme="dark"] .test-option:hover {
+    background: var(--background-secondary) !important;
+    border-color: var(--primary-color) !important;
+    transform: translateY(-2px) !important;
+    box-shadow: var(--shadow-orange) !important;
+}
+
+[data-theme="dark"] .answer-option.selected,
+[data-theme="dark"] .quiz-option.selected,
+[data-theme="dark"] .test-option.selected {
+    background: linear-gradient(145deg, var(--primary-color), var(--primary-dark)) !important;
+    color: var(--text-inverse) !important;
+    border-color: var(--primary-color) !important;
+    box-shadow: var(--shadow-orange) !important;
+}
+
+[data-theme="dark"] .answer-option.correct,
+[data-theme="dark"] .quiz-option.correct,
+[data-theme="dark"] .test-option.correct {
+    background: linear-gradient(145deg, var(--success-color), #4caf50) !important;
+    color: var(--text-inverse) !important;
+    border-color: var(--success-color) !important;
+    box-shadow: var(--shadow-green) !important;
+}
+
+[data-theme="dark"] .answer-option.incorrect,
+[data-theme="dark"] .quiz-option.incorrect,
+[data-theme="dark"] .test-option.incorrect {
+    background: linear-gradient(145deg, var(--error-color), #d32f2f) !important;
+    color: var(--text-inverse) !important;
+    border-color: var(--error-color) !important;
+    box-shadow: 0 4px 12px rgba(239, 83, 80, 0.4) !important;
+}
+
+/* 歡迎頁面區域 */
+[data-theme="dark"] .unit-welcome,
+[data-theme="dark"] .welcome-area,
+[data-theme="dark"] .intro-area {
+    background: var(--background-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .welcome-content,
+[data-theme="dark"] .intro-content {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-large) !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+/* 遊戲設定區域 */
+[data-theme="dark"] .game-settings,
+[data-theme="dark"] .quiz-settings,
+[data-theme="dark"] .test-settings {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: var(--border-thick) solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+}
+
+/* 設定群組 */
+[data-theme="dark"] .setting-group,
+[data-theme="dark"] .config-group,
+[data-theme="dark"] .option-group {
+    background: var(--background-light) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-light) !important;
+    padding: 20px !important;
+    margin: 15px 0 !important;
+}
+
+/* 按鈕群組 */
+[data-theme="dark"] .button-group,
+[data-theme="dark"] .btn-group,
+[data-theme="dark"] .action-group {
+    background: transparent !important;
+}
+
+/* 分母選擇區域 */
+[data-theme="dark"] .denomination-selection,
+[data-theme="dark"] .money-selection,
+[data-theme="dark"] .currency-selection {
+    background: var(--background-light) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    padding: 15px !important;
+}
+
+[data-theme="dark"] .denomination-group,
+[data-theme="dark"] .money-group,
+[data-theme="dark"] .currency-group {
+    background: var(--background-card) !important;
+    border: 1px solid var(--border-light) !important;
+    border-radius: var(--radius-small) !important;
+    padding: 10px !important;
+    margin: 10px 0 !important;
+}
+
+/* 確保所有通用遊戲元素在深色模式下正確顯示 */
+[data-theme="dark"] .game-wrapper,
+[data-theme="dark"] .quiz-wrapper,
+[data-theme="dark"] .test-wrapper,
+[data-theme="dark"] .unit-wrapper {
+    background: var(--background-primary) !important;
+    color: var(--text-primary) !important;
+    min-height: 100vh !important;
+}
+
+/* 價格顯示 */
+[data-theme="dark"] .price,
+[data-theme="dark"] .amount,
+[data-theme="dark"] .cost {
+    color: var(--warning-color) !important;
+    font-weight: bold !important;
+}
+
+/* 成功/錯誤訊息 */
+[data-theme="dark"] .success-message,
+[data-theme="dark"] .correct-message {
+    background: linear-gradient(135deg, var(--success-color), #4caf50) !important;
+    color: var(--text-inverse) !important;
+    border: 2px solid var(--success-color) !important;
+}
+
+[data-theme="dark"] .error-message,
+[data-theme="dark"] .incorrect-message {
+    background: linear-gradient(135deg, var(--error-color), #d32f2f) !important;
+    color: var(--text-inverse) !important;
+    border: 2px solid var(--error-color) !important;
+}
+
+[data-theme="dark"] .warning-message {
+    background: linear-gradient(135deg, var(--warning-color), #f57c00) !important;
+    color: var(--text-inverse) !important;
+    border: 2px solid var(--warning-color) !important;
+}
+
+[data-theme="dark"] .info-message {
+    background: linear-gradient(135deg, var(--info-color), #1976d2) !important;
+    color: var(--text-inverse) !important;
+    border: 2px solid var(--info-color) !important;
+}
+
+/* =====================================================
+   Unit-specific Section Container Rules
+   ===================================================== */
+
+/* 區域標題樣式 */
+[data-theme="dark"] .section-title {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    padding: 15px 25px !important;
+    box-shadow: var(--shadow-medium) !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Unit1 - 認識錢幣和紙鈔 */
+[data-theme="dark"] .target-item-display {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+/* Unit2-Unit3 - 計數和兌換 */
+[data-theme="dark"] .counting-area,
+[data-theme="dark"] .exchange-area,
+[data-theme="dark"] .calculation-area {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+/* Unit4 - 我的金錢區和兌換區 */
+[data-theme="dark"] .my-money-section,
+[data-theme="dark"] .exchange-section {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    padding: 20px !important;
+    margin: 15px !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+[data-theme="dark"] .money-source-container,
+[data-theme="dark"] .drop-zone-container {
+    background: var(--background-light) !important;
+    border: 2px dashed var(--border-color) !important;
+    border-radius: var(--radius-small) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Unit5 - 給足夠的錢 */
+[data-theme="dark"] .payment-section,
+[data-theme="dark"] .wallet-section,
+[data-theme="dark"] .money-display-section {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    padding: 20px !important;
+    margin: 15px !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+/* 通用容器類別 */
+[data-theme="dark"] .game-section,
+[data-theme="dark"] .quiz-section,
+[data-theme="dark"] .content-section {
+    background: var(--background-card) !important;
+    color: var(--text-primary) !important;
+    border: 2px solid var(--border-color) !important;
+    border-radius: var(--radius-medium) !important;
+    padding: 20px !important;
+    margin: 15px !important;
+    box-shadow: var(--shadow-medium) !important;
+}
+
+/* 確保所有 h2, h3 標題在深色模式下正確顯示 */
+[data-theme="dark"] .section-title h2,
+[data-theme="dark"] .section-title h3,
+[data-theme="dark"] .my-money-section h2,
+[data-theme="dark"] .exchange-section h2,
+[data-theme="dark"] .payment-section h2,
+[data-theme="dark"] .wallet-section h2 {
+    color: var(--text-primary) !important;
+    margin: 0 !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+}
