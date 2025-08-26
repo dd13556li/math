@@ -2343,7 +2343,6 @@ document.addEventListener('DOMContentLoaded', () => {
             Game.Debug.logGameFlow('簡單模式操作環境準備完成');
             
             // 【配置驅動】重新初始化觸控拖曳功能
-            const config = this.ModeConfig[difficulty];
             if (config.touchDragConfig?.enabled) {
                 setTimeout(() => {
                     this.TouchDragManager.cleanup();
@@ -2663,12 +2662,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 totalAvailable: totalItems 
             });
             
-            // 【配置驱动】重新初始化觸控拖曳功能
-            const config = this.ModeConfig[difficulty];
-            if (config.touchDragConfig?.enabled) {
+            // 【配置驅動】重新初始化觸控拖曳功能
+            const touchConfig = this.ModeConfig[difficulty];
+            if (touchConfig.touchDragConfig?.enabled) {
                 setTimeout(() => {
                     this.TouchDragManager.cleanup();
-                    this.TouchDragManager.init(difficulty, config);
+                    this.TouchDragManager.init(difficulty, touchConfig);
                     Game.Debug.logUI('普通模式觸控拖曳重新初始化完成');
                 }, 200);
             }
@@ -3002,11 +3001,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             
             // 【配置驅動】重新初始化觸控拖曳功能
-            const config = this.ModeConfig[difficulty];
-            if (config.touchDragConfig?.enabled) {
+            const touchConfig = this.ModeConfig[difficulty];
+            if (touchConfig.touchDragConfig?.enabled) {
                 setTimeout(() => {
                     this.TouchDragManager.cleanup();
-                    this.TouchDragManager.init(difficulty, config);
+                    this.TouchDragManager.init(difficulty, touchConfig);
                     Game.Debug.logUI('困難模式觸控拖曳重新初始化完成');
                 }, 200);
             }
