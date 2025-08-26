@@ -2382,10 +2382,24 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         setupTouchDrag() {
-            if (!window.TouchDragUtility) {
-                console.error('TouchDragUtility 不可用');
-                return;
+            this.waitForTouchDragUtility(() => {
+                this.setupTouchDragActual();
+            });
+        },
+
+        waitForTouchDragUtility(callback, attempts = 0) {
+            if (window.TouchDragUtility) {
+                callback();
+            } else if (attempts < 20) {
+                setTimeout(() => {
+                    this.waitForTouchDragUtility(callback, attempts + 1);
+                }, 50);
+            } else {
+                console.error('TouchDragUtility 載入超時');
             }
+        },
+
+        setupTouchDragActual() {
             
             console.log('🎯 開始設置觸控拖拽功能...');
             console.log('🎯 App元素:', this.elements.app);
@@ -2467,10 +2481,12 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         registerTouchDropZones() {
-            if (!window.TouchDragUtility) {
-                console.error('TouchDragUtility 不可用於註冊放置區域');
-                return;
-            }
+            this.waitForTouchDragUtility(() => {
+                this.registerTouchDropZonesActual();
+            });
+        },
+
+        registerTouchDropZonesActual() {
             
             console.log('🎯 開始註冊觸控放置區域...');
             
