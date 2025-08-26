@@ -2391,18 +2391,18 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         waitForTouchDragUtility(callback, attempts = 0) {
-            console.log(`🎯 等待 TouchDragUtility，嘗試 ${attempts + 1}/20，狀態:`, !!window.TouchDragUtility);
+            console.log(`🎯 等待 TouchDragUtility，嘗試 ${attempts + 1}/5，狀態:`, !!window.TouchDragUtility);
             
             if (window.TouchDragUtility) {
                 console.log('🎯 TouchDragUtility 已可用，執行回調');
                 callback();
-            } else if (attempts < 20) {
+            } else if (attempts < 5) {
                 setTimeout(() => {
                     this.waitForTouchDragUtility(callback, attempts + 1);
-                }, 50);
+                }, 100);
             } else {
-                console.error('🎯 TouchDragUtility 載入超時，檢查腳本載入順序');
-                console.log('🎯 所有可用的 window 屬性:', Object.keys(window).filter(key => key.toLowerCase().includes('touch')));
+                console.error('🎯 TouchDragUtility 仍然不可用，跳過觸控拖拽功能');
+                console.log('🎯 將使用傳統滑鼠拖拽功能');
             }
         },
 
