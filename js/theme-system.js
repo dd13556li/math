@@ -919,7 +919,7 @@ class ThemeSystem {
                 const utterance = new SpeechSynthesisUtterance();
                 utterance.text = `已切換至${this.themes[themeName].displayName}模式`;
                 utterance.lang = 'zh-TW';
-                utterance.rate = 0.8;
+                utterance.rate = 1.0; // 標準語速（與F1統一）
                 utterance.volume = 0.6;
                 
                 // 嘗試選擇最佳的中文語音
