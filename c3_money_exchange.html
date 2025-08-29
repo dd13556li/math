@@ -1,0 +1,1211 @@
+<!-- ================================================================= -->
+<!-- FILE: unit3.html (新檔案)                                       -->
+<!-- ================================================================= -->
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單元三：兌換金錢</title>
+    <!-- 簡化主題系統樣式 -->
+    <link rel="stylesheet" href="css/ai-theme.css">
+    <link rel="stylesheet" href="css/dark-theme.css">
+    <link rel="stylesheet" href="css/unit6.css">
+    <style>
+        /* 確保 script 標籤不會顯示 */
+        script {
+            display: none !important;
+        }
+        
+        /* 兌換目標金錢水平排列 */
+        .target-money-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* 統一結果容器自適應調整 - 置中靠攏布局 */
+        .unified-results-container {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center;
+            justify-content: center; /* 置中靠攏 */
+            gap: 8px; /* 適當間距保持緊湊 */
+            flex-wrap: wrap;
+            padding: 20px; /* 增加內間距 */
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            min-height: 180px; /* 增加最小高度適應新容器 */
+            max-width: 100%; /* 確保不超出容器 */
+            box-sizing: border-box;
+        }
+        
+        /* 我的金錢區自適應調整 - 優化flexbox布局 */
+        .my-money-area {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly; /* 平均分配空間 */
+            align-items: center;
+            gap: 10px; /* 增加容器間距 */
+            padding: 20px; /* 增加容器內間距 */
+            min-height: 180px; /* 增加最小高度適應新容器 */
+            max-width: 100%; /* 確保不超出容器 */
+            box-sizing: border-box;
+        }
+        
+        /* 兌換區自適應調整 - 優化flexbox布局 */
+        .exchange-area, .drop-zone {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-evenly; /* 平均分配空間 */
+            align-items: center;
+            gap: 12px; /* 增加容器間距避免重疊 */
+            padding: 20px; /* 增加容器內間距 */
+            min-height: 180px; /* 增加最小高度適應新容器 */
+            max-width: 100%; /* 確保不超出容器 */
+            box-sizing: border-box;
+        }
+        
+        /* 放置框對齊修正 - 優化紙鈔容器空間 */
+        .drop-zone, .exchange-drop-zone {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 180px; /* 增加高度適應紙鈔容器 */
+            min-width: 160px; /* 確保足夠寬度容納紙鈔容器 145px + 邊距 */
+            padding: 15px; /* 調整內間距 */
+            margin: 5px; /* 添加外間距避免重疊 */
+            box-sizing: border-box;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            flex-shrink: 0; /* 防止放置框被壓縮 */
+        }
+        
+        /* 放置框內的元素垂直居中 */
+        .drop-zone > *, 
+        .exchange-drop-zone > * {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        
+        /* Unit3 專用金錢圖示樣式 - 使用專用類名避免衝突 */
+        
+        /* Unit3 硬幣樣式 */
+        .unit3-coin {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            border-radius: 50%;
+            margin: 0; /* 移除邊距確保與金額數字對齊 */
+            display: block;
+            flex-shrink: 0; /* 防止圖示縮小 */
+        }
+        
+        /* Unit3 紙鈔樣式 - 參照unit6.css標準 120px×120px */
+        .unit3-banknote {
+            width: 120px;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 10px;
+            margin: 0; /* 移除邊距確保與金額數字對齊 */
+            display: block;
+            flex-shrink: 0; /* 防止圖示縮小 */
+        }
+        
+        /* Unit3 覆蓋 unit6.css 衝突 - 使用更高優先級 */
+        .money-item .unit3-banknote,
+        .exchange-money-item .unit3-banknote,
+        div .unit3-banknote {
+            width: 120px !important;
+            height: 120px !important;
+            max-width: 120px !important;
+            max-height: 120px !important;
+        }
+        
+        .money-item .unit3-coin,
+        .exchange-money-item .unit3-coin,
+        div .unit3-coin {
+            width: 80px !important;
+            height: 80px !important;
+            max-width: 80px !important;
+            max-height: 80px !important;
+        }
+        
+        /* Unit3 金錢價值標籤基本樣式 */
+        .money-value {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            font-size: 12px;
+            font-weight: bold;
+            color: #333;
+            background: transparent;
+            border: none;
+            border-radius: 0;
+            padding: 0;
+            margin: 8px 0 0 0; /* 增加上邊距，為圖示與數字間提供更多空間 */
+            text-align: center;
+            width: 100%; /* 確保金額數字占滿容器寬度以實現居中 */
+            z-index: 10;
+            position: relative;
+        }
+        
+        /* Unit3 激活效果 - 增強視覺反饋 */
+        .unit3-coin.target-active,
+        .unit3-banknote.target-active,
+        .target-active {
+            opacity: 1 !important;
+            transform: scale(1.05);
+            transition: all 0.5s ease-in-out;
+            filter: brightness(1.1);
+        }
+        
+        .unit3-coin.target-active:hover,
+        .unit3-banknote.target-active:hover,
+        .target-active:hover {
+            transform: scale(1.1);
+            filter: brightness(1.2);
+        }
+        
+        /* Unit3 專用容器樣式 - 解決紙鈔重疊問題 */
+        .unit3-coin-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            background: white;
+            cursor: grab;
+            transition: all 0.3s ease;
+            min-width: 90px; /* 適應硬幣寬度 80px + 邊距 */
+            min-height: 124px; /* 增加4px適應金額數字的額外間距 */
+            max-width: 95px; /* 限制最大寬度避免不必要的空間 */
+            position: relative;
+            flex-shrink: 0; /* 防止容器被壓縮 */
+            margin: 3px; /* 容器間基本間距 */
+        }
+        
+        .unit3-banknote-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: 2px solid #4CAF50;
+            border-radius: 12px;
+            background: white;
+            cursor: grab;
+            transition: all 0.3s ease;
+            min-width: 140px; /* 適應紙鈔寬度 120px + 邊距 */
+            min-height: 144px; /* 增加4px適應金額數字的額外間距 */
+            max-width: 145px; /* 限制最大寬度 */
+            position: relative;
+            flex-shrink: 0; /* 防止容器被壓縮 */
+            margin: 3px; /* 容器間基本間距 */
+        }
+        
+        /* Unit3 容器懸停效果 */
+        .unit3-coin-container:hover,
+        .unit3-coin-container:focus,
+        .unit3-banknote-container:hover,
+        .unit3-banknote-container:focus {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .unit3-coin-container:active,
+        .unit3-banknote-container:active {
+            transform: translateY(-1px);
+        }
+        
+        /* 兌換區域專用間距規則 - 解決紙鈔重疊 */
+        .exchange-drop-zone .unit3-banknote-container,
+        .drop-zone .unit3-banknote-container,
+        .exchange-area .unit3-banknote-container {
+            margin: 6px 8px !important; /* 增加兌換區域的紙鈔間距 */
+            min-width: 145px !important;
+            flex-shrink: 0 !important;
+        }
+        
+        .exchange-drop-zone .unit3-coin-container,
+        .drop-zone .unit3-coin-container,
+        .exchange-area .unit3-coin-container {
+            margin: 4px 6px !important; /* 適當增加硬幣間距 */
+            min-width: 92px !important;
+            flex-shrink: 0 !important;
+        }
+        
+        /* 兌換區域整體布局優化 */
+        .exchange-area {
+            min-width: 0; /* 允許flexbox正確計算寬度 */
+            overflow-x: auto; /* 如果內容過寬允許橫向滾動 */
+        }
+        
+        /* 🏆 最佳解決方案：外層Grid + 內層標準塊級元素 */
+        /* 放置框主容器 - 使用標準塊級元素 */
+        .drop-zone-area {
+            /* 移除 display: flex，讓它作為標準塊級容器 */
+            /* 高度將由內部內容自動決定 */
+        }
+
+        .flexible-zone {
+            /* 使用Grid系統精確控制寬度，避免初始變寬和閃爍 */
+            display: grid;
+            grid-template-columns: 1fr;
+            width: 100%;
+            min-height: 120px;
+            /* 高度由內容決定 */
+            overflow: visible;
+        }
+
+        /* 放置的金錢容器 - 內層使用Flexbox處理錢幣排列 */
+        .placed-coins-container {
+            /* 🎯 微觀佈局：專注於錢幣的水平排列和換行 */
+            display: flex;
+            flex-wrap: wrap; /* 錢幣先水平排列，寬度不足時自動換行 */
+            gap: 10px;
+            align-items: flex-start; /* 避免垂直居中導致的佈局變化 */
+            justify-content: flex-start; /* 錢幣從左側開始排列 */
+            padding: 10px;
+            /* 🏆 高度自適應核心設定 */
+            min-height: 0; /* 重要：避免Flexbox默認高度限制 */
+            height: auto; /* 高度完全由內容決定 */
+            /* 🛡️ 佈局穩定性保證 */
+            width: 100%; /* 確保寬度穩定 */
+            box-sizing: border-box; /* 包含padding在寬度計算內 */
+            /* 🎯 換行優化 */
+            align-content: flex-start; /* 多行內容從頂部開始排列 */
+        }
+
+        /* 🔧 拖曳狀態下保持佈局穩定性 */
+        .placed-coins-container.dragover {
+            /* 在dragover狀態下不改變尺寸 */
+            transform: none;
+            box-shadow: 0 2px 8px rgba(76, 175, 80, 0.3);
+            border: 2px dashed #4CAF50;
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+
+        /* 錢幣容器內的子元素穩定性 */
+        .placed-coins-container > * {
+            flex-shrink: 0; /* 防止錢幣被壓縮 */
+        }
+
+        /* 🎯 換行後高度自適應優化 */
+        /* 當錢幣數量較多需要換行時的動態高度調整 */
+        .placed-coins-container[data-rows="1"] {
+            min-height: 100px; /* 單行錢幣的基本高度 */
+        }
+
+        .placed-coins-container[data-rows="2"] {
+            min-height: 200px; /* 雙行錢幣的高度 */
+        }
+
+        .placed-coins-container[data-rows="3"] {
+            min-height: 300px; /* 三行錢幣的高度 */
+        }
+
+        /* 響應式錢幣間距調整 - 確保換行時不重疊 */
+        @media (max-width: 600px) {
+            .placed-coins-container {
+                gap: 8px; /* 小螢幕減少間距 */
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .placed-coins-container {
+                gap: 6px; /* 極小螢幕進一步減少間距 */
+                padding: 6px;
+            }
+        }
+        
+        /* 新兌換結果金錢動畫 */
+        .new-result-coin {
+            animation: newCoinAppear 0.8s ease-in-out;
+        }
+        
+        @keyframes newCoinAppear {
+            0% {
+                opacity: 0;
+                transform: scale(0.5) translateY(-20px);
+            }
+            50% {
+                opacity: 0.7;
+                transform: scale(1.1) translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        
+        /* 兌換區轉場動畫 - 簡單模式專用 */
+        .exchange-area-exit {
+            animation: exchangeAreaExit 0.4s ease-out forwards;
+            /* 動畫結束時保持隱藏狀態 - forwards已包含在上面 */
+        }
+        
+        .exchange-area-enter {
+            animation: exchangeAreaEnter 0.5s ease-in-out forwards;
+            animation-delay: 0.2s;
+            /* 動畫開始前保持隱藏狀態 */
+            opacity: 0;
+            transform: translateY(10px);
+            visibility: hidden;
+        }
+        
+        /* 兌換區隱藏狀態 - 高優先級確保隱藏 */
+        #game-area.exchange-area-hidden {
+            opacity: 0 !important;
+            transform: translateY(10px) !important;
+            visibility: hidden !important;
+            transition: none !important;
+        }
+        
+        @keyframes exchangeAreaExit {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+                visibility: visible;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(10px);
+                visibility: hidden;
+            }
+        }
+        
+        @keyframes exchangeAreaEnter {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+                visibility: hidden;
+            }
+            1% {
+                visibility: visible;
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+                visibility: visible;
+            }
+        }
+        
+        /* 拖放區域水平排列 - 增加間距避免紙鈔重疊 */
+        .drop-zones-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 18px; /* 增加間距適應紙鈔容器 145px */
+            flex-wrap: wrap;
+        }
+        
+        .exchange-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 25px; /* 增加間距避免紙鈔重疊 */
+            flex-wrap: wrap;
+        }
+        
+        .target-area {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 🏆 核心修正：drop-zone-area 使用標準塊級佈局 */
+        .drop-zone-area {
+            /* 移除 display: flex - 使用標準塊級元素 */
+            /* 讓高度由內部 .flexible-zone 和 .placed-coins-container 決定 */
+            width: 100%;
+            min-height: 0; /* 重要：不限制最小高度 */
+            /* 使用 Grid 系統精確控制佈局 */
+            display: grid;
+            grid-template-columns: 1fr;
+            align-items: stretch; /* 讓內部元素填滿可用空間 */
+        }
+        
+        /* 自適應容器大小 - 根據內容數量調整 */
+        .money-container-adaptive {
+            min-height: 150px;
+            max-height: none; /* 允許內容決定高度 */
+            overflow: visible; /* 確保內容不被裁切 */
+        }
+        
+        /* 當金錢數量較多時的自適應樣式 */
+        .money-area[data-count="high"] {
+            min-height: 200px;
+            gap: 6px;
+        }
+        
+        .money-area[data-count="medium"] {
+            min-height: 175px;
+            gap: 7px;
+        }
+        
+        .money-area[data-count="low"] {
+            min-height: 150px;
+            gap: 8px;
+        }
+        
+        /* 響應式調整 - 小螢幕優化兌換區間距 */
+        @media (max-width: 768px) {
+            .my-money-area, .exchange-area, .drop-zone, .exchange-drop-zone, .unified-results-container {
+                padding: 15px;
+                gap: 8px; /* 保持適當間距 */
+                min-height: 160px; /* 調整高度 */
+            }
+            
+            /* 調整兌換區域間距 */
+            .drop-zones-row {
+                gap: 12px; /* 小螢幕減少間距但保持不重疊 */
+            }
+            
+            .exchange-row {
+                gap: 15px; /* 小螢幕減少間距但保持不重疊 */
+            }
+            
+            .drop-zone, .exchange-drop-zone {
+                min-width: 130px; /* 小螢幕調整最小寬度 */
+                padding: 12px;
+                margin: 3px;
+            }
+            
+            .unit3-coin-container {
+                min-width: 80px;
+                min-height: 110px;
+                max-width: 85px;
+                padding: 6px;
+                margin: 2px;
+            }
+            
+            .unit3-banknote-container {
+                min-width: 120px; /* 小螢幕仍保持足夠寬度 */
+                min-height: 125px;
+                max-width: 125px;
+                padding: 6px;
+                margin: 2px;
+            }
+            
+            /* 兌換區域專用間距調整 */
+            .exchange-drop-zone .unit3-banknote-container,
+            .drop-zone .unit3-banknote-container {
+                margin: 4px 6px !important;
+                min-width: 125px !important;
+            }
+            
+            .unit3-coin {
+                width: 65px;
+                height: 65px;
+                margin: 2px 4px;
+            }
+            
+            .unit3-banknote {
+                width: 90px;
+                height: 90px;
+                margin: 2px 4px;
+            }
+        }
+        
+        /* 超小螢幕調整 - 優化兌換區間距 */
+        @media (max-width: 480px) {
+            .my-money-area, .exchange-area, .drop-zone, .exchange-drop-zone, .unified-results-container {
+                padding: 10px;
+                gap: 6px;
+                min-height: 140px;
+            }
+            
+            /* 超小螢幕兌換區域間距 */
+            .drop-zones-row {
+                gap: 8px; /* 進一步減少但保持不重疊 */
+            }
+            
+            .exchange-row {
+                gap: 12px;
+            }
+            
+            .drop-zone, .exchange-drop-zone {
+                min-width: 110px; /* 超小螢幕最小寬度 */
+                padding: 8px;
+                margin: 2px;
+            }
+            
+            .unit3-coin-container {
+                min-width: 70px;
+                min-height: 100px;
+                max-width: 75px;
+            }
+            
+            .unit3-banknote-container {
+                min-width: 100px; /* 超小螢幕仍保持合理寬度 */
+                min-height: 110px;
+                max-width: 105px;
+            }
+            
+            /* 超小螢幕兌換區域專用間距 */
+            .exchange-drop-zone .unit3-banknote-container,
+            .drop-zone .unit3-banknote-container {
+                margin: 2px 4px !important;
+                min-width: 105px !important;
+            }
+            
+            .unit3-coin {
+                width: 55px;
+                height: 55px;
+            }
+            
+            .unit3-banknote {
+                width: 75px;
+                height: 75px;
+            }
+        }
+        
+        /* 數量高亮顯示樣式 - 用於標題中的×個×元 */
+        .count-highlight {
+            color: #ff6b35;
+            font-weight: bold;
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #ffb74d;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+            display: inline-block;
+            margin: 0 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .count-highlight:hover {
+            background: linear-gradient(135deg, #ffe0b2, #ffcc02);
+            transform: scale(1.05);
+            box-shadow: 0 2px 4px rgba(255,107,53,0.3);
+        }
+        
+        /* =====================================================
+           Unit3 深色模式專用樣式 - 僅影響 unit3.html
+           ===================================================== */
+        
+        /* Unit3 測驗頁面主要區域 */
+        [data-theme="dark"] #app {
+            background: var(--background-primary) !important;
+            color: var(--text-primary) !important;
+            min-height: 100vh !important;
+        }
+        
+        [data-theme="dark"] #dynamic-game-container,
+        [data-theme="dark"] #game-container {
+            background: var(--background-card) !important;
+            color: var(--text-primary) !important;
+            border: var(--border-thick) solid var(--border-color) !important;
+            border-radius: var(--radius-large) !important;
+            box-shadow: var(--shadow-medium) !important;
+        }
+        
+        /* Unit3 標題和區域標頭 */
+        [data-theme="dark"] .unit3-easy-section-title,
+        [data-theme="dark"] .unit3-normal-section-title,
+        [data-theme="dark"] .unit3-hard-section-title {
+            background: var(--background-secondary) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+            box-shadow: var(--shadow-medium) !important;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
+        }
+        
+        /* Unit3 我的金錢區 */
+        [data-theme="dark"] .my-money-area {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+            border: 2px dashed var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+        }
+        
+        /* Unit3 兌換區 */
+        [data-theme="dark"] .exchange-area,
+        [data-theme="dark"] .drop-zone,
+        [data-theme="dark"] .exchange-drop-zone {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+            border: 2px dashed var(--warning-color) !important;
+            border-radius: var(--radius-medium) !important;
+        }
+        
+        [data-theme="dark"] .drop-zone.filled,
+        [data-theme="dark"] .exchange-drop-zone.filled {
+            background: var(--background-card) !important;
+            border-color: var(--success-color) !important;
+        }
+        
+        /* Unit3 兌換結果區 */
+        [data-theme="dark"] .unified-results-container {
+            background: var(--background-card) !important;
+            color: var(--text-primary) !important;
+            border: 2px dashed var(--success-color) !important;
+            border-radius: var(--radius-medium) !important;
+        }
+        
+        /* Unit3 金錢容器 */
+        [data-theme="dark"] .unit3-coin-container,
+        [data-theme="dark"] .unit3-banknote-container {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--success-color) !important;
+            border-radius: var(--radius-small) !important;
+            box-shadow: var(--shadow-light) !important;
+        }
+        
+        /* Unit3 金錢項目 - 覆蓋白色背景 */
+        [data-theme="dark"] .money-item {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--success-color) !important;
+        }
+        
+        [data-theme="dark"] .exchange-money-item {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Unit3 所有可能的白色背景覆蓋 */
+        [data-theme="dark"] .money-source-container {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+            border: 2px dashed var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] #exchange-results-area {
+            background: var(--background-card) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+        }
+        
+        [data-theme="dark"] .unit3-coin-container:hover,
+        [data-theme="dark"] .unit3-banknote-container:hover {
+            background: var(--background-secondary) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: var(--shadow-orange) !important;
+        }
+        
+        /* Unit3 金錢圖示和價值標籤 */
+        [data-theme="dark"] .money-value {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            color: var(--text-primary) !important;
+            background: var(--background-secondary) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: var(--radius-small) !important;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5) !important;
+            z-index: 15;
+        }
+        
+        /* Unit3 深色模式下確保淡化狀態的金額數字可見 */
+        [data-theme="dark"] .exchange-item.faded .money-value,
+        [data-theme="dark"] .money-item.faded .money-value,
+        [data-theme="dark"] .placeholder-money .faded + .money-value,
+        [data-theme="dark"] .target-money .faded + .money-value,
+        [data-theme="dark"] .placeholder-money .money-value,
+        [data-theme="dark"] .target-money .money-value {
+            opacity: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+            z-index: 15;
+        }
+        
+        /* Unit3 目標金錢顯示 */
+        [data-theme="dark"] .target-display,
+        [data-theme="dark"] .target-money-row {
+            background: var(--background-card) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+        }
+        
+        [data-theme="dark"] .target-display.active {
+            background: var(--background-secondary) !important;
+            border-color: var(--primary-color) !important;
+            box-shadow: var(--shadow-orange) !important;
+        }
+        
+        [data-theme="dark"] .target-display.faded {
+            background: var(--background-light) !important;
+            opacity: 0.4 !important;
+        }
+        
+        /* Unit3 按鈕樣式 */
+        [data-theme="dark"] .complete-exchange-btn,
+        [data-theme="dark"] .next-question-btn,
+        [data-theme="dark"] .return-money-btn {
+            background: linear-gradient(145deg, var(--primary-color), var(--primary-dark)) !important;
+            color: var(--text-inverse) !important;
+            border: 2px solid var(--primary-dark) !important;
+            border-radius: var(--radius-medium) !important;
+            box-shadow: var(--shadow-orange) !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+        }
+        
+        [data-theme="dark"] .complete-exchange-btn:hover,
+        [data-theme="dark"] .next-question-btn:hover,
+        [data-theme="dark"] .return-money-btn:hover {
+            background: linear-gradient(145deg, var(--primary-light), var(--primary-color)) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 15px rgba(79, 140, 255, 0.4) !important;
+        }
+        
+        /* Unit3 拖放提示 */
+        [data-theme="dark"] .transparent-drop-hint {
+            color: var(--text-secondary) !important;
+            background: transparent !important;
+        }
+        
+        [data-theme="dark"] .drop-zone:hover .transparent-drop-hint,
+        [data-theme="dark"] .exchange-drop-zone:hover .transparent-drop-hint {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Unit3 放置容器 */
+        [data-theme="dark"] .placed-coins-container {
+            background: transparent !important;
+        }
+        
+        /* Unit3 進度和狀態顯示 */
+        [data-theme="dark"] .progress-display,
+        [data-theme="dark"] .status-display,
+        [data-theme="dark"] .score-display {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+            box-shadow: var(--shadow-light) !important;
+        }
+        
+        /* Unit3 數量高亮顯示保持原有橘色 */
+        [data-theme="dark"] .count-highlight {
+            color: #ff6b35 !important;
+            background: linear-gradient(135deg, var(--background-secondary), var(--background-light)) !important;
+            border: 1px solid var(--border-color) !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+        }
+        
+        [data-theme="dark"] .count-highlight:hover {
+            background: linear-gradient(135deg, var(--background-light), var(--background-card)) !important;
+            box-shadow: 0 2px 4px rgba(255,107,53,0.3) !important;
+        }
+        
+        /* Unit3 深色模式下的點擊選擇樣式 */
+        [data-theme="dark"] .money-item.selected-item,
+        [data-theme="dark"] .unit3-coin-container.selected-item,
+        [data-theme="dark"] .unit3-banknote-container.selected-item {
+            border: 3px solid var(--success-color) !important;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6) !important;
+            transform: scale(1.05) !important;
+            z-index: 10 !important;
+            background: rgba(76, 175, 80, 0.15) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        /* Unit3 結果佔位符 */
+        [data-theme="dark"] .results-placeholder {
+            color: var(--text-secondary) !important;
+            background: transparent !important;
+        }
+        
+        /* Unit3 動畫元素 */
+        [data-theme="dark"] .new-result-coin {
+            border-color: var(--success-color) !important;
+        }
+        
+        /* Unit3 難度指示器 */
+        [data-theme="dark"] .difficulty-indicator {
+            background: var(--background-light) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-small) !important;
+        }
+        
+        /* Unit3 遊戲統計 */
+        [data-theme="dark"] .game-stats,
+        [data-theme="dark"] .quiz-progress {
+            background: var(--background-card) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+            box-shadow: var(--shadow-light) !important;
+        }
+        
+        /* Unit3 額外的白色背景覆蓋 - 更全面的深色模式 */
+        [data-theme="dark"] .setup-section,
+        [data-theme="dark"] .game-section,
+        [data-theme="dark"] .question-section,
+        [data-theme="dark"] .answer-section {
+            background: var(--background-card) !important;
+            color: var(--text-primary) !important;
+            border: 2px solid var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+        }
+        
+        /* Unit3 通用容器深色覆蓋 */
+        [data-theme="dark"] div[class*="area"],
+        [data-theme="dark"] div[class*="container"]:not(.unit3-coin-container):not(.unit3-banknote-container),
+        [data-theme="dark"] div[class*="section"] {
+            background: var(--background-card) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Unit3 確保所有白色背景被覆蓋 */
+        [data-theme="dark"] * {
+            background-color: inherit !important;
+        }
+        
+        /* Unit3 重新設定關鍵容器背景 */
+        [data-theme="dark"] #app,
+        [data-theme="dark"] #dynamic-game-container,
+        [data-theme="dark"] .my-money-area,
+        [data-theme="dark"] .exchange-area,
+        [data-theme="dark"] .unified-results-container,
+        [data-theme="dark"] .unit3-coin-container,
+        [data-theme="dark"] .unit3-banknote-container {
+            background: var(--background-light) !important;
+        }
+        
+        [data-theme="dark"] #app {
+            background: var(--background-primary) !important;
+        }
+        
+        [data-theme="dark"] #dynamic-game-container {
+            background: var(--background-card) !important;
+        }
+        
+        /* Unit3 更強力的白色背景消除規則 */
+        [data-theme="dark"] div:not([style*="background"]) {
+            background-color: transparent !important;
+        }
+        
+        /* Unit3 確保關鍵區域有正確的深色背景 */
+        [data-theme="dark"] .my-money-area,
+        [data-theme="dark"] .money-source-container {
+            background: linear-gradient(135deg, var(--background-light), var(--background-secondary)) !important;
+            color: var(--text-primary) !important;
+            border: 2px dashed var(--border-color) !important;
+            border-radius: var(--radius-medium) !important;
+            box-shadow: var(--shadow-light) !important;
+        }
+        
+        [data-theme="dark"] .exchange-area,
+        [data-theme="dark"] .drop-zone,
+        [data-theme="dark"] .exchange-drop-zone {
+            background: linear-gradient(135deg, var(--background-light), var(--background-card)) !important;
+            color: var(--text-primary) !important;
+            border: 2px dashed var(--warning-color) !important;
+            border-radius: var(--radius-medium) !important;
+            box-shadow: var(--shadow-light) !important;
+        }
+        
+        [data-theme="dark"] .unified-results-container,
+        [data-theme="dark"] #exchange-results-area {
+            background: linear-gradient(135deg, var(--background-card), var(--background-light)) !important;
+            color: var(--text-primary) !important;
+            border: 2px dashed var(--success-color) !important;
+            border-radius: var(--radius-medium) !important;
+            box-shadow: var(--shadow-light) !important;
+        }
+        
+        /* Unit3 覆蓋任何可能的白色背景 */
+        [data-theme="dark"] .placeholder-money,
+        [data-theme="dark"] .target-money,
+        [data-theme="dark"] .exchange-item,
+        [data-theme="dark"] .placed-coins-container {
+            background: transparent !important;
+        }
+        
+        /* Unit3 更徹底的白色背景消除 - 針對容器元素 */
+        [data-theme="dark"] div:not(.unit3-coin):not(.unit3-banknote):not(img) {
+            background-color: inherit !important;
+        }
+        
+        /* Unit3 重新定義關鍵容器的背景 */
+        [data-theme="dark"] body,
+        [data-theme="dark"] html {
+            background: var(--background-primary) !important;
+        }
+        
+        [data-theme="dark"] #app {
+            background: var(--background-primary) !important;
+        }
+        
+        [data-theme="dark"] #dynamic-game-container {
+            background: var(--background-card) !important;
+        }
+        
+        [data-theme="dark"] .my-money-area,
+        [data-theme="dark"] .money-source-container {
+            background: linear-gradient(135deg, var(--background-light), var(--background-secondary)) !important;
+        }
+        
+        [data-theme="dark"] .exchange-area,
+        [data-theme="dark"] .drop-zone,
+        [data-theme="dark"] .exchange-drop-zone {
+            background: linear-gradient(135deg, var(--background-light), var(--background-card)) !important;
+        }
+        
+        [data-theme="dark"] .unified-results-container,
+        [data-theme="dark"] #exchange-results-area {
+            background: linear-gradient(135deg, var(--background-card), var(--background-light)) !important;
+        }
+        
+        /* Unit3 透明背景的元素 */
+        [data-theme="dark"] .placeholder-money,
+        [data-theme="dark"] .target-money,
+        [data-theme="dark"] .exchange-item,
+        [data-theme="dark"] .placed-coins-container,
+        [data-theme="dark"] img {
+            background: transparent !important;
+        }
+        
+        /* Unit3 確保 placeholder-money 在深色模式下正確顯示 */
+        [data-theme="dark"] .placeholder-money {
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            visibility: visible !important;
+        }
+        
+        [data-theme="dark"] .placeholder-money img {
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* Unit3 深色模式下的激活效果 */
+        [data-theme="dark"] .unit3-coin.target-active,
+        [data-theme="dark"] .unit3-banknote.target-active,
+        [data-theme="dark"] .target-active {
+            opacity: 1 !important;
+            transform: scale(1.05);
+            transition: all 0.5s ease-in-out;
+            filter: brightness(1.2);
+        }
+        
+        [data-theme="dark"] .faded .unit3-coin,
+        [data-theme="dark"] .faded .unit3-banknote {
+            opacity: 0.4 !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* Unit3 確保兌換區的淡化圖示正確顯示 */
+        [data-theme="dark"] .exchange-item.faded,
+        [data-theme="dark"] .exchange-item.faded img,
+        [data-theme="dark"] .money-item.faded,
+        [data-theme="dark"] .money-item.faded img,
+        [data-theme="dark"] .placeholder-money .faded,
+        [data-theme="dark"] .placeholder-money .faded img,
+        [data-theme="dark"] .target-money .faded,
+        [data-theme="dark"] .target-money .faded img {
+            opacity: 0.4 !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* Unit3 基本淡化圖示樣式（非深色模式） */
+        .exchange-item.faded,
+        .exchange-item.faded img,
+        .money-item.faded,
+        .money-item.faded img,
+        .placeholder-money .faded,
+        .placeholder-money .faded img,
+        .target-money .faded,
+        .target-money .faded img {
+            opacity: 0.4 !important;
+            display: block !important;
+            visibility: visible !important;
+        }
+        
+        /* 🔧 [新增] 點擊放置功能樣式 */
+        .money-item.selected-item,
+        .unit3-coin-container.selected-item,
+        .unit3-banknote-container.selected-item {
+            border: 3px solid #4CAF50 !important;
+            box-shadow: 0 0 15px rgba(76, 175, 80, 0.6) !important;
+            transform: scale(1.05) !important;
+            z-index: 10 !important;
+            background: rgba(76, 175, 80, 0.1) !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .money-item,
+        .unit3-coin-container,
+        .unit3-banknote-container {
+            cursor: pointer !important;
+            transition: all 0.2s ease;
+        }
+        
+        .money-item:hover,
+        .unit3-coin-container:hover,
+        .unit3-banknote-container:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+        }
+        
+        /* 確保圖片不會干擾點擊事件 */
+        .unit3-coin,
+        .unit3-banknote {
+            pointer-events: none !important;
+            user-select: none !important;
+        }
+        
+        /* Unit3 確保淡化狀態下金額數字仍然可見且清晰 */
+        .exchange-item.faded .money-value,
+        .money-item.faded .money-value,
+        .placeholder-money .faded + .money-value,
+        .target-money .faded + .money-value,
+        .placeholder-money .money-value,
+        .target-money .money-value {
+            opacity: 1 !important;
+            display: block !important;
+            visibility: visible !important;
+            z-index: 15;
+        }
+    </style>
+</head>
+<body>
+    <!-- 遊戲容器 -->
+    <div id="app">
+        <!-- 內容將由 c3_money_exchange.js 動態產生 -->
+    </div>
+
+    <!-- 音效 -->
+    <audio id="correct-sound" src="audio/correct02.mp3" preload="auto"></audio>
+    <audio id="success-sound" src="audio/success.mp3" preload="auto"></audio>
+    <audio id="error-sound" src="audio/error.mp3" preload="auto"></audio>
+    <audio id="select-sound" src="audio/select.mp3" preload="auto"></audio>
+    <audio id="click-sound" src="audio/click.mp3" preload="auto"></audio>
+
+    <!-- 第三方函式庫：慶祝動畫 -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <!-- 主題系統腳本 -->
+    <script src="js/audio-unlocker.js"></script>
+    <script src="js/theme-system.js"></script>
+    <script src="js/touch-drag-utility.js?v=2.1"></script>
+
+    <!-- 載入單元三專屬的 JavaScript -->
+    <script src="js/c3_money_exchange.js?v=2.1"></script>
+
+    <!-- 手機端除錯工具 -->
+    <script>
+        // 創建視覺化除錯面板
+        function createMobileDebugPanel() {
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'mobile-debug-panel';
+            debugPanel.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                width: 300px;
+                max-height: 200px;
+                background: rgba(0,0,0,0.8);
+                color: #00ff00;
+                font-family: monospace;
+                font-size: 12px;
+                padding: 10px;
+                border-radius: 5px;
+                z-index: 10000;
+                overflow-y: auto;
+                display: none;
+            `;
+            document.body.appendChild(debugPanel);
+            
+            // 添加顯示/隱藏按鈕
+            const toggleBtn = document.createElement('button');
+            toggleBtn.innerHTML = '🐛';
+            toggleBtn.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                background: #ff4444;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                z-index: 10001;
+                cursor: pointer;
+            `;
+            toggleBtn.onclick = () => {
+                debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+            };
+            document.body.appendChild(toggleBtn);
+            
+            return debugPanel;
+        }
+        
+        // 自定義console.log函數
+        let debugPanel;
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function mobileLog(level, ...args) {
+            // 保持原有功能
+            if (level === 'error') {
+                originalError.apply(console, args);
+            } else {
+                originalLog.apply(console, args);
+            }
+            
+            // 添加到視覺化面板
+            if (!debugPanel) {
+                debugPanel = createMobileDebugPanel();
+            }
+            
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const logEntry = document.createElement('div');
+            logEntry.style.color = level === 'error' ? '#ff4444' : '#00ff00';
+            logEntry.style.marginBottom = '2px';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            debugPanel.appendChild(logEntry);
+            debugPanel.scrollTop = debugPanel.scrollHeight;
+        }
+        
+        // 重寫console方法
+        console.log = (...args) => mobileLog('log', ...args);
+        console.error = (...args) => mobileLog('error', ...args);
+        
+        // 全域錯誤捕獲
+        window.addEventListener('error', function(event) {
+            console.error('[C3-全域錯誤]', {
+                message: event.message,
+                filename: event.filename,
+                line: event.lineno,
+                column: event.colno,
+                error: event.error?.toString()
+            });
+        });
+        
+        // Promise 錯誤捕獲
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('[C3-Promise錯誤]', event.reason);
+        });
+        
+        // 測試console是否正常工作
+        console.log('[C3-除錯] 視覺化除錯系統已啟動');
+    </script>
+
+</body>
+</html>
