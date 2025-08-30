@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>單元F4：數字排序</title>
+    <link rel="stylesheet" href="css/ai-theme.css">
+    <link rel="stylesheet" href="css/unit6.css">
+    <link rel="stylesheet" href="css/f4-number-sorting.css">
+    <style>
+        /* Prevents script tags from being displayed */
+        script {
+            display: none !important;
+        }
+
+        /* 【修正版】徹底禁用行動裝置上的下拉重新整理功能
+           同時針對 html, body, 和 #app 容器進行設置，確保完全覆蓋 */
+        html, body, #app {
+            overscroll-behavior-y: contain;
+        }
+
+        /* * [修正] 
+         * 讓遊戲主容器（大白框）的高度自動適應內容，避免底下出現過多空白。
+         * 這裡使用 '#app > :first-child' 作為選擇器，
+         * 來選取由 JavaScript 渲染到 #app 裡的第一個子元素，也就是主容器。
+         * 使用 !important 確保此樣式能覆蓋外部 CSS 檔案的設定。
+         */
+        #app > :first-child {
+            height: auto !important;
+            min-height: unset !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        </div>
+
+    <audio id="correct-sound" src="audio/correct.mp3" preload="auto"></audio>
+    <audio id="success-sound" src="audio/success.mp3" preload="auto"></audio>
+    <audio id="error-sound" src="audio/error.mp3" preload="auto"></audio>
+    <audio id="select-sound" src="audio/select.mp3" preload="auto"></audio>
+    <audio id="menu-select-sound" src="audio/menu-select.mp3" preload="auto"></audio>
+    <audio id="click-sound" src="audio/click.mp3" preload="auto"></audio>
+
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+
+    <script src="js/audio-unlocker.js"></script>
+    <script src="js/theme-system.js"></script>
+    
+    <!-- Inline TouchDragUtility fallback -->
+    <script>
+        if (!window.TouchDragUtility) {
+            console.log('🎯 創建內嵌 TouchDragUtility');
+            
+            class TouchDragUtility {
+                constructor() {
+                    this.dropZones = new Map();
+                    this.dragStartHandlers = new Map();
+                    this.dropHandlers = new Map();
+                    this.touchState = {
+                        isDragging: false,
+                        element: null,
+                        startX: 0,
+                        startY: 0
+                    };
+                    
+                    document.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
+                    document.addEventListener('touchmove', this.handleTouchMove.bind(this), { passive: false });
+                    document.addEventListener('touchend', this.handleTouchEnd.bind(this), { passive: false });
+                    
+                    console.log('🎯 內嵌 TouchDragUtility 初始化完成');
+                }
+                
+                registerDraggable(container, selector, handlers) {
+                    const containerId = this.getElementId(container);
+                    this.dragStartHandlers.set(containerId, {
+                        container,
+                        selector,
+                        handler: handlers.onDragStart || (() => {})
+                    });
+                    this.dropHandlers.set(containerId, handlers.onDrop || (() => {}));
+                    console.log('🎯 註冊拖拽元素:', selector);
+                }
+                
+                registerDropZone(element, validator) {
+                    const id = this.getElementId(element);
+                    this.dropZones.set(id, { element, validator });
+                    console.log('🎯 註冊放置區域:', element.className);
+                }
+                
+                getElementId(element) {
+                    if (!element.dataset.touchDragId) {
+                        element.dataset.touchDragId = 'td_' + Math.random().toString(36).substr(2, 9);
+                    }
+                    return element.dataset.touchDragId;
+                }
+                
+                handleTouchStart(event) {
+                    const draggableInfo = this.findDraggableElement(event.target);
+                    if (!draggableInfo) return;
+                    
+                    const { element, containerId } = draggableInfo;
+                    const dragStartInfo = this.dragStartHandlers.get(containerId);
+                    
+                    event.preventDefault();
+                    
+                    const result = dragStartInfo.handler(element, event);
+                    if (result === false) return;
+                    
+                    const touch = event.touches[0];
+                    this.touchState = {
+                        isDragging: true,
+                        element: element,
+                        containerId: containerId,
+                        startX: touch.clientX,
+                        startY: touch.clientY
+                    };
+                    
+                    element.style.opacity = '0.5';
+                    console.log('🎯 觸控拖拽開始:', element.textContent);
+                }
+                
+                handleTouchMove(event) {
+                    if (!this.touchState.isDragging) return;
+                    event.preventDefault();
+                }
+                
+                handleTouchEnd(event) {
+                    if (!this.touchState.isDragging) return;
+                    
+                    event.preventDefault();
+                    
+                    const touch = event.changedTouches[0];
+                    const dropZone = this.findDropZoneAt(touch.clientX, touch.clientY);
+                    
+                    if (dropZone && this.touchState.containerId) {
+                        const dropHandler = this.dropHandlers.get(this.touchState.containerId);
+                        if (dropHandler) {
+                            dropHandler(this.touchState.element, dropZone, event);
+                        }
+                    }
+                    
+                    if (this.touchState.element) {
+                        this.touchState.element.style.opacity = '1';
+                    }
+                    
+                    this.touchState = { isDragging: false, element: null };
+                    console.log('🎯 觸控拖拽結束');
+                }
+                
+                findDraggableElement(target) {
+                    for (const [containerId, info] of this.dragStartHandlers) {
+                        const { container, selector } = info;
+                        if (container.contains(target)) {
+                            const draggableElement = target.closest(selector);
+                            if (draggableElement && container.contains(draggableElement)) {
+                                return { element: draggableElement, containerId };
+                            }
+                        }
+                    }
+                    return null;
+                }
+                
+                findDropZoneAt(x, y) {
+                    const elementAt = document.elementFromPoint(x, y);
+                    if (!elementAt) return null;
+                    
+                    for (const [id, info] of this.dropZones) {
+                        const { element, validator } = info;
+                        if (element === elementAt || element.contains(elementAt)) {
+                            if (validator(this.touchState.element, element)) {
+                                return element;
+                            }
+                        }
+                    }
+                    return null;
+                }
+            }
+            
+            window.TouchDragUtility = new TouchDragUtility();
+            console.log('🎯 內嵌 TouchDragUtility 已設置到 window 對象');
+        }
+    </script>
+    
+    <script src="js/touch-drag-utility.js?v=2.1"></script>
+
+    <script src="js/f4_number_sorting.js?v=2.2"></script>
+
+    <!-- 手機端除錯工具 -->
+    <script>
+        // 創建視覺化除錯面板
+        function createMobileDebugPanel() {
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'mobile-debug-panel';
+            debugPanel.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                width: 300px;
+                max-height: 200px;
+                background: rgba(0,0,0,0.8);
+                color: #00ff00;
+                font-family: monospace;
+                font-size: 12px;
+                padding: 10px;
+                border-radius: 5px;
+                z-index: 10000;
+                overflow-y: auto;
+                display: none;
+            `;
+            document.body.appendChild(debugPanel);
+            
+            // 添加顯示/隱藏按鈕
+            const toggleBtn = document.createElement('button');
+            toggleBtn.innerHTML = '🐛';
+            toggleBtn.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                background: #ff4444;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 16px;
+                z-index: 10001;
+                cursor: pointer;
+            `;
+            toggleBtn.onclick = () => {
+                debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+            };
+            document.body.appendChild(toggleBtn);
+            
+            return debugPanel;
+        }
+        
+        // 自定義console.log函數
+        let debugPanel;
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function mobileLog(level, ...args) {
+            // 保持原有功能
+            if (level === 'error') {
+                originalError.apply(console, args);
+            } else {
+                originalLog.apply(console, args);
+            }
+            
+            // 添加到視覺化面板
+            if (!debugPanel) {
+                debugPanel = createMobileDebugPanel();
+            }
+            
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            const logEntry = document.createElement('div');
+            logEntry.style.color = level === 'error' ? '#ff4444' : '#00ff00';
+            logEntry.style.marginBottom = '2px';
+            logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            debugPanel.appendChild(logEntry);
+            debugPanel.scrollTop = debugPanel.scrollHeight;
+        }
+        
+        // 重寫console方法
+        console.log = (...args) => mobileLog('log', ...args);
+        console.error = (...args) => mobileLog('error', ...args);
+        
+        // 全域錯誤捕獲
+        window.addEventListener('error', function(event) {
+            console.error('[F4-全域錯誤]', {
+                message: event.message,
+                filename: event.filename,
+                line: event.lineno,
+                column: event.colno,
+                error: event.error?.toString()
+            });
+        });
+        
+        // Promise 錯誤捕獲
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('[F4-Promise錯誤]', event.reason);
+        });
+        
+        // 測試console是否正常工作
+        console.log('[F4-除錯] 視覺化除錯系統已啟動');
+    </script>
+
+</body>
+</html>
