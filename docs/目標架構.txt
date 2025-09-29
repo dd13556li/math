@@ -1,0 +1,130 @@
+ 🏗️ 理想的完全獨立架構：
+
+  📁 目標檔案結構：
+
+  money_tutor/
+  ├── 📁 shared/ (僅共用核心功能)
+  │   ├── theme-system.js      (主題切換)
+  │   ├── audio-unlocker.js    (音訊解鎖)
+  │   └── variables.css        (基礎CSS變數)
+  ├── 📁 units/ (每個單元完全獨立)
+  │   ├── 📁 f5/
+  │   │   ├── f5_quantity_comparison.html
+  │   │   ├── f5_quantity_comparison.js
+  │   │   └── f5_quantity_comparison.css
+  │   ├── 📁 f3/
+  │   │   ├── f3_number_recognition.html
+  │   │   ├── f3_number_recognition.js
+  │   │   └── f3_number_recognition.css
+  │   └── 📁 c1/
+  │       ├── c1_money_types.html
+  │       ├── c1_money_types.js
+  │       └── c1_money_types.css
+  └── index.html (主選單)
+
+● 🎯 完全獨立架構的核心原則：
+
+  ✅ 1. 零依賴原則：
+
+  <!-- 每個單元HTML只引用自己的檔案 -->
+  <!DOCTYPE html>
+  <head>
+      <link rel="stylesheet" href="../shared/variables.css">
+      <link rel="stylesheet" href="f5_quantity_comparison.css">
+      <script src="../shared/theme-system.js"></script>
+      <script src="f5_quantity_comparison.js"></script>
+  </head>
+
+  ✅ 2. 自包含原則：
+
+  - CSS完全獨立：每個單元的CSS包含所有需要的樣式
+  - JS完全獨立：每個單元的JS包含所有業務邏輯
+  - 資源完全獨立：音效、圖片等資源按單元組織
+
+  ✅ 3. 介面標準化：
+
+  // 每個單元統一的介面規範
+  window.UnitInterface = {
+      init() { /* 初始化 */ },
+      start() { /* 開始遊戲 */ },
+      pause() { /* 暫停 */ },
+      reset() { /* 重置 */ },
+      getProgress() { /* 獲取進度 */ }
+  };
+
+  🏆 最佳實踐架構：
+
+● 🥇 選項A：激進重構（理論最佳）
+
+  money_tutor/
+  ├── shared/ (最小共用)
+  │   └── variables.css (僅CSS變數)
+  └── units/
+      ├── f5/ (完全自包含)
+      ├── f3/ (完全自包含)
+      └── c1/ (完全自包含)
+  優點：完全獨立，零干擾
+  風險：需要大量重構，可能破壞現有功能
+
+  🥈 選項B：漸進改善（平衡方案）
+
+  money_tutor/
+  ├── shared/
+  │   ├── theme-system.js
+  │   ├── audio-unlocker.js
+  │   └── base.css (基礎樣式)
+  ├── f5_quantity_comparison.html
+  ├── js/f5_quantity_comparison.js
+  └── css/f5_quantity_comparison.css
+  優點：保持穩定，逐步獨立
+  風險：仍有少量依賴
+
+  🥉 選項C：現狀改進（安全方案）
+
+  目前結構 + 清理重複依賴
+  每個單元：HTML + 專用JS + 專用CSS
+  共用：ai-theme.css + unit6.css + 3個共用JS
+  優點：風險最低，功能穩定
+  風險：維護性提升有限
+
+  📋 實施建議（按優先級）：
+
+● 🚀 第一階段：繼續當前方法
+
+  - ✅ 每個單元CSS完全獨立（如F5已完成）
+  - ✅ 移除JS中的CSS代碼
+  - ✅ 清理不必要的檔案引用
+
+  🚀 第二階段：共用檔案最小化
+
+  - 🎯 將unit6.css的必要樣式分發到各單元
+  - 🎯 創建minimal-shared.css（僅基礎變數）
+  - 🎯 評估theme-system.js等共用檔案的必要性
+
+  🚀 第三階段：目錄重組（可選）
+
+  - 📁 創建units/資料夾結構
+  - 📁 每個單元獨立目錄
+  - 📁 共用資源最小化
+
+  🎯 最佳目標總結：
+
+  從易於維護、不互相干擾的角度，最佳目標是：
+
+  ✅ 核心目標：
+
+  1. 單元完全獨立：修改F5不影響F3
+  2. 最小共用依賴：只保留真正必要的共用功能
+  3. 標準化介面：統一的開發和維護模式
+  4. 清晰的職責分離：HTML/CSS/JS各司其職
+
+  ✅ 實際建議：
+
+  採用選項B（漸進改善） - 在穩定性和維護性之間取得最佳平衡
+
+  目前F5已經是很好的範例，建議：
+  1. 繼續將其他單元改造成F5的模式
+  2. 逐步減少共用檔案的依賴
+  3. 最終實現每個單元的完全獨立
+
+  這樣既能確保功能穩定，又能大幅提升維護性！ 🚀

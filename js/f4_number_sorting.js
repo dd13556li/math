@@ -1,5 +1,11 @@
-// =================================================================
-// FILE: js/f4_number_sorting.js - F4數字排序完整程式（完整合併版）
+/**
+ * @file f4_number_sorting.js
+ * @description F4 數字排序 - 配置驅動版本
+ * @unit F4 - 數字排序
+ * @version 2.2.0 - 配置驅動 + 詳細Debug系統
+ * @lastModified 2025.08.30 下午1:58
+ */
+
 // =================================================================
 //
 // 🚨🚨🚨 【重開機後修改前必讀】🚨🚨🚨
@@ -25,7 +31,8 @@ const NumberSortingConfig = {
     // 🎯 遊戲基本配置
     // =====================================================
     game: {
-        title: "🔢 數字排序",
+        title: "F4: 數字排序",
+        subtitle: "",
         version: "2.0.0",
         author: "配置驅動版本"
     },
@@ -296,11 +303,12 @@ const NumberSortingConfig = {
             description: '播放遊戲音效和語音提示',
             enabled: true,
             sounds: {
-                select: 'audio/select.mp3',
-                correct: 'audio/correct.mp3',
-                incorrect: 'audio/error.mp3',
-                success: 'audio/success.mp3',
-                click: 'audio/click.mp3'
+                select: '../audio/select.mp3',
+                correct: '../audio/correct.mp3',
+                correct02: '../audio/correct02.mp3',
+                incorrect: '../audio/error.mp3',
+                success: '../audio/success.mp3',
+                click: '../audio/click.mp3'
             }
         },
         off: {
@@ -431,7 +439,7 @@ const NumberSortingTemplates = {
                     </div>
                     
                     <div class="game-buttons">
-                        <button class="back-btn" onclick="window.location.href='index.html'">返回主選單</button>
+                        <button class="back-btn" onclick="window.location.href='../index.html'">返回主選單</button>
                         <button id="start-game-btn" class="start-btn" disabled>
                             請完成所有設定
                         </button>
@@ -502,9 +510,9 @@ const NumberSortingTemplates = {
                         }
                         
                         @media (max-width: 768px) {
-                            /* 在小螢幕上簡化佈局，改為垂直排列 */
+                            /* 在小螢幕上保持水平排列，但簡化佈局 */
                             .instruction-content {
-                                flex-direction: column !important;
+                                flex-direction: row !important;
                                 padding: 15px 10px !important;
                                 min-height: auto !important;
                                 gap: 15px;
@@ -651,8 +659,8 @@ const NumberSortingTemplates = {
                     </div>
                     
                     <div class="action-buttons">
-                        <button class="start-btn" onclick="Game.startGame()">🔄 再玩一次</button>
-                        <button class="back-to-main-btn" onclick="Game.init()">🏠 返回設定</button>
+                        <button class="start-btn" onclick="Game.startGame()">再玩一次</button>
+                        <button class="back-to-main-btn" onclick="Game.init()">返回設定</button>
                     </div>
                 </div>
             </div>
@@ -900,7 +908,56 @@ document.addEventListener('DOMContentLoaded', () => {
             logUserAction(action, data = null) { this.log('使用者行為', action, data); },
             logDragDrop(message, data) { this.log('拖拽系統', message, data); },
             logAudio(message, data) { this.log('音效系統', message, data); },
-            logConfig(message, data) { this.log('配置系統', message, data); }
+            logConfig(message, data) { this.log('配置系統', message, data); },
+            
+            // 新增：手機端拖曳除錯專用方法（從F3移植）
+            logMobileDrag(phase, element, event, data = null) {
+                if (!this.enabled) return;
+                const timestamp = new Date().toLocaleTimeString();
+                const elementInfo = {
+                    tagName: element?.tagName,
+                    className: element?.className,
+                    id: element?.id,
+                    dataValue: element?.dataset?.value,
+                    dataIndex: element?.dataset?.index,
+                    parentClass: element?.parentElement?.className
+                };
+                const touchInfo = event?.touches?.[0] ? {
+                    clientX: event.touches[0].clientX,
+                    clientY: event.touches[0].clientY,
+                    touchCount: event.touches.length
+                } : null;
+                
+                console.log(`${this.logPrefix}[📱手機拖曳] ${timestamp}: ${phase}`, {
+                    element: elementInfo,
+                    touch: touchInfo,
+                    extra: data
+                });
+            },
+            
+            // 新增：觸控事件詳細除錯
+            logTouchEvent(eventType, element, event) {
+                if (!this.enabled) return;
+                const timestamp = new Date().toLocaleTimeString();
+                const eventInfo = {
+                    type: eventType,
+                    target: element?.className || 'unknown',
+                    touches: event?.touches?.length || 0,
+                    changedTouches: event?.changedTouches?.length || 0,
+                    preventDefault: event?.defaultPrevented,
+                    propagationStopped: event?.cancelBubble
+                };
+                
+                console.log(`${this.logPrefix}[👆觸控事件] ${timestamp}: ${eventType}`, eventInfo);
+            },
+            
+            // 新增：F4專用放置框檢測方法（適應F4的排序槽位）
+            logPlacementDrop(action, zoneType, itemInfo = null) {
+                if (!this.enabled) return;
+                const timestamp = new Date().toLocaleTimeString();
+                const fullMessage = `${this.logPrefix}[📦放置框檢測] ${timestamp}: ${action} - 區域類型: ${zoneType}`;
+                console.log(fullMessage, itemInfo || '');
+            }
         },
 
         // =====================================================
@@ -1745,6 +1802,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (this.state.tempInputValue && !isNaN(number) && number >= 0) {
                 this.Debug.logUserAction(`確認輸入: ${number} for 位置${this.state.currentInputIndex + 1}`);
                 
+                // 播放輸入數字的語音
+                this.Speech.speak(number.toString());
+                this.Debug.logUserAction(`播放數字語音: ${number}`);
+                
                 // 設定輸入值
                 this.setInputValue(this.state.currentInputIndex, number);
                 
@@ -2364,8 +2425,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.elements.answerContainer.appendChild(slot);
             });
             
-            // 重新註冊觸控拖拽區域（因為新增了slots）
-            this.registerTouchDropZones();
+            // 🔧 [修正] 在 slots 渲染完成後設置觸控拖拽系統
+            this.setupTouchDrag();
         },
 
         // =====================================================
@@ -2382,8 +2443,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.elements.app.addEventListener('dragleave', this.handleDragLeave.bind(this));
             this.elements.app.addEventListener('drop', this.handleDrop.bind(this));
             
-            // Touch drag support
-            this.setupTouchDrag();
+            // Touch drag support will be setup when slots are rendered
         },
 
         setupTouchDrag() {
@@ -2434,6 +2494,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.elements.app,
                 '.number-box:not(.correct)',
                 {
+                    // 🔧 [修正1] 新增視覺回饋配置 - 確保拖拽時數字圖示跟著移動
+                    createDragImage: true,
+                    dragImageOffset: { x: 25, y: 25 },
+                    
                     onDragStart: (element, event) => {
                         console.log('🎯 觸控拖拽開始:', element, event);
                         
@@ -2449,8 +2513,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         console.log('🎯 設置拖拽元素:', number);
                         this.Debug.logDragDrop(`開始觸控拖拽數字: ${number}`);
                         
-                        // 播放數字語音
-                        this.Speech.speak(number);
+                        // 🔧 [修正2] 加強語音播放 - 確保語音系統已準備好
+                        if (this.Speech && this.Speech.isReady && this.Speech.voice) {
+                            this.Speech.speak(number);
+                        } else {
+                            console.log('🎯 語音系統未就緒，跳過語音播放');
+                        }
+                        
+                        // 🔧 [修正1] 添加視覺拖拽樣式
+                        element.style.opacity = '0.8';
+                        element.classList.add('dragging');
                         
                         return true;
                     },
@@ -2462,16 +2534,35 @@ document.addEventListener('DOMContentLoaded', () => {
                         const slot = dropZone.closest('.slot');
                         const numberContainer = dropZone.closest('.number-container');
                         
+                        // 新增：F4專用放置框檢測
+                        const itemInfo = {
+                            numberValue: draggedElement.dataset.value,
+                            itemClass: draggedElement.className,
+                            dropZoneClass: dropZone.className,
+                            slotPosition: slot?.dataset.position,
+                            isNumberContainer: !!numberContainer
+                        };
+                        
                         this.Debug.logDragDrop(`觸控放置檢測: slot=${!!slot}, numberContainer=${!!numberContainer}, dropZone=${dropZone.className}`);
                         
                         if (slot && this.state.draggedElement) {
-                            this.Debug.logDragDrop(`觸控放置到slot: position=${slot.dataset.position}`);
+                            const draggedNumber = parseInt(this.state.draggedElement.dataset.value);
+                            const position = parseInt(slot.dataset.position);
+                            const correctNumber = this.state.correctOrder[position];
+                            const isCorrect = draggedNumber === correctNumber;
+                            
+                            this.Debug.logDragDrop(`觸控放置到slot: position=${position}, number=${draggedNumber}, correct=${correctNumber}, isCorrect=${isCorrect}`);
+                            this.Debug.logPlacementDrop('手機端：數字放入排序槽', 'sorting-slot', itemInfo);
+                            console.log(`📱 手機拖放: 數字${draggedNumber}到位置${position}, 正確=${isCorrect}`);
+                            
                             this.handleSlotDrop(slot);
                         } else if (numberContainer && this.state.draggedElement) {
                             this.Debug.logDragDrop(`觸控放置到數字容器`);
+                            this.Debug.logPlacementDrop('手機端：數字返回數字容器', 'number-container', itemInfo);
                             this.handleNumberContainerDrop();
                         } else {
                             this.Debug.logDragDrop(`觸控放置失敗: 找不到有效的放置目標`);
+                            this.Debug.logPlacementDrop('手機端：數字放入無效區域', 'invalid-drop', itemInfo);
                         }
                     },
                     onDragEnd: (element, event) => {
@@ -2479,6 +2570,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (this.state.draggedElement) {
                             this.state.draggedElement = null;
                         }
+                        
+                        // 🔧 [修正1] 恢復視覺樣式
+                        element.style.opacity = '1';
+                        element.classList.remove('dragging');
                         
                         // 清除所有拖拽樣式
                         document.querySelectorAll('.slot.drag-over').forEach(slot => {
@@ -2509,10 +2604,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             slots.forEach((slot, index) => {
                 window.TouchDragUtility.registerDropZone(slot, (draggedElement, dropZone) => {
-                    // Allow drop only if slot doesn't have a correct number
-                    const hasCorrectNumber = dropZone.querySelector('.number-box.correct');
-                    this.Debug.logDragDrop(`檢查slot ${index} 是否可放置: hasCorrectNumber=${!!hasCorrectNumber}`);
-                    return !hasCorrectNumber;
+                    // 🔧 [修正] 允許替換操作 - 普通困難模式支援拖曳替換
+                    const difficulty = this.state?.settings?.difficulty || 'easy';
+                    
+                    if (difficulty === 'easy') {
+                        // 簡單模式：只能放置到沒有正確數字的slot
+                        const hasCorrectNumber = dropZone.querySelector('.number-box.correct');
+                        this.Debug.logDragDrop(`簡單模式檢查slot ${index}: hasCorrectNumber=${!!hasCorrectNumber}`);
+                        return !hasCorrectNumber;
+                    } else {
+                        // 普通/困難模式：允許替換，包括已有數字的slot
+                        this.Debug.logDragDrop(`${difficulty}模式允許替換 - slot ${index} 可放置`);
+                        return true;
+                    }
                 });
             });
             
@@ -2568,8 +2672,18 @@ document.addEventListener('DOMContentLoaded', () => {
         handleDragEnter(event) {
             event.preventDefault();
             const slot = event.target.closest('.slot');
-            if (slot && !slot.querySelector('.number-box.correct')) {
-                slot.classList.add('drag-over');
+            if (slot) {
+                const difficulty = this.state?.settings?.difficulty || 'easy';
+                
+                if (difficulty === 'easy') {
+                    // 簡單模式：只有沒有正確數字的slot才顯示懸停效果
+                    if (!slot.querySelector('.number-box.correct')) {
+                        slot.classList.add('drag-over');
+                    }
+                } else {
+                    // 普通/困難模式：所有slot都可以顯示懸停效果（支援替換）
+                    slot.classList.add('drag-over');
+                }
             }
         },
 
@@ -2625,11 +2739,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const correctNumber = this.state.correctOrder[position];
             const isCorrect = number === correctNumber;
             
+            console.log(`🎯 processAnswer: position=${position}, number=${number}, correct=${correctNumber}, isCorrect=${isCorrect}`);
+            console.log(`🎯 instantFeedback=${gameConfig.difficulty.instantFeedback}, difficulty=${gameConfig.difficulty.id}`);
+            
             if (gameConfig.difficulty.instantFeedback) {
                 // 簡單模式：立即反饋
+                console.log(`🎯 調用 handleInstantFeedback，isCorrect=${isCorrect}`);
                 this.handleInstantFeedback(slot, isCorrect);
             } else {
                 // 普通/困難模式：等待確認
+                console.log(`🎯 非簡單模式，調用 checkAllSlotsFilled`);
                 this.checkAllSlotsFilled();
             }
         },
@@ -2652,10 +2771,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 // 不在這裡計分，等整題完成時再計分
             } else {
                 numberBox.classList.add('incorrect');
+                this.Debug.logAudio('觸發錯誤音效 - 答案不正確');
                 this.playSound('incorrect');
+                console.log('🔊 播放錯誤音效: incorrect');
+                
+                // 🎯 簡單模式：錯誤數字自動返回
+                const gameConfig = NumberSortingConfig.getGameConfig(this.state.settings);
+                if (gameConfig.difficulty.id === 'easy') {
+                    this.autoReturnIncorrectNumber(numberBox, slot);
+                }
             }
             
             this.checkLevelCompletion();
+        },
+
+        // 🎯 自動返回錯誤數字（簡單模式專用）
+        autoReturnIncorrectNumber(numberBox, slot) {
+            console.log('🎯 自動返回錯誤數字開始');
+            
+            // 新增搖擺動畫效果
+            numberBox.classList.add('shake-animation');
+            
+            // 延遲後移除搖擺效果並返回數字容器
+            setTimeout(() => {
+                // 移除搖擺動畫
+                numberBox.classList.remove('shake-animation');
+                
+                // 移除錯誤標記
+                numberBox.classList.remove('incorrect');
+                
+                // 恢復拖拽功能
+                numberBox.draggable = true;
+                
+                // 返回到數字容器
+                if (this.elements.numberContainer && numberBox.parentNode !== this.elements.numberContainer) {
+                    this.elements.numberContainer.appendChild(numberBox);
+                    console.log('🎯 錯誤數字已返回數字容器');
+                }
+                
+                // 如果是觸控模式，重新註冊拖拽功能
+                if (window.TouchDragUtility && this.state.settings.difficulty === 'easy') {
+                    console.log('🎯 重新註冊觸控拖拽功能');
+                    this.setupTouchDragForReturnedNumber(numberBox);
+                }
+                
+            }, 800); // 搖擺動畫持續時間
+        },
+
+        // 🎯 為返回的數字重新設置觸控拖拽功能
+        setupTouchDragForReturnedNumber(numberBox) {
+            if (!window.TouchDragUtility) return;
+            
+            // 重新註冊為可拖拽元素
+            window.TouchDragUtility.registerDraggable(
+                this.elements.app,
+                `#${numberBox.id}`,
+                {
+                    createDragImage: true,
+                    dragImageOffset: { x: 25, y: 25 },
+                    
+                    onDragStart: (element, event) => {
+                        console.log('🎯 返回數字觸控拖拽開始:', element);
+                        this.state.draggedElement = element;
+                        element.classList.add('dragging');
+                        this.Debug.logDragDrop('觸控拖拽開始', element);
+                    },
+                    
+                    onDragEnd: (element, event) => {
+                        console.log('🎯 返回數字觸控拖拽結束:', element);
+                        element.classList.remove('dragging');
+                        this.state.draggedElement = null;
+                        this.Debug.logDragDrop('觸控拖拽結束', element);
+                    }
+                }
+            );
         },
 
         checkAllSlotsFilled() {
@@ -2714,7 +2903,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         handleCorrectAnswer() {
             this.Debug.logGameFlow('答案全部正確');
-            this.playSound('correct');
+            
+            // 先播放 correct02.mp3 音效
+            this.playSound('correct02');
+            
+            // 啟動煙火動畫
+            this.startFireworksAnimation();
+            
             this.showMessage('太棒了，你答對了！', 'success');
             
             // 答對一題給10分
@@ -2723,18 +2918,21 @@ document.addEventListener('DOMContentLoaded', () => {
             // 重置檢查狀態
             this.state.isChecking = false;
             
-            // 播放語音，語音播放完成後才進入下一題
-            this.Speech.speakTemplate('correct', () => {
-                this.Debug.logGameFlow('正確答案語音播放完成，準備進入下一題');
-                
-                setTimeout(() => {
-                    if (this.state.currentLevel < this.state.totalLevels) {
-                        this.nextLevel();
-                    } else {
-                        this.completeGame();
-                    }
-                }, 500); // 語音後稍微延遲
-            });
+            // 延遲播放語音，讓音效和煙火先展現
+            setTimeout(() => {
+                // 播放語音，語音播放完成後才進入下一題
+                this.Speech.speakTemplate('correct', () => {
+                    this.Debug.logGameFlow('正確答案語音播放完成，準備進入下一題');
+                    
+                    setTimeout(() => {
+                        if (this.state.currentLevel < this.state.totalLevels) {
+                            this.nextLevel();
+                        } else {
+                            this.completeGame();
+                        }
+                    }, 500); // 語音後稍微延遲
+                });
+            }, 800); // 讓音效和煙火先播放800ms
         },
 
         handleIncorrectAnswer(incorrectBoxes) {
@@ -2867,7 +3065,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         /**
-         * [已修改-加速版] 開始語音播放和同步動畫 (使用 async/await)
+         * [已修改-完整指令版] 開始語音播放和同步動畫 (使用 async/await)
          */
         async startVoicePlayback(numbersToRead, speechText) {
             const numbersArray = numbersToRead.split('，');
@@ -2882,12 +3080,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-            const introSpeech = speechText.includes('：') ? speechText.split('：')[0] + '：' : '';
-            if (introSpeech) {
-                await this.Speech.speakAndWait(introSpeech);
-            } else {
-                await sleep(100); // [修改] 縮短初始延遲
-            }
+            // 🎯 修改：先播放完整指令語音（不分割）
+            console.log('🎯 開始播放完整指令語音:', speechText);
+            await this.Speech.speakAndWait(speechText);
+            
+            // 短暫停頓，準備播放數字序列
+            await sleep(300);
+            
+            // 🎯 數字序列播放提示
+            console.log('🎯 完整指令播放完成，開始播放數字序列:', numbersToRead);
 
             for (let i = 0; i < numbersArray.length; i++) {
                 if (!document.body.contains(modal)) {
@@ -2956,13 +3157,32 @@ document.addEventListener('DOMContentLoaded', () => {
         Speech: {
             synth: window.speechSynthesis,
             voice: null,
+            isReady: false,
             
             init() {
                 Game.Debug.logAudio('初始化語音系統');
                 
+                let voiceInitAttempts = 0;
+                const maxAttempts = 10;
+                
                 const loadVoices = () => {
                     const voices = this.synth.getVoices();
                     Game.Debug.logAudio('取得語音列表', { count: voices.length });
+                    voiceInitAttempts++;
+                    
+                    // 🔧 [修正2] 語音系統優化 - 增加重試機制和更好的fallback
+                    if (voices.length === 0) {
+                        if (voiceInitAttempts < maxAttempts) {
+                            Game.Debug.logAudio('語音未就緒，等待中...', { attempt: voiceInitAttempts });
+                            setTimeout(loadVoices, 300); // 縮短等待時間
+                            return;
+                        } else {
+                            Game.Debug.logAudio('手機端無語音，啟用靜音模式', 'fallback', 'system');
+                            this.voice = null;
+                            this.isReady = true;
+                            return;
+                        }
+                    }
                     
                     // 與 f3_number_recognition 相同的語音選擇策略
                     const preferredVoices = [
@@ -2990,8 +3210,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             name: this.voice.name, 
                             lang: this.voice.lang 
                         });
+                        this.isReady = true;
                     } else {
-                        Game.Debug.logAudio('未找到中文語音', '語音初始化');
+                        Game.Debug.logAudio('未找到中文語音，啟用靜音模式', 'fallback');
+                        this.voice = null;
+                        this.isReady = true;
                     }
                 };
                 
@@ -3010,6 +3233,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const soundConfig = NumberSortingConfig.getSoundConfig(Game.state.settings.sound);
                 if (!soundConfig.enabled) {
                     Game.Debug.logAudio('語音被設定關閉', { text });
+                    if (callback) callback();
+                    return;
+                }
+                
+                // 🔧 [修正2] 語音播放檢查優化 - 提供更詳細的診斷訊息
+                if (!this.isReady) {
+                    Game.Debug.logAudio('語音系統未初始化完成，跳過播放', { text, isReady: this.isReady });
+                    if (callback) callback();
+                    return;
+                }
+                
+                if (!this.voice) {
+                    Game.Debug.logAudio('靜音模式或語音未就緒，跳過播放', { 
+                        text, 
+                        isReady: this.isReady, 
+                        hasVoice: !!this.voice 
+                    });
                     if (callback) callback();
                     return;
                 }
@@ -3041,13 +3281,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     };
                     
                     utterance.onerror = (error) => {
-                        Game.Debug.logAudio('語音播放錯誤', error);
+                        Game.Debug.logAudio('語音播放錯誤，但保持語音功能可用', error);
+                        // 🔧 [修正] 不要因為一次錯誤就禁用語音，保持語音功能可用
+                        // this.voice = null; // 註解掉這行，避免永久禁用語音
                         if (callback) callback();
                     };
                     
                     this.synth.speak(utterance);
                 } catch (error) {
-                    Game.Debug.logAudio('語音播放異常', error);
+                    Game.Debug.logAudio('語音播放異常，但保持語音功能可用', error);
+                    // 🔧 [修正] 不要因為異常就永久禁用語音
+                    // this.voice = null; // 註解掉這行，避免永久禁用語音
                     if (callback) callback();
                 }
             },
@@ -3147,6 +3391,34 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 this.Debug.logAudio('點擊音效系統錯誤', error);
+            }
+        },
+
+        // =====================================================
+        // 🎆 煙火動畫系統（簡化版）
+        // =====================================================
+        startFireworksAnimation() {
+            console.log('🎆 開始簡化版煙火動畫');
+            
+            // 🎆 使用canvas-confetti效果
+            if (window.confetti) {
+                console.log('🎆 觸發canvas-confetti慶祝效果');
+                confetti({
+                    particleCount: 150,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+                
+                // 延遲一點時間再觸發第二波
+                setTimeout(() => {
+                    confetti({
+                        particleCount: 100,
+                        spread: 60,
+                        origin: { y: 0.7 }
+                    });
+                }, 200);
+            } else {
+                console.log('❌ canvas-confetti 未載入');
             }
         },
 
@@ -3272,28 +3544,36 @@ document.addEventListener('DOMContentLoaded', () => {
         handleEasyModeCompletion() {
             this.Debug.logGameFlow('簡單模式：整題完成');
             
-            // 顯示訊息和播放音效
+            // 先播放 correct02.mp3 音效
+            this.playSound('correct02');
+            
+            // 啟動煙火動畫
+            this.startFireworksAnimation();
+            
+            // 顯示訊息
             this.showMessage('太棒了，你答對了！', 'success');
-            this.playSound('correct');
             
             // 答對一題給10分
             this.updateScore(10);
             
-            // 播放整題完成語音，語音播放完成後才進入下一題
-            this.Speech.speakTemplate('levelComplete', () => {
-                this.Debug.logGameFlow('簡單模式：整題完成語音播放完畢');
-                
-                // 重置檢查狀態
-                this.state.isChecking = false;
-                
-                setTimeout(() => {
-                    if (this.state.currentLevel < this.state.totalLevels) {
-                        this.nextLevel();
-                    } else {
-                        this.completeGame();
-                    }
-                }, 500);
-            });
+            // 重置檢查狀態
+            this.state.isChecking = false;
+            
+            // 延遲播放語音，讓音效和煙火先展現
+            setTimeout(() => {
+                // 播放整題完成語音，語音播放完成後才進入下一題
+                this.Speech.speakTemplate('levelComplete', () => {
+                    this.Debug.logGameFlow('簡單模式：整題完成語音播放完畢');
+                    
+                    setTimeout(() => {
+                        if (this.state.currentLevel < this.state.totalLevels) {
+                            this.nextLevel();
+                        } else {
+                            this.completeGame();
+                        }
+                    }, 500);
+                });
+            }, 800); // 讓音效和煙火先播放800ms
         }
     };
 

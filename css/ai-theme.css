@@ -108,6 +108,54 @@
    全域基礎設定
    ===================================================== */
 
+/* 🔧 [修正] 全域手機端觸控優化 - 徹底解決點擊閃爍問題 */
+* {
+    /* 移除所有瀏覽器的點擊高亮效果 */
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+
+    /* 優化觸控操作 */
+    touch-action: manipulation !important;
+}
+
+/* 特例：允許輸入框和文本區域選擇文字 */
+input, textarea, [contenteditable="true"] {
+    -webkit-user-select: auto !important;
+    -moz-user-select: auto !important;
+    -ms-user-select: auto !important;
+    user-select: auto !important;
+    -webkit-tap-highlight-color: rgba(0, 123, 255, 0.2) !important;
+}
+
+/* 🔧 [修正] 自定義點擊反饋 - 替代系統閃爍 */
+button, .clickable, .clickable-item, .draggable-item, .money-item,
+.counting-item, .counting-item-easy, .counting-item-normal, .counting-item-hard,
+.touchable, [onclick], [role="button"], [class*="counting-item"] {
+    transition: transform 0.1s ease !important;
+}
+
+button:active, .clickable:active, .clickable-item:active, .draggable-item:active,
+.money-item:active, .counting-item:active, .counting-item-easy:active,
+.counting-item-normal:active, .counting-item-hard:active, .touchable:active,
+[onclick]:active, [role="button"]:active, [class*="counting-item"]:active {
+    transform: scale(0.95) !important;
+}
+
+/* 響應式優化 - 桌面端更細微的效果 */
+@media (min-width: 768px) {
+    button:active, .clickable:active, .clickable-item:active, .draggable-item:active,
+    .money-item:active, .counting-item:active, .counting-item-easy:active,
+    .counting-item-normal:active, .counting-item-hard:active, .touchable:active,
+    [onclick]:active, [role="button"]:active, [class*="counting-item"]:active {
+        transform: scale(0.98) !important;
+        transition: transform 0.05s ease !important;
+    }
+}
+
 /* 全域 box-sizing 設定 */
 html, body {
     width: 100%;
@@ -300,7 +348,7 @@ h1 {
 
 /* 為開始按鈕添加emoji */
 .start-btn::before { content: '🚀 '; }
-.back-btn::before { content: '↩️ '; }
+.back-btn::before { content: '🔙 '; }
 .back-to-main-btn::before { content: '🏠 '; }
 
 .start-btn:hover, .back-to-main-btn:hover, .btn:hover, .button:hover, .primary-btn:hover {
@@ -899,8 +947,10 @@ h1 {
     }
 }
 
-/* 兌換區佈局 */
-.equation-row, .easy-mode, .normal-mode {
+/* 兌換區佈局 - 限定作用範圍避免影響其他單元 */
+.exchange-area .equation-row, 
+.exchange-area .easy-mode, 
+.exchange-area .normal-mode {
     display: grid;
     grid-template-columns: 1fr 60px 60px;
     align-items: center;
@@ -1646,7 +1696,10 @@ a:hover {
     object-fit: contain;
 }
 
-.easy-mode, .normal-mode, .hard-mode {
+/* 修正後：增加 .exchange-area 限定作用範圍，徹底解決樣式衝突 */
+.exchange-area .easy-mode, 
+.exchange-area .normal-mode, 
+.exchange-area .hard-mode {
     display: flex;
     align-items: center;
     justify-content: center;

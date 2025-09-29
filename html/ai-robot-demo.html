@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI小助教『幣幣』主題演示 - 金錢小達人</title>
+    
+    <!-- 簡化主題系統樣式 -->
+    <link rel="stylesheet" href="../css/ai-theme.css">
+    <link rel="stylesheet" href="../css/dark-theme.css">
+    
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--background-primary);
+            color: var(--text-primary);
+            font-family: var(--font-family-main);
+            min-height: 100vh;
+            transition: all var(--transition-normal);
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .demo-title {
+            text-align: center;
+            color: var(--text-primary);
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            text-shadow: var(--shadow-light);
+        }
+        
+        .demo-description {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 1.2em;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* 使用新的AI機器人佈局系統 */
+        .ai-game-board {
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "products wallet controls"
+                "feedback feedback robot"
+                "progress progress progress";
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: auto 1fr auto auto;
+            gap: 20px;
+            padding: 20px;
+            background: var(--background-primary);
+            border-radius: var(--radius-large);
+            box-shadow: var(--shadow-medium);
+            min-height: 500px;
+            transition: all var(--transition-normal);
+        }
+        
+        .ai-header-area {
+            grid-area: header;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: var(--text-inverse);
+            padding: 15px 20px;
+            border-radius: var(--radius-medium);
+            box-shadow: var(--shadow-light);
+        }
+        
+        .ai-products-area, .ai-wallet-area, .ai-controls-area, .ai-robot-area {
+            background: var(--background-card);
+            border-radius: var(--radius-medium);
+            padding: 20px;
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-light);
+            transition: all var(--transition-normal);
+        }
+        
+        .ai-products-area {
+            grid-area: products;
+        }
+        
+        .ai-wallet-area {
+            grid-area: wallet;
+        }
+        
+        .ai-controls-area {
+            grid-area: controls;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .ai-robot-area {
+            grid-area: robot;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .ai-feedback-area {
+            grid-area: feedback;
+            background: var(--background-secondary);
+            border-radius: var(--radius-medium);
+            padding: 15px 20px;
+            box-shadow: var(--shadow-light);
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: var(--text-primary);
+        }
+        
+        .ai-progress-area {
+            grid-area: progress;
+            background: var(--background-secondary);
+            border-radius: var(--radius-medium);
+            padding: 15px 20px;
+            box-shadow: var(--shadow-light);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-secondary);
+        }
+        
+        .area-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .demo-button {
+            background: var(--primary-color);
+            color: var(--text-inverse);
+            border: none;
+            border-radius: var(--radius-medium);
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            box-shadow: var(--shadow-light);
+            margin: 5px;
+        }
+        
+        .demo-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .demo-button.success {
+            background: var(--success-color);
+        }
+        
+        .demo-button.warning {
+            background: var(--warning-color);
+        }
+        
+        .demo-button.error {
+            background: var(--error-color);
+        }
+        
+        .demo-button.info {
+            background: var(--info-color);
+        }
+        
+        .robot-placeholder {
+            font-size: 4em;
+            margin-bottom: 15px;
+            color: var(--info-color);
+        }
+        
+        .robot-speech {
+            background: var(--background-secondary);
+            padding: 15px;
+            border-radius: var(--radius-medium);
+            border: 2px solid var(--border-color);
+            position: relative;
+            color: var(--text-primary);
+            font-style: italic;
+        }
+        
+        .robot-speech::before {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 20px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid var(--border-color);
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 1024px) {
+            .ai-game-board {
+                grid-template-areas: 
+                    "header header"
+                    "products wallet"
+                    "controls controls"
+                    "feedback robot"
+                    "progress progress";
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto 1fr auto auto auto;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .ai-game-board {
+                grid-template-areas: 
+                    "header"
+                    "products"
+                    "wallet"
+                    "controls"
+                    "feedback"
+                    "robot"
+                    "progress";
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(7, auto);
+                gap: 15px;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <h1 class="demo-title">🤖 AI小助教『幣幣』主題演示</h1>
+        
+        <p class="demo-description">
+            歡迎來到全新的AI智能機器人小助教主題！『幣幣』將陪伴學生一起學習金錢知識，
+            使用溫暖的藍、橘、綠、棕色調，營造友善、舒適的學習環境。
+        </p>
+        
+        <div class="ai-game-board">
+            <!-- 標題欄 -->
+            <div class="ai-header-area">
+                <div>
+                    <strong>AI小助教 金錢學習遊戲</strong>
+                </div>
+                <div>
+                    關卡進度：1/5
+                </div>
+            </div>
+            
+            <!-- 商品展示區 -->
+            <div class="ai-products-area">
+                <div class="area-title">🛍️ 商品展示區</div>
+                <p>這裡展示各種日常商品，使用emoji替代圖片：</p>
+                <div style="display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;">
+                    <div style="text-align: center; padding: 10px; background: var(--background-secondary); border-radius: var(--radius-small);">
+                        <div style="font-size: 2em;">🍎</div>
+                        <div>蘋果 $15</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: var(--background-secondary); border-radius: var(--radius-small);">
+                        <div style="font-size: 2em;">🍪</div>
+                        <div>餅乾 $25</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: var(--background-secondary); border-radius: var(--radius-small);">
+                        <div style="font-size: 2em;">✏️</div>
+                        <div>鉛筆 $10</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 錢包區域 -->
+            <div class="ai-wallet-area">
+                <div class="area-title">💰 幣幣的能源包</div>
+                <p>你的錢包裡有：</p>
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="padding: 8px; background: var(--background-secondary); border-radius: var(--radius-small); text-align: center;">
+                        50元 × 2 = 100元
+                    </div>
+                    <div style="padding: 8px; background: var(--background-secondary); border-radius: var(--radius-small); text-align: center;">
+                        10元 × 3 = 30元
+                    </div>
+                    <div style="padding: 8px; background: var(--background-secondary); border-radius: var(--radius-small); text-align: center;">
+                        1元 × 5 = 5元
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 控制區域 -->
+            <div class="ai-controls-area">
+                <div class="area-title">⚙️ 控制面板</div>
+                <button class="demo-button">🛒 確認購買</button>
+                <button class="demo-button success">✅ 正確答案</button>
+                <button class="demo-button warning">⚡ 能源補充</button>
+                <button class="demo-button error">❌ 重新計算</button>
+                <button class="demo-button info">💡 提示幫助</button>
+            </div>
+            
+            <!-- 反饋區域 -->
+            <div class="ai-feedback-area">
+                『幣幣』說：「很棒！你選擇了蘋果，讓我們一起算算需要多少錢吧！」
+            </div>
+            
+            <!-- 機器人區域 -->
+            <div class="ai-robot-area">
+                <div class="robot-placeholder">🤖</div>
+                <div class="robot-speech">
+                    嗨！我是AI小助教『幣幣』！<br>
+                    我會陪伴你一起學習金錢知識～<br>
+                    有任何問題都可以問我喔！
+                </div>
+            </div>
+            
+            <!-- 進度區域 -->
+            <div class="ai-progress-area">
+                <div>學習進度：60%</div>
+                <div>獲得星星：⭐⭐⭐</div>
+                <div>能源狀態：🔋🔋🔋🔋⚪</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+            <p style="color: var(--text-secondary);">
+                💡 您可以使用右下角的主題切換器在「AI小助教」和「深色護眼」模式之間切換
+            </p>
+        </div>
+    </div>
+
+    <!-- 主題系統腳本 -->
+    <script src="../js/theme-system.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script><script>eruda.init();</script>
+
+</body>
+</html>

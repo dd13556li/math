@@ -1,0 +1,122 @@
+ 這是一個很好的問題！讓我詳細解釋拖曳功能在桌面端和手機端的差異，以及我的修正對桌面端的影響。
+
+  🖱️ 桌面端 vs 📱 手機端拖曳差異
+
+  桌面端拖曳 (HTML5 Drag & Drop API)
+
+  // 桌面端使用標準HTML5拖放API
+  <div draggable="true"
+       ondragstart="handleDragStart(event)"
+       ondrop="handleDrop(event)">
+
+  優點：
+  - 瀏覽器原生支援
+  - 事件機制完整 (dragstart, dragover, drop 等)
+  - 自動處理拖放視覺效果
+  - 數據傳遞機制 (dataTransfer)
+
+  手機端拖曳問題
+
+  // 手機端HTML5拖放API支援有限
+  // 需要額外的觸控事件處理
+  touchstart → touchmove → touchend
+
+  問題原因：
+
+  1. API支援差異
+    - 許多手機瀏覽器對HTML5 Drag & Drop API支援不完整
+    - 觸控事件與滑鼠事件行為不同
+  2. 觸控事件複雜性
+    - 需要區分點擊、滾動、拖放
+    - 觸控延遲和震動回饋干擾
+  3. 座標計算差異
+    - 手機端需要處理多點觸控
+    - 座標系統和螢幕縮放問題
+
+  🔧 TouchDragUtility 解決方案
+
+  這就是為什麼Money Tutor使用了TouchDragUtility：
+
+  // TouchDragUtility將觸控事件轉換為拖放事件
+  window.TouchDragUtility.registerDraggable(
+      gameArea,
+      '.money-item[draggable="true"]',
+      {
+          onDragStart: (element, event) => { ... },
+          onDrop: (element, dropZone, event) => { ... },
+          onDragEnd: (element, event) => { ... }
+      }
+  );
+
+  工作原理：
+  1. 監聽觸控事件 → 轉換為拖放邏輯
+  2. 模擬HTML5事件 → 創建syntheticEvent
+  3. 調用原有處理函數 → 保持代碼一致性
+
+  🛡️ 我的修正對桌面端影響分析
+
+  ✅ 不會影響桌面端
+
+  原因：
+
+  1. 雙軌運行機制
+  // 桌面端：直接使用HTML5事件
+  ondrop="Game.handleMoneyDrop(event)"
+
+  // 手機端：TouchDragUtility轉換後調用相同函數
+  onDrop: (element, dropZone, event) => {
+      const syntheticEvent = { ... };
+      this.handleMoneyDrop(syntheticEvent); // 調用相同函數
+  }
+
+  2. 事件來源判斷
+  // 我的修正只影響TouchDragUtility的onDrop回調
+  // 桌面端的HTML5事件直接調用處理函數，不經過此回調
+
+  3. 向後兼容設計
+  // syntheticEvent模擬標準HTML5事件結構
+  const syntheticEvent = {
+      target: dropZone,                    // 與HTML5事件相同
+      preventDefault: () => {},            // 模擬方法
+      dataTransfer: {                      // 模擬數據傳遞
+          getData: () => element.dataset.moneyId
+      }
+  };
+
+  🔍 修正範圍限定
+
+  我的修正只在以下情況生效：
+  // 只有通過TouchDragUtility觸發的拖放才會經過這個邏輯
+  onDrop: (element, dropZone, event) => {
+      // 這裡的修正代碼
+      // 桌面端HTML5事件不會經過這裡
+  }
+
+  📊 事件流程對比
+
+  桌面端事件流程：
+
+  用戶拖拽 → HTML5 dragstart → HTML5 drop → handleMoneyDrop()
+
+  手機端事件流程（修正前）：
+
+  用戶觸控 → TouchDragUtility → onDrop回調 → handleMoneyDrop()
+                                             ↓
+                                      找零頁面拖放失敗 ❌
+
+  手機端事件流程（修正後）：
+
+  用戶觸控 → TouchDragUtility → onDrop回調 → 智能判斷
+                                             ↓
+                      ┌─ 找零拖放 → handleChangeWalletDrop() ✅
+                      └─ 付款拖放 → handleMoneyDrop() ✅
+
+  🎯 總結
+
+  1. 桌面端完全不受影響 - HTML5事件直接調用處理函數
+  2. 手機端功能增強 - TouchDragUtility現在能正確識別找零拖放
+  3. 代碼向後兼容 - 所有現有邏輯保持不變
+  4. 雙軌運行 - 桌面端和手機端使用不同的事件路徑但調用相同的處理函數
+
+  我的修正純粹是在TouchDragUtility的轉換層增加智能判斷，不會影響桌面端的原生HTML5拖放功能。這就像在手機端加了一個「
+  翻譯器」，把觸控操作翻譯成桌面端能理解的拖放事件。

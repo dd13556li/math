@@ -97,6 +97,10 @@
     border: 2px solid #bdc3c7;
     padding: 15px;
     border-radius: 8px;
+    
+    /* 🔧 [修正3] 確保水平排列和自適應寬度 */
+    align-items: center;
+    flex-direction: row;
     min-height: 80px;
 }
 
@@ -148,6 +152,15 @@
 .number-box.incorrect {
     background-color: #e74c3c !important;
     animation: shake 0.5s ease-in-out;
+}
+
+/* 🔧 [修正1] 拖拽視覺回饋樣式 - 確保拖拽時有正確的視覺反饋 */
+.number-box.dragging {
+    opacity: 0.8 !important;
+    transform: scale(1.05);
+    z-index: 1000;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
 }
 
 /* 數字方塊上的勾勾標記 */
@@ -1232,7 +1245,7 @@
     height: 100%;
     pointer-events: none;
     z-index: 1000;
-    display: none;
+    display: block;
 }
 
 .firework {
@@ -1533,13 +1546,26 @@
     }
     
     .header-section {
-        grid-template-columns: 1fr;
+        flex-direction: column;
         gap: 1rem;
         text-align: center;
+        padding: 10px 15px;
+    }
+    
+    .game-title {
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 100%;
+        max-width: 100%;
     }
     
     .number-container {
-        grid-template-columns: repeat(auto-fit, minmax(50px, 1fr));
+        /* 🔧 [修正3] 保持水平排列 - 移除grid配置，保持原本的flex水平佈局 */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 10px;
         padding: 15px;
     }
@@ -1567,8 +1593,22 @@
 }
 
 @media (max-width: 480px) {
+    .header-section {
+        padding: 8px 10px;
+    }
+    
+    .game-title {
+        font-size: 14px;
+        line-height: 1.2;
+        word-break: break-word;
+        white-space: normal;
+    }
+    
     .number-container {
-        grid-template-columns: repeat(auto-fit, minmax(45px, 1fr));
+        /* 🔧 [修正3] 保持水平排列 - 移除grid配置，保持原本的flex水平佈局 */
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
         gap: 8px;
         padding: 10px;
     }
@@ -1589,4 +1629,19 @@
         width: 50px;
         height: 50px;
     }
+}
+
+/* ===== 自動返回動畫效果 ===== */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-3px); }
+    20%, 40%, 60%, 80% { transform: translateX(3px); }
+}
+
+.shake-animation {
+    animation: shake 0.8s ease-in-out;
+    background: linear-gradient(135deg, #ff6b6b, #ffa500);
+    border: 2px solid #ff4757;
+    box-shadow: 0 0 15px rgba(255, 71, 87, 0.5);
+    transform-origin: center;
 }

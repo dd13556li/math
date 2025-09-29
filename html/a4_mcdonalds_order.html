@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A4麥當勞自助點餐</title>
+
+    <!-- SEO 和可存取性 -->
+    <meta name="description" content="透過麥當勞自助點餐系統學習數位點餐流程，包含商品選擇、加入購物車和結帳付款">
+    <meta name="keywords" content="麥當勞點餐,自助點餐,數位服務,兒童教育">
+    <meta name="author" content="金錢教學遊戲">
+
+    <!-- Open Graph 標籤 -->
+    <meta property="og:title" content="A4：麥當勞自助點餐系統">
+    <meta property="og:description" content="學習現代數位點餐流程和服務體驗">
+    <meta property="og:type" content="website">
+
+    <!-- 無障礙設計 -->
+    <meta name="theme-color" content="#ffcc02">
+
+    <!-- 樣式表 -->
+    <link rel="stylesheet" href="../css/ai-theme.css">
+    <link rel="stylesheet" href="../css/dark-theme.css">
+    <link rel="stylesheet" href="../css/a4_mcdonalds_order.css">
+
+    <!-- 預載入重要資源 -->
+    <link rel="preload" href="../js/a4_mcdonalds_order.js" as="script">
+    <link rel="preload" href="../css/a4_mcdonalds_order.css" as="style">
+
+    <!-- 字體預載入 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+
+    <!-- 結構化資料 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalResource",
+        "name": "A4：麥當勞自助點餐系統學習",
+        "description": "透過麥當勞點餐模擬學習數位服務操作的教育工具",
+        "educationalLevel": "小學",
+        "subject": "數學,生活教育",
+        "learningResourceType": "互動模擬",
+        "audience": {
+            "@type": "Audience",
+            "@audienceType": "學生"
+        }
+    }
+    </script>
+
+    <style>
+        /* 禁用行動裝置上的下拉重新整理功能 */
+        html, body, #app {
+            overscroll-behavior-y: contain;
+        }
+
+        /* 麥當勞點餐系統滿版面響應式設計 */
+        .mcdonalds-container {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* 點餐系統主體佈局 */
+        .mcdonalds-body {
+            display: flex;
+            width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #ffcc02, #ff8f00);
+            box-sizing: border-box;
+        }
+
+        /* 左側面板 - 菜單區域 */
+        .mcdonalds-left-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-right: 3px solid #ffcc02;
+        }
+
+        /* 右側面板 - 購物車區域 */
+        .mcdonalds-right-panel {
+            flex: 1;
+            min-width: 350px;
+            display: flex;
+            flex-direction: column;
+            background: #f5f5f5;
+            border-left: 3px solid #ff8f00;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 1200px) {
+            .mcdonalds-body {
+                flex-direction: column;
+            }
+
+            .mcdonalds-left-panel,
+            .mcdonalds-right-panel {
+                flex: none;
+                width: 100%;
+            }
+
+            .mcdonalds-right-panel {
+                min-width: auto;
+                max-height: 400px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mcdonalds-body {
+                min-height: auto;
+            }
+        }
+
+        /* 確保標題列滿版面樣式 */
+        #app {
+            width: 100vw !important;
+            max-width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow-x: hidden;
+        }
+
+        .mcdonalds-title-bar {
+            margin: 0 !important;
+            padding: 15px 25px !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw !important;
+            margin-right: -50vw !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen" aria-label="麥當勞點餐系統載入中">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">麥當勞點餐系統載入中...</div>
+    </div>
+
+    <main id="app" role="main" aria-label="麥當勞自助點餐主要內容">
+        <noscript>
+            <div class="noscript-message">
+                <h1>需要啟用 JavaScript</h1>
+                <p>此麥當勞點餐系統需要 JavaScript 才能正常運作，請在瀏覽器設定中啟用 JavaScript。</p>
+                <p>如需協助，請聯絡您的老師或家長。</p>
+            </div>
+        </noscript>
+    </main>
+
+    <div id="error-boundary" class="error-boundary" style="display: none;" role="alert">
+        <div class="error-content">
+            <h2>系統發生錯誤</h2>
+            <p>麥當勞點餐系統執行時發生問題，請重新整理頁面再試一次。</p>
+            <p>如果問題持續發生，請聯絡系統管理員。</p>
+            <button onclick="location.reload()" class="reload-btn">重新載入系統</button>
+        </div>
+    </div>
+
+    <script>
+        // 錯誤處理
+        window.addEventListener('error', function(event) {
+            console.error('麥當勞點餐系統錯誤:', event.error);
+            document.getElementById('error-boundary').style.display = 'flex';
+            document.getElementById('loading-screen').style.display = 'none';
+        });
+
+        // 載入完成後隱藏載入畫面
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+            }, 1500);
+        });
+
+        // 全域鍵盤快捷鍵
+        document.addEventListener('keydown', function(event) {
+            // Escape 取消操作
+            if (event.key === 'Escape') {
+                if (window.McDonald && window.McDonald.handleCancelKey) {
+                    window.McDonald.handleCancelKey();
+                }
+            }
+
+            // 數字鍵快速加入購物車
+            if (event.key >= '1' && event.key <= '9' && window.McDonald && window.McDonald.handleQuickAdd) {
+                window.McDonald.handleQuickAdd(parseInt(event.key));
+            }
+
+            // Enter 結帳
+            if (event.key === 'Enter' && window.McDonald && window.McDonald.handleCheckout) {
+                event.preventDefault();
+                window.McDonald.handleCheckout();
+            }
+        });
+
+        // 設定基本的 ARIA live regions
+        document.addEventListener('DOMContentLoaded', function() {
+            const app = document.getElementById('app');
+            if (app) {
+                app.setAttribute('aria-live', 'polite');
+            }
+        });
+    </script>
+
+    <script src="../js/audio-unlocker.js"></script>
+    <script src="../js/theme-system.js"></script>
+
+    <script src="../js/a4_mcdonalds_order.js"></script>
+
+    <script>
+        if ('performance' in window) {
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    const perfData = performance.timing;
+                    const loadTime = perfData.loadEventEnd - perfData.navigationStart;
+                    console.log('麥當勞點餐系統載入時間:', loadTime + 'ms');
+
+                    if (loadTime > 5000) {
+                        console.warn('系統載入時間較長，建議檢查網路連線');
+                    }
+                }, 0);
+            });
+        }
+    </script>
+
+    <script>
+        // 麥當勞點餐專用除錯面板
+        function createMcDonaldDebugPanel() {
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'mcdonald-debug-panel';
+            debugPanel.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                width: 300px;
+                max-height: 200px;
+                background: rgba(255, 204, 2, 0.9);
+                color: #333;
+                font-family: monospace;
+                font-size: 11px;
+                padding: 10px;
+                border-radius: 8px;
+                z-index: 10000;
+                overflow-y: auto;
+                display: none;
+                border: 2px solid #ffcc02;
+            `;
+            document.body.appendChild(debugPanel);
+
+            // 麥當勞除錯按鈕
+            const toggleBtn = document.createElement('button');
+            toggleBtn.innerHTML = '🍟';
+            toggleBtn.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                background: #ffcc02;
+                color: #333;
+                border: none;
+                border-radius: 50%;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                z-index: 10001;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(255, 204, 2, 0.3);
+            `;
+            toggleBtn.onclick = () => {
+                debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+            };
+            document.body.appendChild(toggleBtn);
+
+            return debugPanel;
+        }
+
+        // 麥當勞專用console處理
+        let mcDonaldDebugPanel;
+        const originalLog = console.log;
+        const originalError = console.error;
+
+        function mcDonaldLog(level, ...args) {
+            // 保持原有功能
+            if (level === 'error') {
+                originalError.apply(console, args);
+            } else {
+                originalLog.apply(console, args);
+            }
+
+            // 只顯示A4-McDonald相關訊息
+            const message = args.map(arg =>
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+
+            if (message.includes('[A4-McDonald]') || message.includes('麥當勞') || message.includes('點餐') || level === 'error') {
+                if (!mcDonaldDebugPanel) {
+                    mcDonaldDebugPanel = createMcDonaldDebugPanel();
+                }
+
+                const logEntry = document.createElement('div');
+                logEntry.style.color = level === 'error' ? '#d32f2f' : '#333';
+                logEntry.style.marginBottom = '2px';
+                logEntry.style.fontSize = '10px';
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                mcDonaldDebugPanel.appendChild(logEntry);
+                mcDonaldDebugPanel.scrollTop = mcDonaldDebugPanel.scrollHeight;
+
+                // 限制最大訊息數量
+                if (mcDonaldDebugPanel.children.length > 50) {
+                    mcDonaldDebugPanel.removeChild(mcDonaldDebugPanel.firstChild);
+                }
+            }
+        }
+
+        // 重寫console方法
+        console.log = (...args) => mcDonaldLog('log', ...args);
+        console.error = (...args) => mcDonaldLog('error', ...args);
+
+        // 麥當勞全域錯誤捕獲
+        window.addEventListener('error', function(event) {
+            console.error('[A4-McDonald全域錯誤]', {
+                message: event.message,
+                filename: event.filename,
+                line: event.lineno,
+                error: event.error?.toString()
+            });
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('[A4-McDonald Promise錯誤]', event.reason);
+        });
+
+        console.log('[A4-McDonald] 麥當勞點餐系統除錯系統已啟動');
+    </script>
+</body>
+</html>

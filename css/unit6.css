@@ -149,6 +149,11 @@
     background: none;
     border: none;
     padding: 0;
+    /* 🔧 [修正] 確保所有錢包內容都置中 */
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
 }
 
 /* 紙鈔容器調整 */
@@ -189,8 +194,10 @@
 
 /* 紙鈔圖示放大 - 付款提示中的紙鈔 */
 .hint-item img[src*="100_yuan"], 
+.hint-item img[src*="200_yuan"], 
 .hint-item img[src*="500_yuan"], 
-.hint-item img[src*="1000_yuan"] {
+.hint-item img[src*="1000_yuan"], 
+.hint-item img[src*="2000_yuan"] {
     width: 120px !important;
     height: auto !important;
     max-height: 72px !important;
@@ -198,7 +205,7 @@
 }
 
 /* 硬幣圖示 - 付款提示中的硬幣 */
-.hint-item img:not([src*="100_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]) {
+.hint-item img:not([src*="100_yuan"]):not([src*="200_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]):not([src*="2000_yuan"]) {
     width: 60px !important;
     height: 60px !important;
     object-fit: contain !important;
@@ -207,8 +214,10 @@
 
 /* 紙鈔圖示放大 - 付款金錢中的紙鈔 */
 .payment-money-item img[src*="100_yuan"], 
+.payment-money-item img[src*="200_yuan"], 
 .payment-money-item img[src*="500_yuan"], 
-.payment-money-item img[src*="1000_yuan"] {
+.payment-money-item img[src*="1000_yuan"], 
+.payment-money-item img[src*="2000_yuan"] {
     width: 100px !important;
     height: auto !important;
     max-height: 60px !important;
@@ -217,8 +226,10 @@
 
 /* 紙鈔圖示放大 - 找零中的紙鈔 */
 .change-money img[src*="100_yuan"], 
+.change-money img[src*="200_yuan"], 
 .change-money img[src*="500_yuan"], 
-.change-money img[src*="1000_yuan"] {
+.change-money img[src*="1000_yuan"], 
+.change-money img[src*="2000_yuan"] {
     width: 100px !important;
     height: auto !important;
     max-height: 60px !important;
@@ -477,25 +488,42 @@
 .target-item-display img,
 .selected-item-display img,
 .target-money-img {
-    width: 80px !important;
-    height: 80px !important;
+    width: 120px !important;
+    height: 120px !important;
     object-fit: contain;
     border-radius: 10px;
 }
 
-/* 紙鈔圖示大小（硬幣的150%） */
+/* 錢幣圖示大小（保持原本80px大小，但外框是120px） */
+.target-item-display img[src*="_yuan_"]:not([src*="100_yuan"]):not([src*="200_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]):not([src*="2000_yuan"]),
+.selected-item-display img[src*="_yuan_"]:not([src*="100_yuan"]):not([src*="200_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]):not([src*="2000_yuan"]),
+.target-money-img[src*="_yuan_"]:not([src*="100_yuan"]):not([src*="200_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]):not([src*="2000_yuan"]),
+.product-item img[src*="_yuan_"]:not([src*="100_yuan"]):not([src*="200_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]):not([src*="2000_yuan"]) {
+    width: 80px !important;
+    height: 80px !important;
+}
+
+/* 紙鈔圖示大小（保持120px） */
 .target-item-display img[src*="100_yuan"],
+.target-item-display img[src*="200_yuan"],
 .target-item-display img[src*="500_yuan"], 
 .target-item-display img[src*="1000_yuan"],
+.target-item-display img[src*="2000_yuan"],
 .selected-item-display img[src*="100_yuan"],
+.selected-item-display img[src*="200_yuan"],
 .selected-item-display img[src*="500_yuan"],
 .selected-item-display img[src*="1000_yuan"],
+.selected-item-display img[src*="2000_yuan"],
 .target-money-img[src*="100_yuan"],
+.target-money-img[src*="200_yuan"],
 .target-money-img[src*="500_yuan"],
 .target-money-img[src*="1000_yuan"],
+.target-money-img[src*="2000_yuan"],
 .product-item img[src*="100_yuan"],
+.product-item img[src*="200_yuan"],
 .product-item img[src*="500_yuan"],
-.product-item img[src*="1000_yuan"] {
+.product-item img[src*="1000_yuan"],
+.product-item img[src*="2000_yuan"] {
     width: 120px !important;
     height: 120px !important;
 }
@@ -510,8 +538,10 @@
 
 /* Unit2 紙鈔圖示大小（硬幣的150%） */
 #coin-display-area img[src*="100_yuan"],
+#coin-display-area img[src*="200_yuan"],
 #coin-display-area img[src*="500_yuan"],
-#coin-display-area img[src*="1000_yuan"] {
+#coin-display-area img[src*="1000_yuan"],
+#coin-display-area img[src*="2000_yuan"] {
     width: 120px !important;
     height: 120px !important;
 }
@@ -802,14 +832,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 20px;
     border: 3px solid #e0e0e0;
     border-radius: 15px;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
+    width: 180px;
+    height: 180px;
     max-width: 200px;
     margin: 0 auto;
+    box-sizing: border-box;
 }
 
 .product-item:hover,
@@ -830,8 +864,8 @@
 }
 
 .product-item img {
-    width: 80px;
-    height: 80px;
+    width: 120px;
+    height: 120px;
     object-fit: contain;
     margin-bottom: 15px;
     border-radius: 10px;
@@ -991,6 +1025,9 @@
     border-radius: 15px;
     padding: 20px;
     background: linear-gradient(135deg, #f8fff8 0%, #e8f5e8 100%);
+    /* 🔧 [修正] 錢包金錢圖示置中對齊 */
+    justify-content: center;
+    align-items: flex-start;
 }
 
 .money-item {
@@ -1343,6 +1380,20 @@
     color: #4CAF50;
 }
 
+.change-amount-value {
+    color: #2196F3; /* 藍色，與已付金額的深灰色不同 */
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.change-amount-display {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
 .hard-mode-amount {
     color: #4CAF50;
     font-size: 18px;
@@ -1403,7 +1454,7 @@
 }
 
 /* 找零中的硬幣保持圓形 */
-.change-money img:not([src*="100_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]) {
+.change-money img:not([src*="100_yuan"]):not([src*="200_yuan"]):not([src*="500_yuan"]):not([src*="1000_yuan"]):not([src*="2000_yuan"]) {
     border-radius: 50%;
 }
 
@@ -2124,7 +2175,8 @@
 
 .products-grid.horizontal-layout .product-item {
     flex: 0 0 auto;
-    min-width: 150px;
+    width: 180px;
+    height: 180px;
     max-width: 200px;
 }
 
@@ -2194,8 +2246,10 @@
 
 /* 紙鈔圖示大小為錢幣的150% */
 .countable-item[data-value="100"] img,
+.countable-item[data-value="200"] img,
 .countable-item[data-value="500"] img,
-.countable-item[data-value="1000"] img {
+.countable-item[data-value="1000"] img,
+.countable-item[data-value="2000"] img {
     width: 90px;
     height: 90px;
 }
@@ -2610,6 +2664,196 @@
     padding: 20px;
     margin-top: 15px;
     border: 2px solid var(--primary-color);
+}
+
+.magic-store-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.magic-store-header h4 {
+    margin: 0;
+    flex: 1;
+}
+
+.close-magic-store-btn {
+    background: rgba(0, 0, 0, 0.1);
+    border: 2px solid #666;
+    font-size: 20px;
+    color: #333;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.close-magic-store-btn:hover {
+    background: rgba(255, 0, 0, 0.2);
+    color: #ff4444;
+    border-color: #ff4444;
+    transform: scale(1.1);
+}
+
+.upload-btn.disabled {
+    background: #ccc !important;
+    color: #666 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+.upload-btn.disabled:hover {
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* 已選商品列表樣式 */
+.selected-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    transition: all 0.3s ease;
+    max-width: 300px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.selected-item:hover {
+    background: rgba(76, 175, 80, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
+}
+
+.selected-item .item-name {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.selected-item .item-price {
+    color: #e74c3c;
+    font-weight: bold;
+    font-size: 15px;
+    background: rgba(231, 76, 60, 0.1);
+    padding: 4px 8px;
+    border-radius: 12px;
+    border: 1px solid rgba(231, 76, 60, 0.3);
+}
+
+/* 設計感提示按鈕樣式 */
+.stylish-hint-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 25px;
+    padding: 8px 16px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: white;
+    font-weight: 500;
+    font-size: 13px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.stylish-hint-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left 0.6s ease;
+}
+
+.stylish-hint-btn:hover::before {
+    left: 100%;
+}
+
+.stylish-hint-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+.stylish-hint-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.stylish-hint-btn .hint-icon {
+    font-size: 16px;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}
+
+.stylish-hint-btn .hint-text {
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* 已選商品清單容器置中 */
+.selected-items-list {
+    text-align: center;
+    margin: 15px 0;
+}
+
+/* 總計顯示區域布局 */
+.total-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding: 8px 15px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+/* 總計文字和輸入框居中 */
+.total-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    gap: 8px;
+}
+
+/* 深色模式支援 */
+[data-theme="dark"] .selected-item {
+    background: rgba(76, 175, 80, 0.15);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .selected-item .item-name {
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .stylish-hint-btn {
+    background: linear-gradient(135deg, #42a5f5 0%, #478ed1 100%);
+    box-shadow: 0 4px 12px rgba(66, 165, 245, 0.3);
+}
+
+[data-theme="dark"] .stylish-hint-btn:hover {
+    box-shadow: 0 6px 20px rgba(66, 165, 245, 0.4);
+}
+
+[data-theme="dark"] .total-display {
+    border-top-color: rgba(255, 255, 255, 0.1);
 }
 
 .custom-items-list {

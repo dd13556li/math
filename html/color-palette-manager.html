@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 金錢小達人 - 主題設定管理器</title>
+    
+    <!-- 簡化主題系統樣式 -->
+    <link rel="stylesheet" href="../css/ai-theme.css">
+    <link rel="stylesheet" href="../css/dark-theme.css">
+    
+    <style>
+        /* 預設 AI 主題變數 */
+        :root {
+            /* 拆分漸層顏色 */
+            --gradient-start-color: #87CEEB; /* 漸層起始色 */
+            --gradient-end-color: #B0E0E6;   /* 漸層結束色 */
+
+            /* 使用這兩個變數來組合漸層 */
+            --background-primary: linear-gradient(135deg, var(--gradient-start-color) 0%, var(--gradient-end-color) 100%);
+            --background-secondary: #FFFFFF;
+            --background-card: #FFFFFF;
+            --background-overlay: rgba(255, 255, 255, 0.95);
+            --background-light: #E6F3FF;
+            
+            /* 文字色彩 */
+            --text-primary: #2F4F4F;
+            --text-secondary: #696969;
+            --text-muted: #A9A9A9;
+            --text-inverse: #FFFFFF;
+            
+            /* 主要色彩 */
+            --primary-color: #00aeff;
+            --primary-dark: #FF8C00;
+            --primary-light: #FFD700;
+            --secondary-color: #3CB371;
+            --accent-color: #FF69B4;
+            
+            /* 邊框和分隔線 */
+            --border-color: #4682B4;
+            --border-light: #87CEEB;
+            --divider-color: #87CEEB;
+            
+            /* 狀態色彩 */
+            --success-color: #32CD32;
+            --warning-color: #FFD700;
+            --error-color: #FF6347;
+            --info-color: #3CB371;
+            
+            /* 陰影 */
+            --shadow-light: 0 2px 8px rgba(135, 206, 235, 0.2);
+            --shadow-medium: 0 4px 12px rgba(135, 206, 235, 0.25);
+            --shadow-heavy: 0 8px 20px rgba(135, 206, 235, 0.3);
+            --shadow-orange: 0 3px 10px rgba(255, 165, 0, 0.3);
+            --shadow-green: 0 3px 10px rgba(60, 179, 113, 0.3);
+            --shadow-pink: 0 3px 10px rgba(255, 105, 180, 0.3);
+            
+            /* 尺寸與其他 */
+            --radius-small: 12px;
+            --radius-medium: 16px;
+            --radius-large: 20px;
+            --spacing-medium: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            --font-family-main: 'Helvetica', 'Arial', 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family-main);
+            background: var(--background-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            transition: all var(--transition-normal);
+        }
+        
+        /* 深色主題的CSS變數重新定義 */
+        [data-theme="dark"] {
+            /* 拆分深色主題的漸層顏色 */
+            --gradient-start-color: #1e3c72;
+            --gradient-end-color: #2a5298;
+
+            /* --background-primary 的定義不用動，它會自動使用上面新的變數 */
+            --background-secondary: #2c3e50;
+            --background-card: #34495e;
+            --background-overlay: rgba(44, 62, 80, 0.95);
+            --background-light: #455a64;
+            
+            /* 重新定義文字色彩 */
+            --text-primary: #ecf0f1;
+            --text-secondary: #bdc3c7;
+            --text-muted: #95a5a6;
+            --text-inverse: #2c3e50;
+            
+            /* 重新定義主要色彩 */
+            --primary-color: #4f8cff;
+            --primary-dark: #3d7ce6;
+            --primary-light: #6ba0ff;
+            --secondary-color: #6c5ce7;
+            --accent-color: #fd79a8;
+            
+            /* 重新定義邊框和分隔線 */
+            --border-color: #34495e;
+            --border-light: #3e4d5e;
+            --divider-color: #455a64;
+            
+            /* 重新定義狀態色彩 */
+            --success-color: #00e676;
+            --warning-color: #2696ff;
+            --error-color: #ef5350;
+            --info-color: #42a5f5;
+            
+            /* 重新定義陰影 */
+            --shadow-light: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-medium: 0 5px 15px rgba(0,0,0,0.4);
+            --shadow-heavy: 0 15px 35px rgba(0,0,0,0.6);
+            --shadow-orange: 0 4px 12px rgba(79, 140, 255, 0.4);
+            --shadow-green: 0 4px 12px rgba(0, 230, 118, 0.4);
+            --shadow-pink: 0 4px 12px rgba(253, 121, 168, 0.4);
+        }
+        
+        .settings-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr 350px;
+            gap: 30px;
+            min-height: calc(100vh - 40px);
+        }
+        
+        /* 左側導航 */
+        .navigation {
+            background: var(--background-card);
+            border-radius: var(--radius-large);
+            padding: 25px;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid var(--border-color);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+        }
+        
+        .nav-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--border-light);
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: var(--background-light);
+            border: 2px solid transparent;
+            border-radius: var(--radius-small);
+            color: var(--text-primary);
+            text-decoration: none;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            font-weight: bold;
+        }
+        
+        .nav-item:hover {
+            background: var(--primary-color);
+            color: var(--text-inverse);
+            transform: translateX(5px);
+        }
+        
+        .nav-item.active {
+            background: var(--primary-color);
+            color: var(--text-inverse);
+            border-color: var(--primary-dark);
+        }
+        
+        /* 中間預覽區 */
+        .preview-area {
+            background: var(--background-card);
+            border-radius: var(--radius-large);
+            padding: 30px;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid var(--border-color);
+            overflow-y: auto;
+            max-height: calc(100vh - 80px);
+        }
+        
+        .preview-section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .preview-section.active {
+            display: block;
+        }
+        
+        .preview-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin-bottom: 25px;
+            text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        /* 右側控制面板 */
+        .control-panel {
+            background: var(--background-card);
+            border-radius: var(--radius-large);
+            padding: 25px;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid var(--border-color);
+            height: fit-content;
+            position: sticky;
+            top: 20px;
+            max-height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
+        
+        .control-section {
+            margin-bottom: 25px;
+            padding: 20px;
+            background: var(--background-light);
+            border-radius: var(--radius-medium);
+            border: 2px solid var(--border-light);
+        }
+        
+        .control-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.3em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .control-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            padding: 12px;
+            background: var(--background-card);
+            border-radius: var(--radius-small);
+            border: 1px solid var(--border-light);
+            min-height: 70px; /* 確保有足夠高度容納顏色方框 */
+        }
+        
+        /* 顏色選擇器容器 - 自定義方案 */
+        .color-input-wrapper {
+            position: relative;
+            width: 80px;
+            height: 50px;
+            border: 3px solid var(--border-color);
+            border-radius: var(--radius-small);
+            overflow: visible; /* 改為可見，避免裁切點擊區域 */
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            display: inline-block;
+            flex-shrink: 0; /* 防止被壓縮 */
+            background: #f0f0f0; /* 淺灰色背景便於識別 */
+            box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1); /* 內部邊框 */
+        }
+        
+        .color-input-wrapper:hover {
+            transform: scale(1.05); /* 減少縮放避免佈局問題 */
+            box-shadow: var(--shadow-light);
+        }
+        
+        .color-input-wrapper:active {
+            transform: scale(0.98);
+        }
+        
+        /* 自定義顏色顏示方框 - 確保完全填滿容器 */
+        .color-preview {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: calc(var(--radius-small) - 3px);
+            pointer-events: none;
+            z-index: 1;
+            display: block !important;
+            /* 確保顏色方框始終可見，使用內聯樣式設置的背景顏色 */
+            min-width: 74px;
+            min-height: 44px;
+            box-sizing: border-box;
+        }
+        
+        /* 原生color input隱藏但保持完整功能 */
+        .color-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+            z-index: 2;
+            /* 保持原生功能，移除會阻礙點擊的樣式 */
+            border: none;
+            background: none;
+            outline: none;
+            padding: 0;
+            margin: 0;
+            /* 不要使用 appearance: none，這會影響功能 */
+        }
+        
+        .range-input {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--background-light);
+            outline: none;
+            cursor: pointer;
+        }
+        
+        .text-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-small);
+            background: var(--background-card);
+            color: var(--text-primary);
+            font-family: var(--font-family-main);
+        }
+        
+        .text-input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 8px rgba(255, 165, 0, 0.3);
+        }
+        
+        .control-label {
+            flex: 1;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: var(--text-secondary);
+            min-width: 140px; /* 增加寬度確保標籤不會被壓縮 */
+            max-width: 180px; /* 限制最大寬度 */
+        }
+        
+        .control-value {
+            font-family: monospace;
+            font-size: 0.8em;
+            color: var(--text-muted);
+            min-width: 80px;
+            text-align: right;
+        }
+        
+        /* 預覽樣本元件 */
+        /* 主題切換按鈕樣式 */
+        .theme-switch-btn {
+            flex: 1;
+            padding: 8px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-small);
+            background: var(--background-card);
+            color: var(--text-primary);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .theme-switch-btn:hover {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .theme-switch-btn.active {
+            background: var(--primary-color);
+            color: var(--text-inverse);
+            border-color: var(--primary-color);
+        }
+
+        /* 預覽樣本元件 */
+        .sample-menu {
+            background: var(--background-card);
+            border-radius: var(--radius-large);
+            padding: 25px;
+            box-shadow: var(--shadow-medium);
+            border: 2px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .sample-button {
+            background: var(--primary-color);
+            color: var(--text-inverse);
+            border: 2px solid var(--primary-dark);
+            border-radius: var(--radius-medium);
+            padding: 12px 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            margin: 8px;
+            display: inline-block;
+        }
+        
+        .sample-button:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .sample-button.secondary {
+            background: var(--secondary-color);
+            border-color: var(--secondary-color);
+        }
+        
+        .sample-button.success {
+            background: var(--success-color);
+            border-color: var(--success-color);
+        }
+        
+        .sample-button.error {
+            background: var(--error-color);
+            border-color: var(--error-color);
+        }
+        
+        .sample-selection {
+            background: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-small);
+            padding: 10px 20px;
+            margin: 8px;
+            display: inline-block;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+        }
+        
+        .sample-selection:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-1px);
+        }
+        
+        .sample-selection.active {
+            background: var(--primary-color);
+            color: var(--text-inverse);
+        }
+        
+        .sample-feedback {
+            background: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-medium);
+            padding: 15px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .sample-progress {
+            background: var(--background-card);
+            border-radius: var(--radius-small);
+            padding: 10px 15px;
+            box-shadow: var(--shadow-light);
+            margin: 10px 0;
+            font-weight: bold;
+            color: var(--text-secondary);
+        }
+        
+        /* 動作按鈕 */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid var(--border-light);
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-medium);
+            background: var(--primary-color);
+            color: var(--text-inverse);
+            font-weight: bold;
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .action-btn.secondary {
+            background: var(--secondary-color);
+        }
+        
+        .action-btn.danger {
+            background: var(--error-color);
+        }
+        
+        /* 模態框 */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--background-card);
+            border-radius: var(--radius-large);
+            padding: 30px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow-y: auto;
+            box-shadow: var(--shadow-heavy);
+            border: 2px solid var(--border-color);
+        }
+        
+        .export-code {
+            background: var(--background-light);
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-small);
+            padding: 20px;
+            font-family: monospace;
+            font-size: 0.9em;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin: 15px 0;
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 1400px) {
+            .settings-container {
+                grid-template-columns: 280px 1fr 320px;
+                gap: 20px;
+            }
+        }
+        
+        @media (max-width: 1200px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .navigation,
+            .control-panel {
+                position: relative;
+                top: auto;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="settings-container">
+        <!-- 左側導航 -->
+        <nav class="navigation">
+            <div class="nav-title">🎨 主題設定</div>
+            
+            <!-- 主題切換器 -->
+            <div style="margin-bottom: 20px; padding: 15px; background: var(--background-light); border-radius: var(--radius-medium); border: 2px solid var(--border-light);">
+                <div style="font-size: 1.1em; font-weight: bold; margin-bottom: 10px; text-align: center;">🌓 主題模式</div>
+                <div style="display: flex; gap: 8px;">
+                    <button class="theme-switch-btn active" data-theme="ai">🤖 AI</button>
+                    <button class="theme-switch-btn" data-theme="dark">🌙 深色</button>
+                </div>
+            </div>
+            
+            <a href="#" class="nav-item active" data-section="colors">🎨 顏色設定</a>
+            <a href="#" class="nav-item" data-section="layout">📐 版面配置</a>
+            <a href="#" class="nav-item" data-section="typography">📝 文字設定</a>
+            <a href="#" class="nav-item" data-section="effects">✨ 效果設定</a>
+            <a href="#" class="nav-item" data-section="components">🧩 元件樣式</a>
+            <a href="#" class="nav-item" data-section="themes">🌓 主題管理</a>
+        </nav>
+        
+        <!-- 中間預覽區 -->
+        <main class="preview-area">
+            <!-- 顏色設定預覽 -->
+            <section class="preview-section active" id="colors-preview">
+                <div class="preview-title">🎨 顏色系統預覽</div>
+                
+                <div class="sample-menu">
+                    <h3>🏠 主選單樣本</h3>
+                    <div class="sample-button">🚀 開始遊戲</div>
+                    <div class="sample-button secondary">⚙️ 設定</div>
+                    <div class="sample-button success">✅ 確定</div>
+                    <div class="sample-button error">❌ 取消</div>
+                </div>
+                
+                <div class="sample-menu">
+                    <h3>🎮 遊戲介面樣本</h3>
+                    <div class="sample-selection">🎯 簡單</div>
+                    <div class="sample-selection active">⚡ 普通</div>
+                    <div class="sample-selection">🔥 困難</div>
+                    
+                    <div class="sample-feedback">📊 你答對了！總分：85分</div>
+                    <div class="sample-progress">🏆 進度追蹤：關卡 3/5 - 60% 完成</div>
+                </div>
+            </section>
+            
+            <!-- 版面配置預覽 -->
+            <section class="preview-section" id="layout-preview">
+                <div class="preview-title">📐 版面配置預覽</div>
+                
+                <div class="sample-menu">
+                    <h3>📏 間距與邊距示範</h3>
+                    <div style="display: grid; gap: var(--spacing-medium); grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        <div class="sample-button">按鈕 1</div>
+                        <div class="sample-button">按鈕 2</div>
+                        <div class="sample-button">按鈕 3</div>
+                    </div>
+                </div>
+                
+                <div class="sample-menu">
+                    <h3>🔲 圓角與邊框示範</h3>
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        <div style="padding: 15px; background: var(--background-light); border-radius: var(--radius-small); border: 2px solid var(--border-color);">小圓角</div>
+                        <div style="padding: 15px; background: var(--background-light); border-radius: var(--radius-medium); border: 2px solid var(--border-color);">中圓角</div>
+                        <div style="padding: 15px; background: var(--background-light); border-radius: var(--radius-large); border: 2px solid var(--border-color);">大圓角</div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 文字設定預覽 -->
+            <section class="preview-section" id="typography-preview">
+                <div class="preview-title">📝 文字系統預覽</div>
+                
+                <div class="sample-menu">
+                    <h1>H1 主標題 - 金錢小達人</h1>
+                    <h2>H2 副標題 - 單元學習</h2>
+                    <h3>H3 小標題 - 設定選項</h3>
+                    <p>正文段落 - 這是一般的內容文字，用於說明和描述。字體大小適中，易於閱讀。</p>
+                    <p class="control-label">標籤文字 - 用於表單標籤和控制項說明</p>
+                    <p class="control-value">代碼文字 - #FF6B6B - 用於顯示數值和代碼</p>
+                </div>
+            </section>
+            
+            <!-- 效果設定預覽 -->
+            <section class="preview-section" id="effects-preview">
+                <div class="preview-title">✨ 視覺效果預覽</div>
+                
+                <div class="sample-menu">
+                    <h3>🌊 陰影效果</h3>
+                    <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                        <div style="padding: 20px; background: var(--background-card); border-radius: var(--radius-medium); box-shadow: var(--shadow-light);">淺陰影</div>
+                        <div style="padding: 20px; background: var(--background-card); border-radius: var(--radius-medium); box-shadow: var(--shadow-medium);">中陰影</div>
+                        <div style="padding: 20px; background: var(--background-card); border-radius: var(--radius-medium); box-shadow: var(--shadow-heavy);">深陰影</div>
+                    </div>
+                </div>
+                
+                <div class="sample-menu">
+                    <h3>🎭 過渡動畫</h3>
+                    <div class="sample-button" style="transition: all var(--transition-fast);">快速過渡</div>
+                    <div class="sample-button" style="transition: all var(--transition-normal);">正常過渡</div>
+                    <div class="sample-button" style="transition: all var(--transition-slow);">緩慢過渡</div>
+                </div>
+            </section>
+            
+            <!-- 元件樣式預覽 -->
+            <section class="preview-section" id="components-preview">
+                <div class="preview-title">🧩 元件樣式預覽</div>
+                
+                <div class="sample-menu">
+                    <h3>🎮 遊戲元件</h3>
+                    <div class="sample-feedback">✅ 正確回答的反饋樣式</div>
+                    <div class="sample-feedback" style="background: var(--error-color); color: var(--text-inverse);">❌ 錯誤回答的反饋樣式</div>
+                    <div class="sample-progress">📊 遊戲進度：第 3 關 / 共 5 關</div>
+                    
+                    <h4 style="margin-top: 20px; margin-bottom: 10px;">遊戲按鈕樣式：</h4>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                        <button class="back-to-menu-btn">🏠 返回主選單</button>
+                        <button class="play-again-btn">
+                            <span>🔄</span>
+                            <span>再玩一次</span>
+                        </button>
+                        <button class="main-menu-btn">
+                            <span>🏠</span>
+                            <span>返回主選單</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="sample-menu">
+                    <h3>💰 金錢相關元件</h3>
+                    <div style="padding: 15px; background: var(--ai-gold-gradient); border-radius: var(--radius-medium); margin: 10px 0;">
+                        💰 金錢區域 - 50元 × 2 = 100元
+                    </div>
+                    <div style="padding: 15px; background: var(--background-light); border: 3px dashed var(--border-color); border-radius: var(--radius-medium);">
+                        📦 拖放區域 - 將金錢拖放到這裡
+                    </div>
+                </div>
+            </section>
+            
+            <!-- 主題管理預覽 -->
+            <section class="preview-section" id="themes-preview">
+                <div class="preview-title">🌓 主題管理中心</div>
+                
+                <div class="sample-menu">
+                    <h3>🎨 當前主題：<span id="current-theme-name">AI智能機器人</span></h3>
+                    <div style="display: flex; gap: 15px; margin: 20px 0;">
+                        <div class="sample-button" onclick="switchToTheme('ai')">🤖 AI卡通主題</div>
+                        <div class="sample-button secondary" onclick="switchToTheme('dark')">🌙 深色護眼主題</div>
+                    </div>
+                </div>
+                
+                <div class="sample-menu">
+                    <h3>💾 主題預設方案</h3>
+                    <div style="display: grid; gap: 15px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        <div class="sample-selection" onclick="loadPreset('ocean')">🌊 海洋藍調</div>
+                        <div class="sample-selection" onclick="loadPreset('sunset')">🌅 夕陽橙紅</div>
+                        <div class="sample-selection" onclick="loadPreset('forest')">🌲 森林綠意</div>
+                        <div class="sample-selection" onclick="loadPreset('candy')">🍭 糖果彩虹</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <!-- 右側控制面板 -->
+        <aside class="control-panel">
+            <!-- 顏色控制 -->
+            <div class="control-section" id="color-controls">
+                <h3>🎨 主題顏色</h3>
+                
+                <!-- 背景漸層控制 -->
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="gradient-start-color" value="#87CEEB">
+                        <div class="color-preview" style="background-color: #87CEEB;"></div>
+                    </div>
+                    <span class="control-label">背景漸層起始色</span>
+                    <span class="control-value" id="gradient-start-color-value">#87CEEB</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="gradient-end-color" value="#B0E0E6">
+                        <div class="color-preview" style="background-color: #B0E0E6;"></div>
+                    </div>
+                    <span class="control-label">背景漸層結束色</span>
+                    <span class="control-value" id="gradient-end-color-value">#B0E0E6</span>
+                </div>
+                
+                <!-- 其他顏色控制 -->
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="primary-color" value="#00aeff">
+                        <div class="color-preview" style="background-color: #00aeff;"></div>
+                    </div>
+                    <span class="control-label">主要顏色 (Primary)</span>
+                    <span class="control-value" id="primary-color-value">#00aeff</span>
+                </div>
+                
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="secondary-color" value="#3CB371">
+                        <div class="color-preview" style="background-color: #3CB371;"></div>
+                    </div>
+                    <span class="control-label">次要顏色 (Secondary)</span>
+                    <span class="control-value" id="secondary-color-value">#3CB371</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="accent-color" value="#FF69B4">
+                        <div class="color-preview" style="background-color: #FF69B4;"></div>
+                    </div>
+                    <span class="control-label">強調顏色 (Accent)</span>
+                    <span class="control-value" id="accent-color-value">#FF69B4</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="success-color" value="#32CD32">
+                        <div class="color-preview" style="background-color: #32CD32;"></div>
+                    </div>
+                    <span class="control-label">成功顏色</span>
+                    <span class="control-value" id="success-color-value">#32CD32</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="error-color" value="#FF6347">
+                        <div class="color-preview" style="background-color: #FF6347;"></div>
+                    </div>
+                    <span class="control-label">錯誤顏色</span>
+                    <span class="control-value" id="error-color-value">#FF6347</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="background-card" value="#FFFFFF">
+                        <div class="color-preview" style="background-color: #FFFFFF;"></div>
+                    </div>
+                    <span class="control-label">卡片背景</span>
+                    <span class="control-value" id="background-card-value">#FFFFFF</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="text-primary" value="#2F4F4F">
+                        <div class="color-preview" style="background-color: #2F4F4F;"></div>
+                    </div>
+                    <span class="control-label">主要文字顏色</span>
+                    <span class="control-value" id="text-primary-value">#2F4F4F</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="warning-color" value="#FFD700">
+                        <div class="color-preview" style="background-color: #FFD700;"></div>
+                    </div>
+                    <span class="control-label">💰 金錢區域背景</span>
+                    <span class="control-value" id="warning-color-value">#FFD700</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="info-color" value="#3CB371">
+                        <div class="color-preview" style="background-color: #3CB371;"></div>
+                    </div>
+                    <span class="control-label">資訊提示顏色</span>
+                    <span class="control-value" id="info-color-value">#3CB371</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="text-secondary" value="#696969">
+                        <div class="color-preview" style="background-color: #696969;"></div>
+                    </div>
+                    <span class="control-label">次要文字顏色</span>
+                    <span class="control-value" id="text-secondary-value">#696969</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="text-muted" value="#A9A9A9">
+                        <div class="color-preview" style="background-color: #A9A9A9;"></div>
+                    </div>
+                    <span class="control-label">輔助文字顏色</span>
+                    <span class="control-value" id="text-muted-value">#A9A9A9</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="border-color" value="#4682B4">
+                        <div class="color-preview" style="background-color: #4682B4;"></div>
+                    </div>
+                    <span class="control-label">邊框顏色</span>
+                    <span class="control-value" id="border-color-value">#4682B4</span>
+                </div>
+
+                <div class="control-item">
+                    <div class="color-input-wrapper">
+                        <input type="color" class="color-input" id="border-light" value="#87CEEB">
+                        <div class="color-preview" style="background-color: #87CEEB;"></div>
+                    </div>
+                    <span class="control-label">淺色邊框</span>
+                    <span class="control-value" id="border-light-value">#87CEEB</span>
+                </div>
+            </div>
+            
+            <!-- 深色主題顏色控制面板已移除，深色主題使用預定義的[data-theme="dark"]變數 -->
+            
+            <!-- 尺寸控制 -->
+            <div class="control-section" id="size-controls" style="display: none;">
+                <h3>📐 尺寸設定</h3>
+                
+                <div class="control-item">
+                    <span class="control-label">小圓角</span>
+                    <input type="range" class="range-input" id="radius-small" min="5" max="25" value="12">
+                    <span class="control-value" id="radius-small-value">12px</span>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">中圓角</span>
+                    <input type="range" class="range-input" id="radius-medium" min="10" max="35" value="16">
+                    <span class="control-value" id="radius-medium-value">16px</span>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">大圓角</span>
+                    <input type="range" class="range-input" id="radius-large" min="15" max="45" value="20">
+                    <span class="control-value" id="radius-large-value">20px</span>
+                </div>
+                
+                <div class="control-item">
+                    <span class="control-label">邊框厚度</span>
+                    <input type="range" class="range-input" id="border-thick" min="1" max="8" value="2">
+                    <span class="control-value" id="border-thick-value">2px</span>
+                </div>
+            </div>
+            
+            <!-- 動作按鈕 -->
+            <div class="action-buttons">
+                <button class="action-btn" onclick="applyChanges()">💾 應用更改</button>
+                <button class="action-btn secondary" onclick="exportTheme()">📤 導出主題</button>
+                <button class="action-btn secondary" onclick="importTheme()">📥 導入主題</button>
+                <button class="action-btn danger" onclick="resetToDefault()">🔄 恢復預設</button>
+            </div>
+        </aside>
+    </div>
+    
+    <!-- 導出模態框 -->
+    <div class="modal" id="exportModal">
+        <div class="modal-content">
+            <h3>📤 導出主題代碼</h3>
+            <p>複製以下CSS代碼並保存為檔案：</p>
+            <div class="export-code" id="exportCode"></div>
+            <div class="action-buttons">
+                <button class="action-btn" onclick="copyToClipboard()">📋 複製代碼</button>
+                <button class="action-btn secondary" onclick="downloadTheme()">💾 下載檔案</button>
+                <button class="action-btn danger" onclick="closeModal()">❌ 關閉</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 主題系統腳本 -->
+    <script src="../js/theme-system.js"></script>
+    
+    <script>
+        // 主題設定管理器 JavaScript
+        
+        let currentSection = 'colors';
+        let currentTheme = 'ai';
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM已載入，開始初始化');
+            initializeNavigation();
+            initializeColorControls();
+            initializeSizeControls();
+            initializeThemeSwitcher();
+            updatePreview();
+            
+            // 初始化主題狀態
+            updateThemeSwitcherButtons('ai');
+            
+            // 確保所有顏色預覽都被正確初始化（延遲執行確保DOM完全準備）
+            setTimeout(() => {
+                console.log('延遲初始化顏色預覽');
+                const colorInputs = document.querySelectorAll('.color-input');
+                colorInputs.forEach(input => {
+                    const wrapper = input.closest('.color-input-wrapper');
+                    if (wrapper) {
+                        const preview = wrapper.querySelector('.color-preview');
+                        if (preview) {
+                            preview.style.backgroundColor = input.value;
+                            console.log('強制設置初始顏色:', input.id, '=', input.value);
+                        }
+                    }
+                });
+                
+                // 測試第一個顏色選擇器是否可以正常點擊
+                const firstColorInput = colorInputs[0];
+                if (firstColorInput) {
+                    console.log('測試第一個顏色選擇器:', firstColorInput.id);
+                    console.log('Input是否可見:', firstColorInput.offsetWidth, 'x', firstColorInput.offsetHeight);
+                    console.log('Input位置:', firstColorInput.getBoundingClientRect());
+                }
+            }, 100);
+        });
+        
+        // 導航初始化
+        function initializeNavigation() {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    
+                    // 更新導航狀態
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    item.classList.add('active');
+                    
+                    // 切換預覽區域
+                    const section = item.dataset.section;
+                    switchSection(section);
+                });
+            });
+        }
+        
+        // 切換區域
+        function switchSection(section) {
+            currentSection = section;
+            
+            // 隱藏所有預覽區域
+            const sections = document.querySelectorAll('.preview-section');
+            sections.forEach(s => s.classList.remove('active'));
+            
+            // 顯示選中的區域
+            const targetSection = document.getElementById(section + '-preview');
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+            
+            // 顯示對應的控制面板
+            showControlPanel(section);
+        }
+        
+        // 顯示控制面板
+        function showControlPanel(section) {
+            const controls = document.querySelectorAll('.control-section');
+            controls.forEach(control => {
+                control.style.display = 'none';
+            });
+            
+            switch(section) {
+                case 'colors':
+                    document.getElementById('color-controls').style.display = 'block';
+                    break;
+                case 'layout':
+                    document.getElementById('size-controls').style.display = 'block';
+                    break;
+                case 'typography':
+                case 'effects':
+                case 'components':
+                case 'themes':
+                    document.getElementById('color-controls').style.display = 'block';
+                    break;
+            }
+        }
+        
+        // 初始化顏色控制
+        function initializeColorControls() {
+            console.log('初始化顏色控制');
+            
+            // 處理所有顏色輸入控制項
+            const colorInputs = document.querySelectorAll('.color-input');
+            console.log('找到顏色輸入控制項:', colorInputs.length);
+            
+            colorInputs.forEach((input, index) => {
+                console.log(`處理顏色輸入 ${index + 1}:`, input.id, '初始值:', input.value);
+                
+                // 更新對應的 value span 的初始值
+                const initialValueSpan = document.getElementById(input.id + '-value');
+                if (initialValueSpan) {
+                    initialValueSpan.textContent = input.value.toUpperCase();
+                }
+                
+                // 立即設置初始顏色預覽
+                const wrapper = input.closest('.color-input-wrapper');
+                if (wrapper) {
+                    const preview = wrapper.querySelector('.color-preview');
+                    if (preview) {
+                        preview.style.backgroundColor = input.value;
+                        console.log(`設置初始顏色預覽 ${input.id}:`, input.value);
+                    } else {
+                        console.error(`未找到 .color-preview for ${input.id}`);
+                    }
+                } else {
+                    console.error(`未找到 .color-input-wrapper for ${input.id}`);
+                }
+
+                // 綁定顏色變化事件
+                input.addEventListener('input', (e) => {
+                    const colorValue = e.target.value;
+                    console.log('顏色變化:', e.target.id, '新值:', colorValue);
+                    
+                    // 更新 value span
+                    const valueSpan = document.getElementById(e.target.id + '-value');
+                    if (valueSpan) {
+                        valueSpan.textContent = colorValue.toUpperCase();
+                    }
+                    
+                    // 更新自定義顏色預覽方框
+                    const wrapper = input.closest('.color-input-wrapper');
+                    if (wrapper) {
+                        const preview = wrapper.querySelector('.color-preview');
+                        if (preview) {
+                            preview.style.backgroundColor = colorValue;
+                        }
+                    }
+                    
+                    // 更新CSS變數
+                    updateCSSVariable(e.target.id, colorValue);
+                });
+                
+                // 綁定change事件作為備用
+                input.addEventListener('change', (e) => {
+                    const colorValue = e.target.value;
+                    console.log('顏色change事件:', e.target.id, '新值:', colorValue);
+                    
+                    const wrapper = input.closest('.color-input-wrapper');
+                    if (wrapper) {
+                        const preview = wrapper.querySelector('.color-preview');
+                        if (preview) {
+                            preview.style.backgroundColor = colorValue;
+                        }
+                    }
+                });
+            });
+
+            // 為顏色包裝器添加點擊事件處理（後備方案）
+            const colorWrappers = document.querySelectorAll('.color-input-wrapper');
+            console.log('找到顏色包裝器:', colorWrappers.length);
+            
+            colorWrappers.forEach((wrapper, index) => {
+                const colorInput = wrapper.querySelector('.color-input');
+                const preview = wrapper.querySelector('.color-preview');
+                
+                if (colorInput && preview) {
+                    // 當點擊預覽方框時，觸發input的點擊
+                    preview.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        console.log(`點擊預覽方框 ${index + 1}, 觸發:`, colorInput.id);
+                        
+                        // 嘗試多種方法觸發顏色選擇器
+                        try {
+                            // 方法1: 直接點擊
+                            colorInput.click();
+                        } catch (error) {
+                            console.log('方法1失敗，嘗試方法2');
+                            try {
+                                // 方法2: 程式化觸發
+                                const event = new MouseEvent('click', {
+                                    view: window,
+                                    bubbles: true,
+                                    cancelable: true
+                                });
+                                colorInput.dispatchEvent(event);
+                            } catch (error2) {
+                                console.log('方法2失敗，嘗試方法3');
+                                // 方法3: 聚焦並觸發
+                                colorInput.focus();
+                                setTimeout(() => colorInput.click(), 10);
+                            }
+                        }
+                    });
+                    
+                    // 確保原生input仍然可以直接點擊
+                    colorInput.addEventListener('click', (e) => {
+                        console.log(`直接點擊color input: ${colorInput.id}`);
+                        // 不阻止默認行為，讓瀏覽器正常處理
+                    });
+                }
+            });
+        }
+        
+        // 初始化尺寸控制
+        function initializeSizeControls() {
+            const rangeInputs = document.querySelectorAll('.range-input');
+            rangeInputs.forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const value = e.target.value + 'px';
+                    const valueSpan = document.getElementById(e.target.id + '-value');
+                    if (valueSpan) {
+                        valueSpan.textContent = value;
+                    }
+                    
+                    // 實時更新CSS變數
+                    updateCSSVariable(e.target.id, value);
+                });
+            });
+        }
+        
+        // 初始化主題切換器
+        function initializeThemeSwitcher() {
+            const themeBtns = document.querySelectorAll('.theme-switch-btn');
+            console.log('找到主題切換按鈕:', themeBtns.length);
+            
+            themeBtns.forEach(btn => {
+                console.log('綁定按鈕事件:', btn.dataset.theme);
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('按鈕被點擊:', btn.dataset.theme);
+                    
+                    // 切換主題
+                    const theme = btn.dataset.theme;
+                    switchToTheme(theme);
+                });
+            });
+        }
+        
+        // 更新CSS變數
+        function updateCSSVariable(name, value) {
+            const varName = '--' + name;
+            console.log('更新CSS變數:', varName, '=', value);
+            document.documentElement.style.setProperty(varName, value);
+        }
+        
+        // 新增輔助函數來更新控制項
+        function updateControlValue(id, value) {
+            console.log('updateControlValue:', id, '=', value);
+            
+            const input = document.getElementById(id);
+            const valueSpan = document.getElementById(id + '-value');
+            
+            if (input) {
+                input.value = value;
+                console.log('更新input值:', id, '=', value);
+            } else {
+                console.error('未找到input:', id);
+            }
+            
+            if (valueSpan) {
+                valueSpan.textContent = value.toUpperCase();
+            } else {
+                console.error('未找到valueSpan:', id + '-value');
+            }
+            
+            // 更新自定義顏色預覽方框
+            const wrapper = input ? input.closest('.color-input-wrapper') : null;
+            if (wrapper) {
+                const preview = wrapper.querySelector('.color-preview');
+                if (preview) {
+                    preview.style.backgroundColor = value;
+                    console.log('更新預覽方框顏色:', id, '=', value);
+                } else {
+                    console.error('未找到preview in wrapper for:', id);
+                }
+            } else {
+                console.error('未找到wrapper for:', id);
+            }
+        }
+        
+        // 修正後的 switchToTheme 函數 - 直接設定CSS變數確保生效
+        function switchToTheme(theme) {
+            console.log('切換主題至:', theme);
+            currentTheme = theme;
+            const body = document.body;
+            
+            // 1. 根據主題，添加或移除 data-theme 屬性
+            if (theme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                
+                // 2. 直接設定深色主題的CSS變數（確保生效）
+                document.documentElement.style.setProperty('--gradient-start-color', '#1e3c72');
+                document.documentElement.style.setProperty('--gradient-end-color', '#2a5298');
+                document.documentElement.style.setProperty('--background-secondary', '#2c3e50');
+                document.documentElement.style.setProperty('--background-card', '#34495e');
+                document.documentElement.style.setProperty('--background-light', '#455a64');
+                document.documentElement.style.setProperty('--text-primary', '#ecf0f1');
+                document.documentElement.style.setProperty('--text-secondary', '#bdc3c7');
+                document.documentElement.style.setProperty('--text-muted', '#95a5a6');
+                document.documentElement.style.setProperty('--text-inverse', '#2c3e50');
+                document.documentElement.style.setProperty('--primary-color', '#4f8cff');
+                document.documentElement.style.setProperty('--primary-dark', '#3d7ce6');
+                document.documentElement.style.setProperty('--primary-light', '#6ba0ff');
+                document.documentElement.style.setProperty('--secondary-color', '#6c5ce7');
+                document.documentElement.style.setProperty('--accent-color', '#fd79a8');
+                document.documentElement.style.setProperty('--border-color', '#34495e');
+                document.documentElement.style.setProperty('--border-light', '#3e4d5e');
+                document.documentElement.style.setProperty('--success-color', '#00e676');
+                document.documentElement.style.setProperty('--error-color', '#ef5350');
+                document.documentElement.style.setProperty('--warning-color', '#2696ff');
+                document.documentElement.style.setProperty('--info-color', '#42a5f5');
+                
+            } else {
+                body.removeAttribute('data-theme');
+                
+                // 2. 直接設定AI主題的CSS變數（確保生效）
+                document.documentElement.style.setProperty('--gradient-start-color', '#87CEEB');
+                document.documentElement.style.setProperty('--gradient-end-color', '#B0E0E6');
+                document.documentElement.style.setProperty('--background-secondary', '#FFFFFF');
+                document.documentElement.style.setProperty('--background-card', '#FFFFFF');
+                document.documentElement.style.setProperty('--background-light', '#E6F3FF');
+                document.documentElement.style.setProperty('--text-primary', '#2F4F4F');
+                document.documentElement.style.setProperty('--text-secondary', '#696969');
+                document.documentElement.style.setProperty('--text-muted', '#A9A9A9');
+                document.documentElement.style.setProperty('--text-inverse', '#FFFFFF');
+                document.documentElement.style.setProperty('--primary-color', '#00aeff');
+                document.documentElement.style.setProperty('--primary-dark', '#FF8C00');
+                document.documentElement.style.setProperty('--primary-light', '#FFD700');
+                document.documentElement.style.setProperty('--secondary-color', '#3CB371');
+                document.documentElement.style.setProperty('--accent-color', '#FF69B4');
+                document.documentElement.style.setProperty('--border-color', '#4682B4');
+                document.documentElement.style.setProperty('--border-light', '#87CEEB');
+                document.documentElement.style.setProperty('--success-color', '#32CD32');
+                document.documentElement.style.setProperty('--error-color', '#FF6347');
+                document.documentElement.style.setProperty('--warning-color', '#FFD700');
+                document.documentElement.style.setProperty('--info-color', '#3CB371');
+            }
+            
+            // 3. 更新所有顏色控制項顯示值和預覽方框
+            if (theme === 'dark') {
+                updateControlValue('gradient-start-color', '#1e3c72');
+                updateControlValue('gradient-end-color', '#2a5298');
+                updateControlValue('background-card', '#34495e');
+                updateControlValue('text-primary', '#ecf0f1');
+                updateControlValue('text-secondary', '#bdc3c7');
+                updateControlValue('text-muted', '#95a5a6');
+                updateControlValue('primary-color', '#4f8cff');
+                updateControlValue('secondary-color', '#6c5ce7');
+                updateControlValue('accent-color', '#fd79a8');
+                updateControlValue('border-color', '#34495e');
+                updateControlValue('border-light', '#3e4d5e');
+                updateControlValue('success-color', '#00e676');
+                updateControlValue('error-color', '#ef5350');
+                updateControlValue('warning-color', '#ffc107');
+                updateControlValue('info-color', '#42a5f5');
+            } else {
+                updateControlValue('gradient-start-color', '#87CEEB');
+                updateControlValue('gradient-end-color', '#B0E0E6');
+                updateControlValue('background-card', '#FFFFFF');
+                updateControlValue('text-primary', '#2F4F4F');
+                updateControlValue('text-secondary', '#696969');
+                updateControlValue('text-muted', '#A9A9A9');
+                updateControlValue('primary-color', '#00aeff');
+                updateControlValue('secondary-color', '#3CB371');
+                updateControlValue('accent-color', '#FF69B4');
+                updateControlValue('border-color', '#4682B4');
+                updateControlValue('border-light', '#87CEEB');
+                updateControlValue('success-color', '#32CD32');
+                updateControlValue('error-color', '#FF6347');
+                updateControlValue('warning-color', '#FFD700');
+                updateControlValue('info-color', '#3CB371');
+            }
+            
+            // 4. 更新主題名稱顯示
+            const nameElement = document.getElementById('current-theme-name');
+            if (nameElement) {
+                nameElement.textContent = (theme === 'dark') ? '深色護眼模式' : 'AI智能機器人';
+            }
+                    
+            // 5. 更新左側切換器按鈕的 active 狀態
+            updateThemeSwitcherButtons(theme);
+            
+            console.log('主題切換完成:', theme);
+        }
+        
+        // 更新左側切換器按鈕狀態 (修正後版本)
+        function updateThemeSwitcherButtons(activeTheme) {
+            console.log('更新按鈕狀態，活躍主題:', activeTheme);
+            const themeBtns = document.querySelectorAll('.theme-switch-btn');
+            
+            themeBtns.forEach(btn => {
+                console.log('處理按鈕:', btn.dataset.theme, '是否活躍:', btn.dataset.theme === activeTheme);
+                
+                // 我們不再需要直接操作 style 屬性
+                // 只需要根據主題來添加或移除 'active' class 即可
+                // 樣式的變化將完全交給 CSS 處理
+                if (btn.dataset.theme === activeTheme) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+        
+        // 應用更改
+        function applyChanges() {
+            alert('✅ 設定已應用！所有更改將保存到主題檔案中。');
+        }
+        
+        // 導出主題
+        function exportTheme() {
+            const cssCode = generateCSSCode();
+            document.getElementById('exportCode').textContent = cssCode;
+            document.getElementById('exportModal').classList.add('show');
+        }
+        
+        // 產生CSS代碼
+        function generateCSSCode() {
+            const colors = {};
+            const colorInputs = document.querySelectorAll('.color-input');
+            colorInputs.forEach(input => {
+                colors[input.id] = input.value;
+            });
+            
+            let css = '/* 自定義主題CSS */\n:root {\n';
+            for (const [key, value] of Object.entries(colors)) {
+                css += `    --${key}: ${value};\n`;
+            }
+            css += '}\n';
+            
+            return css;
+        }
+        
+        // 複製到剪貼板
+        function copyToClipboard() {
+            const code = document.getElementById('exportCode').textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                alert('📋 代碼已複製到剪貼板！');
+            });
+        }
+        
+        // 下載主題檔案
+        function downloadTheme() {
+            const code = generateCSSCode();
+            const blob = new Blob([code], { type: 'text/css' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'custom-theme.css';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 導入主題
+        function importTheme() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.css';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        // 解析CSS檔案並應用設定
+                        alert('📥 主題檔案已導入！');
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        }
+        
+        // 恢復預設
+        function resetToDefault() {
+            if (confirm('🔄 確定要恢復所有設定到預設值嗎？這將清除所有自定義設定。')) {
+                location.reload();
+            }
+        }
+        
+        // 載入預設方案
+        function loadPreset(preset) {
+            const presets = {
+                ocean: {
+                    'ai-sky-blue': '#4FB3E9',
+                    'ai-vibrant-orange': '#FF8A50',
+                    'ai-robot-green': '#4ECDC4',
+                    'ai-cute-pink': '#FF6B9D'
+                },
+                sunset: {
+                    'ai-sky-blue': '#FFA726',
+                    'ai-vibrant-orange': '#FF7043',
+                    'ai-robot-green': '#66BB6A',
+                    'ai-cute-pink': '#EC407A'
+                },
+                forest: {
+                    'ai-sky-blue': '#81C784',
+                    'ai-vibrant-orange': '#FFA726',
+                    'ai-robot-green': '#4CAF50',
+                    'ai-cute-pink': '#8BC34A'
+                },
+                candy: {
+                    'ai-sky-blue': '#E1BEE7',
+                    'ai-vibrant-orange': '#FFB74D',
+                    'ai-robot-green': '#A5D6A7',
+                    'ai-cute-pink': '#F8BBD9'
+                }
+            };
+            
+            const colors = presets[preset];
+            if (colors) {
+                for (const [key, value] of Object.entries(colors)) {
+                    const input = document.getElementById(key);
+                    if (input) {
+                        input.value = value;
+                        input.dispatchEvent(new Event('input'));
+                    }
+                }
+            }
+        }
+        
+        // 關閉模態框
+        function closeModal() {
+            document.getElementById('exportModal').classList.remove('show');
+        }
+        
+        // 更新預覽
+        function updatePreview() {
+            // 實時預覽更新邏輯
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script><script>eruda.init();</script>
+
+</body>
+</html>

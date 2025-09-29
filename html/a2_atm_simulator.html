@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A2模擬提款</title>
+    
+    <!-- SEO 和可存取性 -->
+    <meta name="description" content="透過真實ATM操作模擬學習提款機使用技巧，包含插卡、輸入密碼、選擇功能和金額操作">
+    <meta name="keywords" content="ATM教學,提款機模擬,金融教育,數位金融,兒童教育">
+    <meta name="author" content="金錢教學遊戲">
+    
+    <!-- Open Graph 標籤 -->
+    <meta property="og:title" content="A2：ATM提款機模擬學習">
+    <meta property="og:description" content="學習真實ATM提款機操作流程和安全使用技巧">
+    <meta property="og:type" content="website">
+    
+    <!-- 無障礙設計 -->
+    <meta name="theme-color" content="#1976d2">
+    
+    <!-- 簡化主題系統樣式 -->
+    <link rel="stylesheet" href="../css/ai-theme.css">
+    <link rel="stylesheet" href="../css/dark-theme.css">
+    <link rel="stylesheet" href="../css/a2_atm_simulator.css">
+    
+    <!-- 預載入重要資源 -->
+    <link rel="preload" href="../js/a2_atm_simulator.js" as="script">
+    <link rel="preload" href="../css/a2_atm_simulator.css" as="style">
+    
+    <!-- 字體預載入 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    
+    <!-- 結構化資料 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "EducationalResource",
+        "name": "A2：ATM提款機模擬學習",
+        "description": "透過ATM模擬學習金融服務操作的教育工具",
+        "educationalLevel": "小學",
+        "subject": "數學,生活教育",
+        "learningResourceType": "互動模擬",
+        "audience": {
+            "@type": "Audience",
+            "@audienceType": "學生"
+        }
+    }
+    </script>
+    
+    <style>
+        /* 禁用行動裝置上的下拉重新整理功能 */
+        html, body, #app {
+            overscroll-behavior-y: contain;
+        }
+        
+        /* ATM 滿版面響應式設計 */
+        .atm-container {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        /* 🔧 [修改] 滿版面三欄佈局樣式 - 卡片插槽左側、螢幕中央、收據右側 */
+        .atm-body {
+            display: flex;
+            gap: 20px;
+            align-items: stretch; /* 確保左右側面板高度相等 */
+            justify-content: center;
+            width: 100vw;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-radius: 0;
+            box-shadow: none;
+            box-sizing: border-box;
+        }
+
+        /* 左側面板 - 卡片插槽區域 */
+        .atm-left-panel {
+            flex: 0 0 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* 高度由 align-items: stretch 自動調整 */
+        }
+
+        /* 中央面板 - ATM螢幕和按鈕區域 */
+        .atm-center-panel {
+            flex: 1;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* 右側面板 - 收據出口和顯示區域 */
+        .atm-right-panel {
+            flex: 0 0 200px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            /* 高度由 align-items: stretch 自動調整 */
+        }
+
+        /* 卡片插槽區域樣式 */
+        .card-slot-area {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* 收據印表機樣式 */
+        .receipt-printer {
+            background: linear-gradient(135deg, #4caf50, #388e3c);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .receipt-slot {
+            background: #1b5e20;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .receipt-opening {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* 收據顯示區域 */
+        .receipt-display-area {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-height: 200px;
+        }
+
+        .receipt-display-header h4 {
+            color: #4caf50;
+            margin: 0 0 15px 0;
+            text-align: center;
+            font-size: 16px;
+        }
+
+        .receipt-display-content {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 120px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .no-receipt-message {
+            text-align: center;
+            color: #999;
+            font-style: italic;
+            margin: 50px 0;
+        }
+
+        .receipt-display-actions {
+            margin-top: 15px;
+            text-align: center;
+        }
+
+        .take-receipt-btn {
+            background: #4caf50;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .take-receipt-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        /* 🔧 [新增] 取走現金按鈕樣式 */
+        .take-cash-btn {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Microsoft JhengHei', sans-serif;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+            margin: 15px auto 0;
+            display: block;
+            min-width: 140px;
+        }
+
+        .take-cash-btn:hover {
+            background: linear-gradient(135deg, #f57c00, #ef6c00);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
+        }
+
+        .take-cash-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* 🔧 [修正] 現金出口區域 */
+        .cash-dispenser-area {
+            background: linear-gradient(135deg, #607d8b, #455a64);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
+            position: relative;
+        }
+
+        .cash-dispenser {
+            background: #37474f;
+            border-radius: 8px;
+            padding: 15px;
+            min-height: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cash-slot-label {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .cash-display-frame {
+            background: #263238;
+            border-radius: 6px;
+            padding: 10px;
+            min-height: 80px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .cash-placeholder {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            text-align: center;
+            width: 100%;
+        }
+
+        /* ATM螢幕樣式 */
+        .atm-screen {
+            background: #000;
+            border: 8px solid #1a252f;
+            border-radius: 15px;
+            width: 100%;
+            height: 520px; /* 🔧 增加高度讓螢幕更大，減少上下空隙 */
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .screen-content {
+            background: linear-gradient(135deg, #1e3a8a, #1e40af);
+            color: white;
+            padding: 20px;
+            height: 100%;
+            box-sizing: border-box;
+            font-family: 'Microsoft JhengHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        /* 響應式設計 */
+        @media (max-width: 1200px) {
+            .atm-body {
+                flex-direction: column;
+                align-items: stretch; /* 垂直佈局下也保持寬度一致 */
+            }
+            
+            .atm-left-panel,
+            .atm-right-panel {
+                flex: 0 0 auto;
+                width: 100%;
+                max-width: 500px;
+                margin: 0 auto; /* 居中對齊 */
+            }
+            
+            .atm-center-panel {
+                width: 100%;
+                max-width: 500px;
+                margin: 0 auto; /* 居中對齊 */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .atm-body {
+                padding: 10px;
+                gap: 10px;
+            }
+            
+            .atm-screen {
+                height: 420px; /* 🔧 平板版本也增加高度 */
+            }
+            
+            .cash-dispenser-area,
+            .card-slot-area,
+            .receipt-printer {
+                padding: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .atm-container {
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .atm-body {
+                padding: 5px;
+                min-height: auto;
+            }
+            
+            .atm-screen {
+                height: 350px; /* 🔧 手機版本也適度增加高度 */
+            }
+        }
+        
+        /* 🔧 [新增] 確保標題列滿版面樣式 */
+        #app {
+            width: 100vw !important;
+            max-width: 100vw !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            overflow-x: hidden;
+        }
+        
+        .atm-title-bar {
+            margin: 0 !important;
+            padding: 15px 25px !important;
+            width: 100vw !important;
+            max-width: 100vw !important;
+            box-sizing: border-box !important;
+            position: relative;
+            left: 50%;
+            right: 50%;
+            margin-left: -50vw !important;
+            margin-right: -50vw !important;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading-screen" class="loading-screen" aria-label="ATM系統載入中">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">ATM系統載入中...</div>
+    </div>
+    
+    <main id="app" role="main" aria-label="ATM提款機模擬學習主要內容">
+        <noscript>
+            <div class="noscript-message">
+                <h1>需要啟用 JavaScript</h1>
+                <p>此ATM模擬器需要 JavaScript 才能正常運作，請在瀏覽器設定中啟用 JavaScript。</p>
+                <p>如需協助，請聯絡您的老師或家長。</p>
+            </div>
+        </noscript>
+    </main>
+    
+    <div id="error-boundary" class="error-boundary" style="display: none;" role="alert">
+        <div class="error-content">
+            <h2>系統發生錯誤</h2>
+            <p>ATM系統執行時發生問題，請重新整理頁面再試一次。</p>
+            <p>如果問題持續發生，請聯絡系統管理員。</p>
+            <button onclick="location.reload()" class="reload-btn">重新載入系統</button>
+        </div>
+    </div>
+    
+    <script>
+        // 錯誤處理
+        window.addEventListener('error', function(event) {
+            console.error('ATM系統錯誤:', event.error);
+            document.getElementById('error-boundary').style.display = 'flex';
+            document.getElementById('loading-screen').style.display = 'none';
+        });
+        
+        // 載入完成後隱藏載入畫面
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.display = 'none';
+            }, 1500);
+        });
+        
+        // 全域鍵盤快捷鍵
+        document.addEventListener('keydown', function(event) {
+            // Escape 取消操作
+            if (event.key === 'Escape') {
+                if (window.ATM && window.ATM.handleCancelKey) {
+                    window.ATM.handleCancelKey();
+                }
+            }
+            
+            // 數字鍵直接輸入
+            if (event.key >= '0' && event.key <= '9' && window.ATM && window.ATM.handleNumberInput) {
+                window.ATM.handleNumberInput(event.key);
+            }
+            
+            // Enter 確認操作
+            if (event.key === 'Enter' && window.ATM && window.ATM.handleEnterKey) {
+                event.preventDefault();
+                window.ATM.handleEnterKey();
+            }
+        });
+        
+        // 設定基本的 ARIA live regions
+        document.addEventListener('DOMContentLoaded', function() {
+            const app = document.getElementById('app');
+            if (app) {
+                app.setAttribute('aria-live', 'polite');
+            }
+        });
+    </script>
+    
+    <script src="../js/audio-unlocker.js"></script>
+    <script src="../js/theme-system.js"></script>
+    
+    <script src="../js/a2_atm_simulator.js"></script>
+    
+    <script>
+        if ('performance' in window) {
+            window.addEventListener('load', function() {
+                setTimeout(() => {
+                    const perfData = performance.timing;
+                    const loadTime = perfData.loadEventEnd - perfData.navigationStart;
+                    console.log('ATM系統載入時間:', loadTime + 'ms');
+                    
+                    if (loadTime > 5000) {
+                        console.warn('系統載入時間較長，建議檢查網路連線');
+                    }
+                }, 0);
+            });
+        }
+    </script>
+    
+    <script>
+        // ATM專用除錯面板
+        function createATMDebugPanel() {
+            const debugPanel = document.createElement('div');
+            debugPanel.id = 'atm-debug-panel';
+            debugPanel.style.cssText = `
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                width: 300px;
+                max-height: 200px;
+                background: rgba(25, 118, 210, 0.9);
+                color: #ffffff;
+                font-family: monospace;
+                font-size: 11px;
+                padding: 10px;
+                border-radius: 8px;
+                z-index: 10000;
+                overflow-y: auto;
+                display: none;
+                border: 2px solid #1976d2;
+            `;
+            document.body.appendChild(debugPanel);
+            
+            // ATM除錯按鈕
+            const toggleBtn = document.createElement('button');
+            toggleBtn.innerHTML = '🏧';
+            toggleBtn.style.cssText = `
+                position: fixed;
+                top: 10px;
+                left: 10px;
+                background: #1976d2;
+                color: white;
+                border: none;
+                border-radius: 50%;
+                width: 45px;
+                height: 45px;
+                font-size: 18px;
+                z-index: 10001;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+            `;
+            toggleBtn.onclick = () => {
+                debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+            };
+            document.body.appendChild(toggleBtn);
+            
+            return debugPanel;
+        }
+        
+        // ATM專用console處理
+        let atmDebugPanel;
+        const originalLog = console.log;
+        const originalError = console.error;
+        
+        function atmLog(level, ...args) {
+            // 保持原有功能
+            if (level === 'error') {
+                originalError.apply(console, args);
+            } else {
+                originalLog.apply(console, args);
+            }
+            
+            // 只顯示A2-ATM相關訊息
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            
+            if (message.includes('[A2-ATM]') || message.includes('ATM') || level === 'error') {
+                if (!atmDebugPanel) {
+                    atmDebugPanel = createATMDebugPanel();
+                }
+                
+                const logEntry = document.createElement('div');
+                logEntry.style.color = level === 'error' ? '#ff6b6b' : '#ffffff';
+                logEntry.style.marginBottom = '2px';
+                logEntry.style.fontSize = '10px';
+                logEntry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                atmDebugPanel.appendChild(logEntry);
+                atmDebugPanel.scrollTop = atmDebugPanel.scrollHeight;
+                
+                // 限制最大訊息數量
+                if (atmDebugPanel.children.length > 50) {
+                    atmDebugPanel.removeChild(atmDebugPanel.firstChild);
+                }
+            }
+        }
+        
+        // 重寫console方法
+        console.log = (...args) => atmLog('log', ...args);
+        console.error = (...args) => atmLog('error', ...args);
+        
+        // ATM全域錯誤捕獲
+        window.addEventListener('error', function(event) {
+            console.error('[A2-ATM全域錯誤]', {
+                message: event.message,
+                filename: event.filename,
+                line: event.lineno,
+                error: event.error?.toString()
+            });
+        });
+        
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('[A2-ATM Promise錯誤]', event.reason);
+        });
+        
+        console.log('[A2-ATM] ATM除錯系統已啟動');
+    </script>
+</body>
+</html>

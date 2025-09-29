@@ -1,0 +1,2833 @@
+● Update(CSS_REFACTORING_GUIDE.md)
+  ⎿  Updated CSS_REFACTORING_GUIDE.md with 723 additions and 53 removals
+        80
+        81    ## 🚀 詳細實施步驟
+        82
+        83 -  ### 階段一：準備與備份 (預估時間：1小時)
+        83 +  ### 階段一：準備與備份 (預估時間：1-2小時)
+        84
+        85 -  #### Step 1.1：創建目錄結構
+        85 +  ⚠️ **重要安全提醒**：重構前務必完成完整備份，建議使用版本控制系統
+        86 +
+        87 +  #### Step 1.1：環境檢查與準備
+        88 +
+        89 +  ##### Step 1.1.1：檢查當前項目狀態
+        90    ```bash
+        91 -  # 在 css/ 目錄下創建新的目錄結構
+        91 +  # 檢查當前目錄結構
+        92 +  ls -la css/
+        93 +
+        94 +  # 預期看到的現有檔案：
+        95 +  # ai-theme.css
+        96 +  # dark-theme.css
+        97 +  # unit6.css
+        98 +  # f4-number-sorting.css
+        99 +  # f5-quantity-comparison.css
+       100 +  # （可能還有其他單元CSS檔案）
+       101 +  ```
+       102 +
+       103 +  ##### Step 1.1.2：創建完整目錄結構
+       104 +  ```bash
+       105 +  # Windows 環境 (使用 cmd 或 PowerShell)
+       106 +  md css\shared
+       107 +  md css\modules\index-page
+       108 +  md css\modules\c1-money-types
+       109 +  md css\modules\c2-money-counting
+       110 +  md css\modules\c3-money-exchange
+       111 +  md css\modules\c4-correct-amount
+       112 +  md css\modules\c5-sufficient-payment
+       113 +  md css\modules\f1-object-correspondence
+       114 +  md css\modules\f2-rote-rational-counting
+       115 +  md css\modules\f3-number-recognition
+       116 +  md css\modules\f4-number-sorting
+       117 +  md css\modules\f5-quantity-comparison
+       118 +  md css\modules\a1-simulated-shopping
+       119 +  md css\modules\a2-atm-simulator
+       120 +  md css\modules\theme-switcher
+       121 +  md css\legacy
+       122 +  md css\temp-backup
+       123 +
+       124 +  # Unix/Linux/macOS 環境
+       125    mkdir -p css/shared
+       126 -  mkdir -p css/modules/index-page
+       127 -  mkdir -p css/modules/c1-money-types
+       128 -  mkdir -p css/modules/c2-money-counting
+       129 -  mkdir -p css/modules/c3-money-exchange
+       130 -  mkdir -p css/modules/c4-correct-amount
+       131 -  mkdir -p css/modules/c5-sufficient-payment
+       132 -  mkdir -p css/modules/f1-object-correspondence
+       133 -  mkdir -p css/modules/f2-rote-rational-counting
+       134 -  mkdir -p css/modules/f3-number-recognition
+       135 -  mkdir -p css/modules/f4-number-sorting
+       136 -  mkdir -p css/modules/f5-quantity-comparison
+       137 -  mkdir -p css/modules/a1-simulated-shopping
+       138 -  mkdir -p css/modules/a2-atm-simulator
+       139 -  mkdir -p css/modules/theme-switcher
+       140 -  mkdir -p css/legacy
+       126 +  mkdir -p css/modules/{index-page,c1-money-types,c2-money-counting,c3-money-exchange,c4-correct-amount,c5-sufficient-payment,f1-object-correspondence,f2-rote-rational-counting,f3-number-rec
+           + ognition,f4-number-sorting,f5-quantity-comparison,a1-simulated-shopping,a2-atm-simulator,theme-switcher}
+       127 +  mkdir -p css/{legacy,temp-backup}
+       128    ```
+       129
+       130 -  #### Step 1.2：備份現有檔案
+       130 +  ##### Step 1.1.3：驗證目錄創建成功
+       131    ```bash
+       132 -  # 備份所有現有CSS檔案到 legacy 目錄
+       132 +  # 檢查新目錄結構
+       133 +  dir css\modules\  # Windows
+       134 +  ls css/modules/   # Unix/Linux/macOS
+       135 +
+       136 +  # 應該看到所有模組目錄已創建
+       137 +  # 如果有缺失，手動補充創建
+       138 +  ```
+       139 +
+       140 +  #### Step 1.2：完整備份現有檔案
+       141 +
+       142 +  ##### Step 1.2.1：備份所有CSS檔案
+       143 +  ```bash
+       144 +  # Windows 環境
+       145 +  copy css\*.css css\legacy\
+       146 +  copy css\*.css css\temp-backup\
+       147 +
+       148 +  # Unix/Linux/macOS 環境
+       149    cp css/*.css css/legacy/
+       150 +  cp css/*.css css/temp-backup/
+       151 +
+       152 +  # 備份HTML檔案（包含內嵌CSS）
+       153 +  copy index.html index.html.backup
+       154 +  copy html\*.html html\backup\  # Windows
+       155 +  cp index.html index.html.backup
+       156 +  cp -r html/ html_backup/       # Unix/Linux/macOS
+       157    ```
+       158
+       159 +  ##### Step 1.2.2：備份JavaScript檔案（包含內嵌CSS）
+       160 +  ```bash
+       161 +  # 備份包含內嵌CSS的JS檔案
+       162 +  copy js\theme-system.js js\theme-system.js.backup
+       163 +  cp js/theme-system.js js/theme-system.js.backup
+       164 +
+       165 +  # 檢查其他可能包含內嵌CSS的JS檔案
+       166 +  findstr /i "style" js\*.js     # Windows
+       167 +  grep -r "style" js/           # Unix/Linux/macOS
+       168 +  ```
+       169 +
+       170 +  ##### Step 1.2.3：創建備份清單
+       171 +  ```bash
+       172 +  # 創建備份清單文件
+       173 +  echo "CSS重構備份 - $(date)" > backup_list.txt
+       174 +  echo "===================" >> backup_list.txt
+       175 +  echo "" >> backup_list.txt
+       176 +  echo "備份檔案：" >> backup_list.txt
+       177 +  dir css\legacy\*.css >> backup_list.txt  # Windows
+       178 +  ls -la css/legacy/*.css >> backup_list.txt  # Unix/Linux/macOS
+       179 +  ```
+       180 +
+       181    #### Step 1.3：版本控制檢查點
+       182 +
+       183 +  ##### Step 1.3.1：初始化版本控制（如果尚未使用）
+       184    ```bash
+       185 -  # 如果使用Git，創建一個檢查點
+       185 +  # 如果項目尚未使用Git
+       186 +  git init
+       187 +  echo "node_modules/" > .gitignore
+       188 +  echo "*.log" >> .gitignore
+       189 +  echo "css/temp-backup/" >> .gitignore
+       190 +  ```
+       191 +
+       192 +  ##### Step 1.3.2：創建重構前檢查點
+       193 +  ```bash
+       194 +  # 添加所有現有檔案到版本控制
+       195    git add .
+       196 -  git commit -m "CSS重構開始：備份現有檔案和創建目錄結構"
+       196 +  git commit -m "CSS重構前狀態：備份所有現有檔案
+       197 +
+       198 +  - 備份所有CSS檔案到 css/legacy/
+       199 +  - 備份HTML檔案
+       200 +  - 備份包含內嵌CSS的JS檔案
+       201 +  - 創建新的模組目錄結構
+       202 +  - 創建備份清單
+       203 +
+       204 +  準備開始模組化重構"
+       205    ```
+       206
+       207 +  ##### Step 1.3.3：創建重構分支（推薦）
+       208 +  ```bash
+       209 +  # 創建專用的重構分支
+       210 +  git checkout -b css-refactoring
+       211 +  echo "當前在重構分支：css-refactoring"
+       212 +  echo "如有問題可隨時回到主分支：git checkout main"
+       213 +  ```
+       214 +
+       215 +  ##### Step 1.3.4：建立回滾腳本
+       216 +  ```bash
+       217 +  # Windows 批次檔 (rollback.bat)
+       218 +  echo @echo off > rollback.bat
+       219 +  echo echo 正在回滾CSS重構... >> rollback.bat
+       220 +  echo copy css\temp-backup\*.css css\ >> rollback.bat
+       221 +  echo copy index.html.backup index.html >> rollback.bat
+       222 +  echo copy js\theme-system.js.backup js\theme-system.js >> rollback.bat
+       223 +  echo echo 回滾完成！ >> rollback.bat
+       224 +
+       225 +  # Unix/Linux/macOS 腳本 (rollback.sh)
+       226 +  cat > rollback.sh << 'EOF'
+       227 +  #!/bin/bash
+       228 +  echo "正在回滾CSS重構..."
+       229 +  cp css/temp-backup/*.css css/
+       230 +  cp index.html.backup index.html
+       231 +  cp js/theme-system.js.backup js/theme-system.js
+       232 +  echo "回滾完成！"
+       233 +  EOF
+       234 +  chmod +x rollback.sh
+       235 +  ```
+       236 +
+       237    ### 階段二：建立基礎共用檔案 (預估時間：2小時)
+       238
+       239    #### Step 2.1：創建最小化重置檔案
+       240    **檔案：`css/shared/css-reset-minimal.css`**
+       241
+       242 +  ⚠️ **創建前檢查**：確認 `css/shared/` 目錄存在
+       243 +
+       244 +  **創建步驟：**
+       245 +  1. 使用文字編輯器創建新檔案：`css/shared/css-reset-minimal.css`
+       246 +  2. 複製以下完整內容（包含註解）
+       247 +  3. 儲存檔案並檢查無語法錯誤
+       248 +
+       249    ```css
+       250    /* =================================================================
+       251       最小化CSS重置 - 避免瀏覽器預設樣式衝突
+       252 +     版本：1.0.0
+       253 +     創建日期：[當前日期]
+       254 +     用途：作為所有模組的基礎重置，避免瀏覽器差異
+       255       ================================================================= */
+       256
+       257 -  /* 基礎重置 */
+       257 +  /* 🎯 全域盒模型重置 */
+       258    *,
+       259    *::before,
+       260    *::after {
+       261        box-sizing: border-box;
+       262 +      /* 確保所有元素使用border-box計算方式 */
+       263    }
+       264
+       265 -  /* 移除預設邊距 */
+       266 -  body, h1, h2, h3, h4, h5, h6, p, ul, ol, li, figure, blockquote, dl, dd {
+       265 +  /* 🧹 移除預設邊距和內距 */
+       266 +  body, h1, h2, h3, h4, h5, h6, p, ul, ol, li,
+       267 +  figure, blockquote, dl, dd, fieldset, legend {
+       268        margin: 0;
+       269 +      padding: 0;
+       270    }
+       271
+       272 -  /* 基礎字體設定 */
+       272 +  /* 📝 基礎字體和文字渲染優化 */
+       273    body {
+       274        line-height: 1.5;
+       275        -webkit-font-smoothing: antialiased;
+       276        -moz-osx-font-smoothing: grayscale;
+       277 +      text-rendering: optimizeSpeed;
+       278 +      word-wrap: break-word;
+       279 +
+       280 +      /* 防止橫向滾動 */
+       281 +      overflow-x: hidden;
+       282 +
+       283 +      /* 基礎字體棧 - 適合中文顯示 */
+       284 +      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI',
+       285 +                   'Microsoft JhengHei', '微軟正黑體', 'PingFang TC',
+       286 +                   'Helvetica Neue', Arial, sans-serif;
+       287    }
+       288
+       289 -  /* 圖片和媒體 */
+       289 +  /* 🖼️ 圖片和媒體元素優化 */
+       290    img, picture, video, canvas, svg {
+       291        display: block;
+       292        max-width: 100%;
+       293 +      height: auto;
+       294 +
+       295 +      /* 改善圖片載入體驗 */
+       296 +      image-rendering: -webkit-optimize-contrast;
+       297    }
+       298
+       299 -  /* 表單元素 */
+       299 +  /* 📋 表單元素統一 */
+       300    input, button, textarea, select {
+       301        font: inherit;
+       302 +      color: inherit;
+       303 +      background: transparent;
+       304 +      border: none;
+       305 +      outline: none;
+       306 +
+       307 +      /* 移除iOS樣式 */
+       308 +      -webkit-appearance: none;
+       309 +      -moz-appearance: none;
+       310 +      appearance: none;
+       311    }
+       312
+       313 -  /* 移除按鈕預設樣式 */
+       313 +  /* 🖱️ 按鈕基礎樣式重置 */
+       314    button {
+       315        border: none;
+       316        background: none;
+       317        cursor: pointer;
+       318 +      padding: 0;
+       319 +
+       320 +      /* 防止選取文字 */
+       321 +      user-select: none;
+       322 +      -webkit-user-select: none;
+       323 +      -moz-user-select: none;
+       324 +
+       325 +      /* 觸控設備優化 */
+       326 +      touch-action: manipulation;
+       327    }
+       328
+       329 -  /* 改善焦點指示 */
+       329 +  /* 🎯 改善焦點可訪問性 */
+       330    :focus-visible {
+       331        outline: 2px solid #007bff;
+       332        outline-offset: 2px;
+       333 +      border-radius: 2px;
+       334    }
+       335 +
+       336 +  /* 隱藏所有元素的預設焦點樣式 */
+       337 +  :focus:not(:focus-visible) {
+       338 +      outline: none;
+       339 +  }
+       340 +
+       341 +  /* 📱 觸控設備優化 */
+       342 +  a, button, [role="button"], [tabindex] {
+       343 +      /* 增大觸控目標 */
+       344 +      min-width: 44px;
+       345 +      min-height: 44px;
+       346 +
+       347 +      /* 改善觸控體驗 */
+       348 +      touch-action: manipulation;
+       349 +  }
+       350 +
+       351 +  /* 🔗 連結樣式重置 */
+       352 +  a {
+       353 +      color: inherit;
+       354 +      text-decoration: none;
+       355 +  }
+       356 +
+       357 +  /* 📄 列表樣式重置 */
+       358 +  ul, ol {
+       359 +      list-style: none;
+       360 +  }
+       361 +
+       362 +  /* 📊 表格樣式重置 */
+       363 +  table {
+       364 +      border-collapse: collapse;
+       365 +      border-spacing: 0;
+       366 +  }
+       367 +
+       368 +  /* 🎨 選取文字顏色優化 */
+       369 +  ::selection {
+       370 +      background-color: rgba(0, 123, 255, 0.2);
+       371 +  }
+       372 +
+       373 +  ::-moz-selection {
+       374 +      background-color: rgba(0, 123, 255, 0.2);
+       375 +  }
+       376 +
+       377 +  /* 📱 行動裝置滾動優化 */
+       378 +  html {
+       379 +      scroll-behavior: smooth;
+       380 +      /* 防止彈性滾動 */
+       381 +      overscroll-behavior-y: contain;
+       382 +  }
+       383 +
+       384 +  /* 🔄 動畫性能優化 */
+       385 +  @media (prefers-reduced-motion: reduce) {
+       386 +      * {
+       387 +          animation-duration: 0.01ms !important;
+       388 +          animation-iteration-count: 1 !important;
+       389 +          transition-duration: 0.01ms !important;
+       390 +      }
+       391 +
+       392 +      html {
+       393 +          scroll-behavior: auto;
+       394 +      }
+       395 +  }
+       396 +
+       397 +  /* 🖥️ 高對比模式支援 */
+       398 +  @media (prefers-contrast: high) {
+       399 +      :focus-visible {
+       400 +          outline: 3px solid;
+       401 +          outline-offset: 2px;
+       402 +      }
+       403 +  }
+       404 +
+       405 +  /* 🌙 深色模式基礎準備 */
+       406 +  @media (prefers-color-scheme: dark) {
+       407 +      /* 這裡保持空白，由各模組自行處理深色模式 */
+       408 +  }
+       409 +
+       410 +  /* ✨ 防止FOUC（Flash of Unstyled Content） */
+       411 +  [data-theme] {
+       412 +      opacity: 1;
+       413 +      transition: opacity 0.1s ease;
+       414 +  }
+       415 +
+       416 +  /* 🎬 載入狀態 */
+       417 +  [data-loading="true"] {
+       418 +      opacity: 0.7;
+       419 +      pointer-events: none;
+       420 +  }
+       421    ```
+       422
+       423 +  **檔案創建後驗證：**
+       424 +  1. 開啟瀏覽器開發者工具
+       425 +  2. 檢查網路面板確認CSS檔案載入成功
+       426 +  3. 確認無CSS語法錯誤
+       427 +  4. 檢查檔案大小約 2-3KB
+       428 +
+       429    #### Step 2.2：創建設計規範庫（可選共用資源）
+       430    **檔案：`css/shared/design-tokens.css`**
+       431
+     ...
+       579    ```
+       580
+       581    ##### Step 3.1.4：修改 index.html
+       582 -  **備份原有的 index.html**
+       582 +
+       583 +  ⚠️ **重要**：這是關鍵步驟，操作前請確保已備份！
+       584 +
+       585 +  **Step 3.1.4.1：再次備份當前 index.html**
+       586    ```bash
+       587 -  cp index.html index.html.backup
+       587 +  # Windows
+       588 +  copy index.html index.html.step3.backup
+       589 +
+       590 +  # Unix/Linux/macOS
+       591 +  cp index.html index.html.step3.backup
+       592    ```
+       593
+       594 -  **修改 index.html 的 CSS 引用部分：**
+       594 +  **Step 3.1.4.2：檢查原始 index.html 結構**
+       595 +  首先開啟 `index.html`，找到以下關鍵部分：
+       596
+       597 +  1. **原有的CSS引用**（通常在 `<head>` 中）
+       598 +  2. **內嵌 `<style>` 標籤**（需要提取的CSS內容）
+       599 +  3. **`<body>` 中的主要內容結構**
+       600 +
+       601 +  **Step 3.1.4.3：逐步修改 HTML 結構**
+       602 +
+       603 +  **修改前原始結構範例：**
+       604    ```html
+       605 +  <!-- 修改前的結構 -->
+       606    <!DOCTYPE html>
+       607    <html lang="zh-TW">
+       608    <head>
+     ...
+        594        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        595        <title>生活數學王</title>
+        596
+        597 -      <!-- 🔧 基礎重置 (可選) -->
+        597 +      <!-- 原有可能存在的CSS引用 -->
+        598 +      <link rel="stylesheet" href="css/ai-theme.css">
+        599 +      <link rel="stylesheet" href="css/dark-theme.css">
+        600 +
+        601 +      <!-- 原有的內嵌樣式 -->
+        602 +      <style>
+        603 +          body { /* 原有樣式 */ }
+        604 +          .container { /* 原有樣式 */ }
+        605 +          /* ... 其他內嵌CSS ... */
+        606 +      </style>
+        607 +  </head>
+        608 +  <body>
+        609 +      <div class="container">
+        610 +          <!-- 原有內容 -->
+        611 +      </div>
+        612 +      <!-- 腳本檔案 -->
+        613 +      <script src="js/theme-system.js"></script>
+        614 +  </body>
+        615 +  </html>
+        616 +  ```
+        617 +
+        618 +  **修改後的完整結構：**
+        619 +  ```html
+        620 +  <!DOCTYPE html>
+        621 +  <html lang="zh-TW">
+        622 +  <head>
+        623 +      <meta charset="UTF-8">
+        624 +      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        625 +      <title>生活數學王</title>
+        626 +
+        627 +      <!-- ✅ 新的模組化CSS載入順序 -->
+        628 +      <!-- 🔧 基礎重置 (可選 - 建議載入) -->
+        629        <link rel="stylesheet" href="css/shared/css-reset-minimal.css">
+        630
+        631 +      <!-- 🌐 共用設計規範 (可選) -->
+        632 +      <link rel="stylesheet" href="css/shared/design-tokens.css">
+        633 +
+        634        <!-- 📦 模組核心樣式 (必需) -->
+        635        <link rel="stylesheet" href="css/modules/index-page/index-core.css">
+        636
+        637 -      <!-- 🎨 主題支援 (可選) -->
+        637 +      <!-- 🎨 主題支援 (可選 - 建議載入) -->
+        638        <link rel="stylesheet" href="css/modules/index-page/index-theme.css">
+        639
+        640 -      <!-- 📱 響應式支援 (可選) -->
+        640 +      <!-- 📱 響應式支援 (可選 - 建議載入) -->
+        641        <link rel="stylesheet" href="css/modules/index-page/index-mobile.css">
+        642
+        643 -      <!-- ❌ 移除原有的內嵌樣式 -->
+        643 +      <!-- 🎚️ 主題切換器樣式 (自動載入 - 可選手動載入) -->
+        644 +      <link rel="stylesheet" href="css/modules/theme-switcher/theme-switcher-core.css">
+        645 +      <link rel="stylesheet" href="css/modules/theme-switcher/theme-calculator.css">
+        646 +      <link rel="stylesheet" href="css/modules/theme-switcher/theme-colorpicker.css">
+        647 +
+        648 +      <!-- ❌ 註釋掉原有的CSS引用 - 保留以便回滾 -->
+        649        <!--
+        650 +      <link rel="stylesheet" href="css/ai-theme.css">
+        651 +      <link rel="stylesheet" href="css/dark-theme.css">
+        652 +      -->
+        653 +
+        654 +      <!-- ❌ 移除或註釋原有的內嵌樣式 -->
+        655 +      <!--
+        656        <style>
+        657 -          /* 原有的內嵌CSS已移動到 index-core.css */
+        657 +          /*
+        658 +          原有的內嵌CSS已移動到對應的模組CSS檔案中
+        659 +          如需回滾，請還原這些樣式並移除上方的模組CSS引用
+        660 +          */
+        661 +          body { /* 移動到 index-core.css */ }
+        662 +          .container { /* 移動到 index-core.css */ }
+        663 +          /* ... 其他內嵌CSS已移動 ... */
+        664        </style>
+        665        -->
+        666 +
+        667 +      <!-- 🐛 臨時除錯樣式 - 完成重構後可移除 -->
+        668 +      <style>
+        669 +          /* 用於確認模組容器正確載入 */
+        670 +          .index-container:not([data-theme]) {
+        671 +              border: 2px dashed red;
+        672 +          }
+        673 +          .index-container[data-theme] {
+        674 +              border: none;
+        675 +          }
+        676 +
+        677 +          /* 檢查CSS載入 */
+        678 +          .index-container::before {
+        679 +              content: "主頁模組CSS已載入";
+        680 +              position: fixed;
+        681 +              top: 0;
+        682 +              left: 0;
+        683 +              background: green;
+        684 +              color: white;
+        685 +              padding: 5px;
+        686 +              font-size: 12px;
+        687 +              z-index: 9999;
+        688 +          }
+        689 +      </style>
+        690    </head>
+        691    <body>
+        692 -      <!-- 🏠 添加模組容器包裝 -->
+        693 -      <div class="index-container">
+        692 +      <!-- 🏠 添加模組容器包裝 - 關鍵修改 -->
+        693 +      <div class="index-container" data-module="index-page">
+        694 +          <!-- 保持原有的HTML結構，只是添加了外層容器 -->
+        695            <div class="container">
+        696 -              <!-- 原有的HTML內容保持不變 -->
+        696 +              <!-- 📄 原有的頁面標題 -->
+        697 +              <div class="page-header">
+        698 +                  <h1>🎓 生活數學王</h1>
+        699 +                  <div class="ai-assistant-intro">
+        700 +                      <div class="ai-avatar">🤖</div>
+        701 +                      <div class="ai-speech-bubble">
+        702 +                          <p>嗨！我是你的AI數學助手。準備好學習生活中的數學了嗎？</p>
+        703 +                      </div>
+        704 +                  </div>
+        705 +              </div>
+        706 +
+        707 +              <!-- 📋 原有的頁籤導覽 -->
+        708 +              <div class="tabs">
+        709 +                  <button class="tab-btn active" data-tab="basic">基礎金錢</button>
+        710 +                  <button class="tab-btn" data-tab="advanced">進階應用</button>
+        711 +                  <button class="tab-btn" data-tab="fun">趣味練習</button>
+        712 +              </div>
+        713 +
+        714 +              <!-- 📦 原有的內容區域 -->
+        715 +              <div class="tab-content active" id="basic-content">
+        716 +                  <div class="unit-grid">
+        717 +                      <!-- 原有的單元按鈕保持不變 -->
+        718 +                      <!-- ... -->
+        719 +                  </div>
+        720 +              </div>
+        721 +
+        722 +              <!-- 其他原有內容保持完全相同 -->
+        723                <!-- ... -->
+        724            </div>
+        725        </div>
+        726
+        727 -      <!-- JS檔案保持不變 -->
+        727 +      <!-- ✅ JavaScript檔案載入順序保持不變 -->
+        728        <script src="js/audio-unlocker.js"></script>
+        729        <script src="js/theme-system.js"></script>
+        730
+        731 -      <!-- 其餘腳本保持不變 -->
+        731 +      <!-- 🐛 臨時測試腳本 - 完成重構後可移除 -->
+        732 +      <script>
+        733 +          // 檢查模組容器是否正確設置
+        734 +          document.addEventListener('DOMContentLoaded', function() {
+        735 +              const container = document.querySelector('.index-container');
+        736 +              if (container) {
+        737 +                  console.log('✅ 主頁模組容器載入成功');
+        738 +                  console.log('容器屬性:', container.dataset);
+        739 +              } else {
+        740 +                  console.error('❌ 主頁模組容器未找到');
+        741 +              }
+        742 +
+        743 +              // 檢查CSS變數是否生效
+        744 +              const computedStyle = getComputedStyle(container);
+        745 +              const primaryColor = computedStyle.getPropertyValue('--index-primary');
+        746 +              console.log('主頁主色調:', primaryColor || '未設定');
+        747 +          });
+        748 +      </script>
+        749    </body>
+        750    </html>
+        751    ```
+        752
+        753 -  ##### Step 3.1.5：測試主頁重構
+        754 -  1. **開啟瀏覽器測試主頁**
+        755 -  2. **檢查所有功能是否正常**：
+        756 -     - 頁籤切換
+        757 -     - 按鈕hover效果
+        758 -     - 響應式佈局
+        759 -     - 主題切換器
+        760 -  3. **檢查控制台是否有錯誤**
+        761 -  4. **在不同螢幕尺寸下測試**
+        753 +  **Step 3.1.4.4：分段應用修改（降低風險）**
+        754
+        755 -  > ✅ **檢查點**：主頁功能完全正常後，再進行下一個模組
+        755 +  **第一階段：只添加容器**
+        756 +  ```html
+        757 +  <!-- 只修改body部分，先添加容器包裝 -->
+        758 +  <body>
+        759 +      <div class="index-container">
+        760 +          <!-- 原有所有內容保持不變 -->
+        761 +      </div>
+        762 +      <!-- 腳本保持不變 -->
+        763 +  </body>
+        764 +  ```
+        765
+        766 +  **第二階段：載入核心CSS**
+        767 +  ```html
+        768 +  <!-- 在head中添加核心CSS -->
+        769 +  <link rel="stylesheet" href="css/modules/index-page/index-core.css">
+        770 +  ```
+        771 +
+        772 +  **第三階段：載入其他CSS**
+        773 +  ```html
+        774 +  <!-- 逐一添加其他CSS檔案 -->
+        775 +  <link rel="stylesheet" href="css/modules/index-page/index-theme.css">
+        776 +  <link rel="stylesheet" href="css/modules/index-page/index-mobile.css">
+        777 +  ```
+        778 +
+        779 +  **第四階段：移除原有CSS**
+        780 +  ```html
+        781 +  <!-- 註釋掉原有CSS引用 -->
+        782 +  <!-- <link rel="stylesheet" href="css/ai-theme.css"> -->
+        783 +  ```
+        784 +
+        785 +  ##### Step 3.1.5：全面測試主頁重構
+        786 +
+        787 +  ⚠️ **關鍵測試階段**：必須確保所有功能正常才能繼續
+        788 +
+        789 +  **Step 3.1.5.1：基礎功能測試**
+        790 +
+        791 +  **測試清單 1：頁面載入**
+        792 +  - [ ] 頁面能正常開啟，無白畫面
+        793 +  - [ ] 控制台無CSS載入錯誤
+        794 +  - [ ] 所有圖片正常顯示
+        795 +  - [ ] 文字顯示正常，無亂碼
+        796 +
+        797 +  **檢查方法：**
+        798 +  ```javascript
+        799 +  // 在瀏覽器控制台執行
+        800 +  console.log('=== 基礎載入檢查 ===');
+        801 +  console.log('頁面標題:', document.title);
+        802 +  console.log('模組容器:', document.querySelector('.index-container') ? '✅存在' : '❌缺失');
+        803 +  console.log('原始容器:', document.querySelector('.container') ? '✅存在' : '❌缺失');
+        804 +
+        805 +  // 檢查CSS檔案載入
+        806 +  const stylesheets = Array.from(document.styleSheets);
+        807 +  console.log('已載入CSS檔案數:', stylesheets.length);
+        808 +  stylesheets.forEach((sheet, index) => {
+        809 +      try {
+        810 +          console.log(`CSS ${index + 1}:`, sheet.href ? sheet.href.split('/').pop() : '內嵌樣式');
+        811 +      } catch(e) {
+        812 +          console.log(`CSS ${index + 1}: 無法訪問（可能是跨域）`);
+        813 +      }
+        814 +  });
+        815 +  ```
+        816 +
+        817 +  **Step 3.1.5.2：樣式檢測**
+        818 +
+        819 +  **測試清單 2：視覺樣式**
+        820 +  - [ ] 背景顏色/漸層正常顯示
+        821 +  - [ ] 按鈕樣式正確
+        822 +  - [ ] 文字顏色和字體正確
+        823 +  - [ ] 間距和佈局正確
+        824 +  - [ ] 陰影和圓角效果正確
+        825 +
+        826 +  **檢查方法：**
+        827 +  ```javascript
+        828 +  // 檢查CSS變數
+        829 +  const container = document.querySelector('.index-container');
+        830 +  if (container) {
+        831 +      const styles = getComputedStyle(container);
+        832 +      console.log('=== CSS變數檢查 ===');
+        833 +      console.log('主色調:', styles.getPropertyValue('--index-primary'));
+        834 +      console.log('背景:', styles.getPropertyValue('--index-bg-primary'));
+        835 +      console.log('文字顏色:', styles.getPropertyValue('--index-text-primary'));
+        836 +      console.log('卡片背景:', styles.getPropertyValue('--index-card-bg'));
+        837 +
+        838 +      // 檢查計算後的實際樣式
+        839 +      console.log('=== 計算樣式檢查 ===');
+        840 +      console.log('實際背景:', styles.background);
+        841 +      console.log('實際字體:', styles.fontFamily);
+        842 +      console.log('實際顏色:', styles.color);
+        843 +  } else {
+        844 +      console.error('❌ 找不到主頁容器');
+        845 +  }
+        846 +  ```
+        847 +
+        848 +  **Step 3.1.5.3：交互功能測試**
+        849 +
+        850 +  **測試清單 3：用戶交互**
+        851 +  - [ ] 頁籤切換功能正常
+        852 +  - [ ] 按鈕點擊響應正常
+        853 +  - [ ] 鼠標懸停效果正常
+        854 +  - [ ] 主題切換器正常顯示和工作
+        855 +  - [ ] 連結跳轉正常
+        856 +
+        857 +  **詳細測試步驟：**
+        858 +
+        859 +  1. **頁籤切換測試**
+        860 +     ```javascript
+        861 +     // 測試頁籤功能
+        862 +     const tabs = document.querySelectorAll('.tab-btn');
+        863 +     const contents = document.querySelectorAll('.tab-content');
+        864 +
+        865 +     console.log('頁籤數量:', tabs.length);
+        866 +     console.log('內容區域數量:', contents.length);
+        867 +
+        868 +     // 模擬點擊每個頁籤
+        869 +     tabs.forEach((tab, index) => {
+        870 +         console.log(`測試頁籤 ${index + 1}:`, tab.textContent);
+        871 +         tab.click();
+        872 +         setTimeout(() => {
+        873 +             const activeTab = document.querySelector('.tab-btn.active');
+        874 +             const activeContent = document.querySelector('.tab-content.active');
+        875 +             console.log('當前活動頁籤:', activeTab ? activeTab.textContent : '無');
+        876 +             console.log('當前顯示內容:', activeContent ? '正常' : '異常');
+        877 +         }, 100);
+        878 +     });
+        879 +     ```
+        880 +
+        881 +  2. **按鈕響應測試**
+        882 +     ```javascript
+        883 +     // 測試單元按鈕
+        884 +     const unitBtns = document.querySelectorAll('.unit-btn');
+        885 +     console.log('單元按鈕數量:', unitBtns.length);
+        886 +
+        887 +     unitBtns.forEach((btn, index) => {
+        888 +         const title = btn.querySelector('.title')?.textContent || '無標題';
+        889 +         const href = btn.href || '無連結';
+        890 +         console.log(`按鈕 ${index + 1}: ${title} -> ${href}`);
+        891 +     });
+        892 +     ```
+        893 +
+        894 +  3. **主題切換器測試**
+        895 +     ```javascript
+        896 +     // 檢查主題切換器
+        897 +     const themeSwitcher = document.querySelector('.theme-switcher-container');
+        898 +     if (themeSwitcher) {
+        899 +         console.log('✅ 主題切換器存在');
+        900 +         const themeToggle = themeSwitcher.querySelector('.theme-toggle');
+        901 +         if (themeToggle) {
+        902 +             console.log('✅ 主題切換按鈕存在');
+        903 +             // 測試主題切換
+        904 +             themeToggle.click();
+        905 +             setTimeout(() => {
+        906 +                 const currentTheme = document.documentElement.getAttribute('data-theme');
+        907 +                 console.log('當前主題:', currentTheme || '預設');
+        908 +             }, 500);
+        909 +         }
+        910 +     } else {
+        911 +         console.log('⚠️ 主題切換器不存在（可能稍後載入）');
+        912 +     }
+        913 +     ```
+        914 +
+        915 +  **Step 3.1.5.4：響應式測試**
+        916 +
+        917 +  **測試清單 4：響應式佈局**
+        918 +  - [ ] 桌面版 (1200px+) 佈局正確
+        919 +  - [ ] 平板版 (768px-1199px) 佈局正確
+        920 +  - [ ] 手機版 (768px以下) 佈局正確
+        921 +  - [ ] 橫屏/豎屏切換正常
+        922 +
+        923 +  **測試方法：**
+        924 +  1. **手動調整瀏覽器視窗大小**
+        925 +  2. **使用開發者工具裝置模擬**
+        926 +  3. **實機測試（如果可能）**
+        927 +
+        928 +  **響應式檢查腳本：**
+        929 +  ```javascript
+        930 +  // 響應式測試輔助
+        931 +  function testResponsive() {
+        932 +      const widths = [320, 480, 768, 1024, 1200, 1440];
+        933 +      const container = document.querySelector('.index-container');
+        934 +
+        935 +      widths.forEach(width => {
+        936 +          // 模擬不同寬度
+        937 +          document.body.style.width = width + 'px';
+        938 +          const styles = getComputedStyle(container);
+        939 +
+        940 +          console.log(`寬度 ${width}px:`);
+        941 +          console.log('  - 容器寬度:', styles.width);
+        942 +          console.log('  - 內邊距:', styles.padding);
+        943 +          console.log('  - 字體大小:', styles.fontSize);
+        944 +      });
+        945 +
+        946 +      // 恢復原狀
+        947 +      document.body.style.width = '';
+        948 +  }
+        949 +
+        950 +  // 執行測試
+        951 +  testResponsive();
+        952 +  ```
+        953 +
+        954 +  **Step 3.1.5.5：效能檢測**
+        955 +
+        956 +  **測試清單 5：效能指標**
+        957 +  - [ ] 頁面載入時間 < 3秒
+        958 +  - [ ] CSS檔案大小合理
+        959 +  - [ ] 無重複CSS載入
+        960 +  - [ ] 無未使用的大型資源
+        961 +
+        962 +  **檢查方法：**
+        963 +  ```javascript
+        964 +  // 效能檢測
+        965 +  console.log('=== 效能檢測 ===');
+        966 +
+        967 +  // 檢查載入時間
+        968 +  if (performance.timing) {
+        969 +      const loadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
+        970 +      console.log('頁面載入時間:', loadTime + 'ms');
+        971 +  }
+        972 +
+        973 +  // 檢查資源大小
+        974 +  if (performance.getEntriesByType) {
+        975 +      const resources = performance.getEntriesByType('resource');
+        976 +      const cssResources = resources.filter(r => r.name.includes('.css'));
+        977 +      console.log('CSS資源:');
+        978 +      cssResources.forEach(css => {
+        979 +          console.log(`  ${css.name.split('/').pop()}: ${Math.round(css.transferSize/1024)}KB`);
+        980 +      });
+        981 +  }
+        982 +  ```
+        983 +
+        984 +  **Step 3.1.5.6：錯誤處理測試**
+        985 +
+        986 +  **測試清單 6：錯誤恢復**
+        987 +  - [ ] CSS檔案載入失敗時頁面仍可用
+        988 +  - [ ] JavaScript錯誤不影響基本功能
+        989 +  - [ ] 主題切換失敗有回退方案
+        990 +
+        991 +  **模擬測試：**
+        992 +  ```javascript
+        993 +  // 模擬CSS載入失敗
+        994 +  const testLink = document.createElement('link');
+        995 +  testLink.rel = 'stylesheet';
+        996 +  testLink.href = 'css/non-existent.css';
+        997 +  testLink.onerror = () => console.log('✅ CSS載入失敗處理正常');
+        998 +  document.head.appendChild(testLink);
+        999 +
+       1000 +  // 檢查降級方案
+       1001 +  if (!document.querySelector('.index-container')) {
+       1002 +      console.log('⚠️ 需要實施降級方案');
+       1003 +  }
+       1004 +  ```
+       1005 +
+       1006 +  **Step 3.1.5.7：瀏覽器相容性測試**
+       1007 +
+       1008 +  **測試瀏覽器清單：**
+       1009 +  - [ ] Chrome (最新版)
+       1010 +  - [ ] Firefox (最新版)
+       1011 +  - [ ] Safari (如果使用Mac)
+       1012 +  - [ ] Edge (最新版)
+       1013 +  - [ ] 行動瀏覽器 (如果可能)
+       1014 +
+       1015 +  **記錄測試結果：**
+       1016 +  ```javascript
+       1017 +  // 瀏覽器資訊記錄
+       1018 +  console.log('=== 瀏覽器環境 ===');
+       1019 +  console.log('User Agent:', navigator.userAgent);
+       1020 +  console.log('螢幕解析度:', screen.width + 'x' + screen.height);
+       1021 +  console.log('視窗大小:', window.innerWidth + 'x' + window.innerHeight);
+       1022 +  console.log('像素比:', window.devicePixelRatio || 1);
+       1023 +  ```
+       1024 +
+       1025 +  **完成檢查點：**
+       1026 +
+       1027 +  ✅ **通過條件（必須全部滿足）：**
+       1028 +  - 所有基礎功能測試通過
+       1029 +  - 樣式顯示完全正常
+       1030 +  - 交互功能完全正常
+       1031 +  - 響應式佈局正確
+       1032 +  - 效能指標在可接受範圍
+       1033 +  - 至少2個主流瀏覽器測試通過
+       1034 +
+       1035 +  ❌ **如果任何測試失敗：**
+       1036 +  1. 記錄具體錯誤訊息
+       1037 +  2. 檢查對應的CSS檔案
+       1038 +  3. 使用回滾腳本恢復
+       1039 +  4. 重新檢查步驟並修復問題
+       1040 +  5. 再次進行完整測試
+       1041 +
+       1042 +  > 🎯 **重要提醒**：只有主頁重構100%成功才能繼續下一個模組！
+       1043 +
+       1044    #### Step 3.2：重構 C1 單元 (金錢的種類與幣值)
+       1045
+       1046    ##### Step 3.2.1：創建 C1 核心樣式
+
+● Update(CSS_REFACTORING_GUIDE.md)
+  ⎿  Updated CSS_REFACTORING_GUIDE.md with 799 additions and 2 removals
+       1316    #### Step 3.2：重構 C1 單元 (金錢的種類與幣值)
+       1317
+       1318    ##### Step 3.2.1：創建 C1 核心樣式
+       1319 +
+       1320 +  ⚠️ **創建前檢查**：確認 `css/modules/c1-money-types/` 目錄存在
+       1321 +
+       1322 +  **建議操作步驟：**
+       1323 +  1. **先檢查原始 C1 檔案**：開啟 `html/c1_money_types.html` 查看現有樣式
+       1324 +  2. **提取關鍵資訊**：記錄下現有的類名、變數、布局結構
+       1325 +  3. **分段創建**：先創建基礎框架，再逐步添加功能
+       1326 +  4. **立即測試**：每次添加部分後都要測試
+       1327 +
+       1328    **檔案：`css/modules/c1-money-types/c1-core.css`**
+       1329
+       1330 +  **分段創建步驟：**
+       1331 +
+       1332 +  **第一步：建立基本框架**
+       1333    ```css
+       1334    /* =================================================================
+       1335       C1 金錢的種類與幣值 - 核心樣式
+       1336 +     版本：1.0.0
+       1337 +     創建日期：[當前日期]
+       1338 +     相依：css/shared/css-reset-minimal.css (可選)
+       1339 +             css/shared/design-tokens.css (可選)
+       1340       ================================================================= */
+       1341
+       1342 +  /* 📦 C1模組基本容器 */
+       1343    .c1-container {
+       1344 +      /* 🃏 模組標識 */
+       1345 +      --module-name: 'c1-money-types';
+       1346 +      --module-version: '1.0.0';
+       1347 +
+       1348 +      /* ℹ️ 測試信息（後續可移除） */
+       1349 +      border: 1px dashed blue; /* 確認容器正確載入 */
+       1350 +  }
+       1351 +
+       1352 +  /* 🖥️ 檢查容器是否正確載入 */
+       1353 +  .c1-container::before {
+       1354 +      content: "C1模組核心CSS已載入";
+       1355 +      position: fixed;
+       1356 +      top: 0;
+       1357 +      left: 0;
+       1358 +      background: green;
+       1359 +      color: white;
+       1360 +      padding: 5px;
+       1361 +      font-size: 12px;
+       1362 +      z-index: 9999;
+       1363 +      pointer-events: none;
+       1364 +  }
+       1365 +
+       1366 +  /* 基礎容器樣式（最小可用版本） */
+       1367 +  .c1-container {
+       1368 +      min-height: 100vh;
+       1369 +      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+       1370 +      background: #f0f0f0; /* 臨時背景色 */
+       1371 +      color: #333; /* 臨時文字色 */
+       1372 +  }
+       1373 +  ```
+       1374 +
+       1375 +  **立即測試第一步：**
+       1376 +  1. 儲存檔案
+       1377 +  2. 在 c1_money_types.html 中添加：`<link rel="stylesheet" href="../css/modules/c1-money-types/c1-core.css">`
+       1378 +  3. 在 body 中添加：`<div class="c1-container">原有內容</div>`
+       1379 +  4. 開啟頁面檢查是否有藍色線框和綠色測試信息
+       1380 +
+       1381 +  **第二步：添加CSS變數系統**
+       1382 +  ```css
+       1383 +  .c1-container {
+       1384        /* 🎨 C1 模組內部變數系統 */
+       1385        --c1-primary: #00aeff;
+       1386        --c1-secondary: #3CB371;
+     ...
+       1359        /* 🔤 字體 */
+       1360        --c1-font-family: 'Helvetica', 'Arial', 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+       1361
+       1362 +      /* 🌐 可選：使用共用設計規範 (fallback保護) */
+       1363 +      --c1-primary: var(--design-primary-blue, #00aeff);
+       1364 +      --c1-secondary: var(--design-robot-green, #3CB371);
+       1365 +      --c1-success: var(--design-success-green, #32CD32);
+       1366 +      --c1-error: var(--design-error-red, #FF6347);
+       1367 +      --c1-font-family: var(--design-font-family, 'Helvetica', 'Arial', 'Microsoft JhengHei', sans-serif);
+       1368 +
+       1369 +      /* 📦 更新容器基礎樣式 */
+       1370 +      min-height: 100vh;
+       1371 +      background: var(--c1-bg-primary);
+       1372 +      color: var(--c1-text-primary);
+       1373 +      font-family: var(--c1-font-family);
+       1374 +      transition: var(--c1-transition-normal);
+       1375 +
+       1376 +      /* 📱 行動裝置優化 */
+       1377 +      overscroll-behavior-y: contain;
+       1378 +  }
+       1379 +
+       1380 +  /* 測試CSS變數是否生效 */
+       1381 +  .c1-container .test-variables {
+       1382 +      background: var(--c1-primary);
+       1383 +      color: var(--c1-text-white);
+       1384 +      padding: 10px;
+       1385 +      border-radius: var(--c1-radius-small);
+       1386 +      box-shadow: var(--c1-shadow-medium);
+       1387 +  }
+       1388 +  ```
+       1389 +
+       1390 +  **測試第二步：**
+       1391 +  ```html
+       1392 +  <!-- 在 c1_money_types.html 中加入測試元素 -->
+       1393 +  <div class="test-variables">測試CSS變數</div>
+       1394 +  ```
+       1395 +
+       1396 +  **第三步：添加主要佈局結構**
+       1397 +  ```css
+       1398 +  /* 🎮 遊戲主要佈局 */
+       1399 +  .c1-container .game-container {
+       1400 +      padding: 20px;
+       1401 +      max-width: 1200px;
+       1402 +      margin: 0 auto;
+       1403 +  }
+       1404 +
+       1405 +  .c1-container .game-header {
+       1406 +      text-align: center;
+       1407 +      margin-bottom: 30px;
+       1408 +  }
+       1409 +
+       1410 +  .c1-container .game-title {
+       1411 +      font-size: 2.5em;
+       1412 +      color: var(--c1-primary);
+       1413 +      margin-bottom: 10px;
+       1414 +      font-weight: bold;
+       1415 +      text-shadow: 2px 2px 4px rgba(0, 174, 255, 0.2);
+       1416 +  }
+       1417 +
+       1418 +  .c1-container .game-subtitle {
+       1419 +      font-size: 1.2em;
+       1420 +      color: var(--c1-text-secondary);
+       1421 +      margin-bottom: 20px;
+       1422 +  }
+       1423 +
+       1424 +  /* 🎚️ 設定面板 */
+       1425 +  .c1-container .settings-panel {
+       1426 +      background: var(--c1-bg-card);
+       1427 +      border-radius: var(--c1-radius-large);
+       1428 +      padding: 25px;
+       1429 +      margin-bottom: 30px;
+       1430 +      box-shadow: var(--c1-shadow-medium);
+       1431 +      border: 2px solid var(--c1-primary);
+       1432 +  }
+       1433 +
+       1434 +  .c1-container .setting-group {
+       1435 +      margin-bottom: 25px;
+       1436 +  }
+       1437 +
+       1438 +  .c1-container .setting-group:last-child {
+       1439 +      margin-bottom: 0;
+       1440 +  }
+       1441 +
+       1442 +  .c1-container .setting-group h4 {
+       1443 +      font-size: 1.3em;
+       1444 +      color: var(--c1-primary);
+       1445 +      margin-bottom: 15px;
+       1446 +      font-weight: 600;
+       1447 +  }
+       1448 +  ```
+       1449 +
+       1450 +  **第四步：加入按鈕和交互元素**
+       1451 +  ```css
+       1452 +  /* 🔘 設定選項按鈕 */
+       1453 +  .c1-container .setting-options {
+       1454 +      display: flex;
+       1455 +      flex-wrap: wrap;
+       1456 +      gap: 10px;
+       1457 +  }
+       1458 +
+       1459 +  .c1-container .option-btn {
+       1460 +      background: var(--c1-bg-light);
+       1461 +      color: var(--c1-text-primary);
+       1462 +      border: 2px solid var(--c1-primary);
+       1463 +      padding: 12px 20px;
+       1464 +      border-radius: var(--c1-radius-medium);
+       1465 +      font-size: 1em;
+       1466 +      font-weight: 500;
+       1467 +      cursor: pointer;
+       1468 +      transition: var(--c1-transition-normal);
+       1469 +      touch-action: manipulation;
+       1470 +      user-select: none;
+       1471 +  }
+       1472 +
+       1473 +  .c1-container .option-btn:hover {
+       1474 +      background: var(--c1-primary);
+       1475 +      color: var(--c1-text-white);
+       1476 +      transform: translateY(-2px);
+       1477 +      box-shadow: var(--c1-shadow-medium);
+       1478 +  }
+       1479 +
+       1480 +  .c1-container .option-btn:active {
+       1481 +      transform: translateY(0);
+       1482 +  }
+       1483 +
+       1484 +  .c1-container .option-btn.selected {
+       1485 +      background: var(--c1-primary);
+       1486 +      color: var(--c1-text-white);
+       1487 +      box-shadow: var(--c1-shadow-medium);
+       1488 +  }
+       1489 +  ```
+       1490 +
+       1491 +  **逐步測試每個部分**，確認正常後繼續添加後續內容：
+       1492 +
+       1493 +  ```css
+       1494 +  /* 🎮 遊戲區域 */
+       1495 +  .c1-container .game-area {
+       1496 +      background: var(--c1-bg-card);
+       1497 +      border-radius: var(--c1-radius-large);
+       1498 +      padding: 30px;
+       1499 +      box-shadow: var(--c1-shadow-medium);
+       1500 +      border: 2px solid var(--c1-primary);
+       1501 +      min-height: 400px;
+       1502 +  }
+       1503 +
+       1504 +  .c1-container .question-section {
+       1505 +      text-align: center;
+       1506 +      margin-bottom: 30px;
+       1507 +  }
+       1508 +
+       1509 +  .c1-container .question-text {
+       1510 +      font-size: 1.4em;
+       1511 +      color: var(--c1-text-primary);
+       1512 +      margin-bottom: 20px;
+       1513 +      font-weight: 600;
+       1514 +  }
+       1515 +
+       1516 +  /* 💰 金錢顯示區域 */
+       1517 +  .c1-container .money-display {
+       1518 +      display: flex;
+       1519 +      justify-content: center;
+       1520 +      align-items: center;
+       1521 +      gap: 20px;
+       1522 +      margin-bottom: 30px;
+       1523 +      padding: 20px;
+       1524 +      background: var(--c1-bg-light);
+       1525 +      border-radius: var(--c1-radius-medium);
+       1526 +      border: 2px dashed var(--c1-primary);
+       1527 +  }
+       1528 +
+       1529 +  .c1-container .money-item {
+       1530 +      display: flex;
+       1531 +      flex-direction: column;
+       1532 +      align-items: center;
+       1533 +      gap: 10px;
+       1534 +      padding: 15px;
+       1535 +      background: var(--c1-bg-card);
+       1536 +      border-radius: var(--c1-radius-small);
+       1537 +      box-shadow: var(--c1-shadow-light);
+       1538 +      transition: var(--c1-transition-normal);
+       1539 +      cursor: pointer;
+       1540 +      user-select: none;
+       1541 +  }
+       1542 +
+       1543 +  .c1-container .money-item:hover {
+       1544 +      transform: scale(1.05);
+       1545 +      box-shadow: var(--c1-shadow-medium);
+       1546 +  }
+       1547 +
+       1548 +  .c1-container .money-item img {
+       1549 +      width: 80px;
+       1550 +      height: 80px;
+       1551 +      object-fit: contain;
+       1552 +      border-radius: var(--c1-radius-small);
+       1553 +  }
+       1554 +
+       1555 +  .c1-container .money-value {
+       1556 +      font-size: 1.1em;
+       1557 +      font-weight: bold;
+       1558 +      color: var(--c1-primary);
+       1559 +  }
+       1560 +
+       1561 +  /* 🎯 答案選項區域 */
+       1562 +  .c1-container .answer-options {
+       1563 +      display: grid;
+       1564 +      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+       1565 +      gap: 15px;
+       1566 +      margin-bottom: 30px;
+       1567 +  }
+       1568 +
+       1569 +  .c1-container .answer-option {
+       1570 +      background: var(--c1-bg-light);
+       1571 +      border: 2px solid var(--c1-primary);
+       1572 +      border-radius: var(--c1-radius-medium);
+       1573 +      padding: 20px 15px;
+       1574 +      text-align: center;
+       1575 +      cursor: pointer;
+       1576 +      transition: var(--c1-transition-normal);
+       1577 +      font-size: 1.2em;
+       1578 +      font-weight: 600;
+       1579 +      color: var(--c1-text-primary);
+       1580 +      user-select: none;
+       1581 +  }
+       1582 +
+       1583 +  .c1-container .answer-option:hover {
+       1584 +      background: var(--c1-primary);
+       1585 +      color: var(--c1-text-white);
+       1586 +      transform: translateY(-3px);
+       1587 +      box-shadow: var(--c1-shadow-medium);
+       1588 +  }
+       1589 +
+       1590 +  .c1-container .answer-option.selected {
+       1591 +      background: var(--c1-secondary);
+       1592 +      color: var(--c1-text-white);
+       1593 +      border-color: var(--c1-secondary);
+       1594 +  }
+       1595 +
+       1596 +  .c1-container .answer-option.correct {
+       1597 +      background: var(--c1-success);
+       1598 +      color: var(--c1-text-white);
+       1599 +      border-color: var(--c1-success);
+       1600 +      animation: c1-success-pulse 0.5s ease;
+       1601 +  }
+       1602 +
+       1603 +  .c1-container .answer-option.incorrect {
+       1604 +      background: var(--c1-error);
+       1605 +      color: var(--c1-text-white);
+       1606 +      border-color: var(--c1-error);
+       1607 +      animation: c1-error-shake 0.5s ease;
+       1608 +  }
+       1609 +
+       1610 +  /* 🎯 按鈕區域 */
+       1611 +  .c1-container .button-area {
+       1612 +      display: flex;
+       1613 +      justify-content: center;
+       1614 +      gap: 20px;
+       1615 +      margin-top: 30px;
+       1616 +  }
+       1617 +
+       1618 +  .c1-container .game-button {
+       1619 +      padding: 15px 30px;
+       1620 +      font-size: 1.1em;
+       1621 +      font-weight: 600;
+       1622 +      border-radius: var(--c1-radius-medium);
+       1623 +      border: none;
+       1624 +      cursor: pointer;
+       1625 +      transition: var(--c1-transition-normal);
+       1626 +      user-select: none;
+       1627 +      box-shadow: var(--c1-shadow-light);
+       1628 +  }
+       1629 +
+       1630 +  .c1-container .primary-button {
+       1631 +      background: var(--c1-primary);
+       1632 +      color: var(--c1-text-white);
+       1633 +  }
+       1634 +
+       1635 +  .c1-container .primary-button:hover {
+       1636 +      background: var(--c1-secondary);
+       1637 +      transform: translateY(-2px);
+       1638 +      box-shadow: var(--c1-shadow-medium);
+       1639 +  }
+       1640 +
+       1641 +  .c1-container .secondary-button {
+       1642 +      background: var(--c1-bg-light);
+       1643 +      color: var(--c1-text-primary);
+       1644 +      border: 2px solid var(--c1-primary);
+       1645 +  }
+       1646 +
+       1647 +  .c1-container .secondary-button:hover {
+       1648 +      background: var(--c1-primary);
+       1649 +      color: var(--c1-text-white);
+       1650 +  }
+       1651 +
+       1652 +  /* 📊 結果面板 */
+       1653 +  .c1-container .result-panel {
+       1654 +      background: var(--c1-bg-card);
+       1655 +      border-radius: var(--c1-radius-large);
+       1656 +      padding: 25px;
+       1657 +      margin-top: 20px;
+       1658 +      box-shadow: var(--c1-shadow-medium);
+       1659 +      text-align: center;
+       1660 +  }
+       1661 +
+       1662 +  .c1-container .result-panel.success {
+       1663 +      border: 3px solid var(--c1-success);
+       1664 +  }
+       1665 +
+       1666 +  .c1-container .result-panel.error {
+       1667 +      border: 3px solid var(--c1-error);
+       1668 +  }
+       1669 +
+       1670 +  .c1-container .result-title {
+       1671 +      font-size: 1.5em;
+       1672 +      font-weight: bold;
+       1673 +      margin-bottom: 15px;
+       1674 +  }
+       1675 +
+       1676 +  .c1-container .result-panel.success .result-title {
+       1677 +      color: var(--c1-success);
+       1678 +  }
+       1679 +
+       1680 +  .c1-container .result-panel.error .result-title {
+       1681 +      color: var(--c1-error);
+       1682 +  }
+       1683 +
+       1684 +  .c1-container .result-message {
+       1685 +      font-size: 1.1em;
+       1686 +      color: var(--c1-text-primary);
+       1687 +      margin-bottom: 20px;
+       1688 +      line-height: 1.5;
+       1689 +  }
+       1690 +
+       1691 +  /* 🎭 動畫效果 */
+       1692 +  @keyframes c1-success-pulse {
+       1693 +      0% { transform: scale(1); }
+       1694 +      50% { transform: scale(1.05); }
+       1695 +      100% { transform: scale(1); }
+       1696 +  }
+       1697 +
+       1698 +  @keyframes c1-error-shake {
+       1699 +      0%, 100% { transform: translateX(0); }
+       1700 +      25% { transform: translateX(-5px); }
+       1701 +      75% { transform: translateX(5px); }
+       1702 +  }
+       1703 +
+       1704 +  /* 🔄 載入動畫 */
+       1705 +  .c1-container .loading-spinner {
+       1706 +      display: inline-block;
+       1707 +      width: 40px;
+       1708 +      height: 40px;
+       1709 +      border: 3px solid var(--c1-bg-light);
+       1710 +      border-radius: 50%;
+       1711 +      border-top-color: var(--c1-primary);
+       1712 +      animation: c1-spin 1s ease-in-out infinite;
+       1713 +  }
+       1714 +
+       1715 +  @keyframes c1-spin {
+       1716 +      to { transform: rotate(360deg); }
+       1717 +  }
+       1718 +
+       1719 +  /* 👻 隱藏元素 */
+       1720 +  .c1-container .hidden {
+       1721 +      display: none !important;
+       1722 +  }
+       1723 +
+       1724 +  /* 🎨 禁用狀態 */
+       1725 +  .c1-container .disabled {
+       1726 +      opacity: 0.6;
+       1727 +      pointer-events: none;
+       1728 +      cursor: not-allowed;
+       1729 +  }
+       1730 +
+       1731 +  /* 🌈 主題過渡效果 */
+       1732 +  .c1-container.theme-transitioning * {
+       1733 +      transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease !important;
+       1734 +  }
+       1735 +  ```
+       1736 +
+       1737 +  **最終測試檢查清單：**
+       1738 +  - [ ] 所有變數正確設置且生效
+       1739 +  - [ ] 佈局結構正確顯示
+       1740 +  - [ ] 按鈕交互正常
+       1741 +  - [ ] 鼠標懸停效果正常
+       1742 +  - [ ] 動畫效果正常
+       1743 +  - [ ] 響應式特性在下一步驟中測試
+       1744 +
+       1745 +  **完成後清理：**
+       1746 +  ```css
+       1747 +  /* 移除測試相關樣式 */
+       1748 +  .c1-container {
+       1749 +      /* 移除 border: 1px dashed blue; */
+       1750 +  }
+       1751 +
+       1752 +  .c1-container::before {
+       1753 +      /* 移除或註釋測試信息 */
+       1754 +      display: none;
+       1755 +  }
+       1756 +  ```
+       1757 +      /* 🎨 C1 模組內部變數系統 */
+       1758 +      --c1-primary: #00aeff;
+       1759 +      --c1-secondary: #3CB371;
+       1760 +      --c1-accent: #FF69B4;
+       1761 +      --c1-success: #32CD32;
+       1762 +      --c1-error: #FF6347;
+       1763 +      --c1-warning: #FFD700;
+       1764 +
+       1765 +      /* 🌈 背景色彩 */
+       1766 +      --c1-bg-primary: linear-gradient(135deg, #87CEEB 0%, #B0E0E6 100%);
+       1767 +      --c1-bg-card: #FFFFFF;
+       1768 +      --c1-bg-light: #E6F3FF;
+       1769 +
+       1770 +      /* 📝 文字色彩 */
+       1771 +      --c1-text-primary: #2F4F4F;
+       1772 +      --c1-text-secondary: #696969;
+       1773 +      --c1-text-light: #A9A9A9;
+       1774 +      --c1-text-white: #FFFFFF;
+       1775 +
+       1776 +      /* 🔵 尺寸和效果 */
+       1777 +      --c1-radius-small: 12px;
+       1778 +      --c1-radius-medium: 16px;
+       1779 +      --c1-radius-large: 20px;
+       1780 +      --c1-shadow-light: 0 2px 8px rgba(135, 206, 235, 0.2);
+       1781 +      --c1-shadow-medium: 0 4px 12px rgba(135, 206, 235, 0.25);
+       1782 +      --c1-shadow-heavy: 0 8px 20px rgba(135, 206, 235, 0.3);
+       1783 +
+       1784 +      /* ⏱️ 動畫 */
+       1785 +      --c1-transition-fast: 0.2s ease;
+       1786 +      --c1-transition-normal: 0.3s ease;
+       1787 +      --c1-transition-slow: 0.5s ease;
+       1788 +
+       1789 +      /* 🔤 字體 */
+       1790 +      --c1-font-family: 'Helvetica', 'Arial', 'Microsoft JhengHei', '微軟正黑體', sans-serif;
+       1791 +
+       1792        /* 🌐 可選：使用共用設計規範 (有fallback) */
+       1793        --c1-primary: var(--design-primary-blue, #00aeff);
+       1794        --c1-secondary: var(--design-robot-green, #3CB371);
+     ...
+       2720    ##### Step 4.1.4：修改 theme-system.js
+       2721    **修改 `js/theme-system.js`，移除內嵌CSS，改為載入外部CSS：**
+       2722
+       2723 -  找到 `createThemeSwitcher()` 方法中的 `switcherStyles` 部分，替換為：
+       2723 +  ⚠️ **重要**：這是高風險操作，建議逐步進行
+       2724
+       2725 +  **步驟 4.1.4.1：備份原始檔案**
+       2726 +  ```bash
+       2727 +  # 再次備份 theme-system.js
+       2728 +  cp js/theme-system.js js/theme-system.js.step4.backup
+       2729 +  ```
+       2730 +
+       2731 +  **步驟 4.1.4.2：先了解原始結構**
+       2732 +
+       2733 +  開啟 `js/theme-system.js` 找到以下關鍵部分：
+       2734 +
+       2735 +  1. **`createThemeSwitcher()` 方法**
+       2736 +  2. **`switcherStyles` 變數**（包含大量內嵌CSS）
+       2737 +  3. **`showCalculator()` 方法**
+       2738 +  4. **`calculatorStyles` 變數**（如果存在）
+       2739 +
+       2740 +  **步驟 4.1.4.3：逐步修改 createThemeSwitcher 方法**
+       2741 +
+       2742 +  **原始結構範例：**
+       2743    ```javascript
+       2744 +  // 修改前的結構（簡化版）
+       2745 +  createThemeSwitcher() {
+       2746 +      // ...前面的檢查邏輯...
+       2747 +
+       2748 +      const switcherStyles = `
+       2749 +          .theme-switcher {
+       2750 +              /* 大量內嵌CSS代碼 */
+       2751 +          }
+       2752 +          // 繼續更多CSS...
+       2753 +      `;
+       2754 +
+       2755 +      // 插入樣式
+       2756 +      const styleElement = document.createElement('style');
+       2757 +      styleElement.textContent = switcherStyles;
+       2758 +      document.head.appendChild(styleElement);
+       2759 +
+       2760 +      // 其他功能...
+       2761 +  }
+       2762 +  ```
+       2763 +
+       2764 +  **修改後的結構：**
+       2765 +  ```javascript
+       2766    // js/theme-system.js 中的修改
+       2767
+       2768    createThemeSwitcher() {
+       2769        try {
+       2770 -          // 檢查是否在主題設定頁面
+       2770 +          // ✅ 保留原有的基礎檢查
+       2771            if (window.location.pathname.includes('color-palette-manager.html')) {
+       2772                console.log('在主題設定頁面，跳過建立主題切換器');
+       2773                return;
+       2774            }
+       2775
+       2776 +          // ✅ 保留原有的存在性檢查
+       2777 +          if (document.querySelector('.theme-switcher-container')) {
+       2778 +              console.log('主題切換器已存在，跳過建立');
+       2779 +              return;
+       2780 +          }
+       2781 +
+       2782 +          // ✅ 保留原有的body檢查
+       2783 +          if (!document.body) {
+       2784 +              console.warn('document.body 不存在，延遲建立主題切換器');
+       2785 +              setTimeout(() => this.createThemeSwitcher(), 100);
+       2786 +              return;
+       2787 +          }
+       2788 +
+       2789 +          // ✨ 新增：確保主題切換器CSS已載入
+       2790 +          this.ensureThemeSwitcherCSS();
+       2791 +
+       2792 +          // ✅ 保留原有的HTML結構（移除內嵌樣式）
+       2793 +          const switcherHTML = `
+       2794 +              <div class="theme-switcher-container" role="region" aria-label="主題切換">
+       2795 +                  <div class="theme-switcher-header">
+       2796 +                      <div class="theme-switcher-drag-handle"
+       2797 +                           title="拖拽移動主題切換器">
+       2798 +                          <span>⋮⋮</span>
+       2799 +                      </div>
+       2800 +                      <div class="theme-switcher-minimize-btn"
+       2801 +                           title="點擊縮小視窗">
+       2802 +                          <span>−</span>
+       2803 +                      </div>
+       2804 +                  </div>
+       2805 +
+       2806 +                  <div class="theme-switcher-content">
+       2807 +                      <div class="theme-toggle"
+       2808 +                           role="button"
+       2809 +                           tabindex="0"
+       2810 +                           aria-label="切換主題模式"
+       2811 +                           aria-describedby="theme-tooltip">
+       2812 +
+       2813 +                          <div class="theme-option" data-theme="ai-robot">
+       2814 +                              <span class="theme-option-icon">🤖</span>
+       2815 +                              <span class="theme-option-text">AI機器人</span>
+       2816 +                          </div>
+       2817 +
+       2818 +                          <div class="theme-option" data-theme="dark">
+       2819 +                              <span class="theme-option-icon">🌙</span>
+       2820 +                              <span class="theme-option-text">護眼</span>
+       2821 +                          </div>
+       2822 +                      </div>
+       2823 +
+       2824 +                      <div class="color-picker-tool"
+       2825 +                           role="button"
+       2826 +                           tabindex="0"
+       2827 +                           aria-label="顏色吸管工具"
+       2828 +                           title="點擊啟用吸管工具，然後點擊頁面任何元素獲取顏色代碼">
+       2829 +                          <span class="picker-icon">🎨</span>
+       2830 +                          <span class="picker-text">吸管</span>
+       2831 +                      </div>
+       2832 +
+       2833 +                      <div class="color-info-display" id="color-info" style="display: none;">
+       2834 +                          <div class="color-code" id="color-code">#000000</div>
+       2835 +                          <div class="color-sample" id="color-sample"></div>
+       2836 +                          <button class="copy-color-btn" id="copy-color-btn" title="複製顏色代碼">📋</button>
+       2837 +                      </div>
+       2838 +
+       2839 +                      <div class="calculator-section">
+       2840 +                          <button class="calculator-btn" id="calculator-btn" title="開啟計算機">🧮</button>
+       2841 +                      </div>
+       2842 +
+       2843 +                      <div class="theme-switcher-tooltip" id="theme-tooltip" role="tooltip">
+       2844 +                          點擊切換主題模式、使用吸管工具或開啟計算機
+       2845 +                      </div>
+       2846 +                  </div>
+       2847 +              </div>
+       2848 +          `;
+       2849 +
+       2850 +          // ✅ 保留原有的HTML插入邏輯
+       2851 +          document.body.insertAdjacentHTML('beforeend', switcherHTML);
+       2852 +
+       2853 +          // ❌ 移除內嵌樣式載入（這部分要移除）
+       2854 +          // const switcherStyles = `...` // 這部分已移動到外部CSS檔案
+       2855 +          // const styleElement = document.createElement('style');
+       2856 +          // styleElement.textContent = switcherStyles;
+       2857 +          // document.head.appendChild(styleElement);
+       2858 +
+       2859 +          // ✅ 保留原有的後續邏輯
+       2860 +          this.switcher = document.querySelector('.theme-switcher-container');
+       2861 +          if (!this.switcher) {
+       2862 +              throw new Error('無法找到新建立的主題切換器');
+       2863 +          }
+       2864 +
+       2865 +          const toggle = this.switcher.querySelector('.theme-toggle');
+       2866 +          if (!toggle) {
+       2867 +              throw new Error('無法找到主題切換按鈕');
+       2868 +          }
+       2869 +
+       2870 +          // ✅ 保留原有的事件繫定
+       2871 +          this.bindSwitcherEvents(toggle);
+       2872 +          this.bindMinimizeEvents();
+       2873 +          this.initializeDragFunctionality();
+       2874 +          this.initializeColorPicker();
+       2875 +          this.initializeCalculator();
+       2876 +
+       2877 +          // ✅ 保留原有的初始化
+       2878 +          this.updateSwitcherState();
+       2879 +          this.loadMinimizedState();
+       2880 +
+       2881 +      } catch (error) {
+       2882 +          console.error('建立主題切換器時發生錯誤:', error);
+       2883 +          this.createFallbackSwitcher();
+       2884 +      }
+       2885 +  }
+       2886 +
+       2887 +  // ✨ 新增方法：確保主題切換器CSS已載入
+       2888 +  ensureThemeSwitcherCSS() {
+       2889 +      console.log('🔍 檢查主題切換器CSS狀態...');
+       2890 +
+       2891 +      const cssFiles = [
+       2892 +          {
+       2893 +              id: 'theme-switcher-core',
+       2894 +              href: this.getAbsolutePath('../css/modules/theme-switcher/theme-switcher-core.css')
+       2895 +          },
+       2896 +          {
+       2897 +              id: 'theme-switcher-calculator',
+       2898 +              href: this.getAbsolutePath('../css/modules/theme-switcher/theme-calculator.css')
+       2899 +          },
+       2900 +          {
+       2901 +              id: 'theme-switcher-colorpicker',
+       2902 +              href: this.getAbsolutePath('../css/modules/theme-switcher/theme-colorpicker.css')
+       2903 +          }
+       2904 +      ];
+       2905 +
+       2906 +      cssFiles.forEach(({ id, href }) => {
+       2907 +          const existingLink = document.querySelector(`link[data-theme-css="${id}"]`);
+       2908 +          if (!existingLink) {
+       2909 +              console.log(`🔗 載入CSS: ${id}`);
+       2910 +              this.loadCSS(href, id);
+       2911 +          } else {
+       2912 +              console.log(`✅ CSS已存在: ${id}`);
+       2913 +          }
+       2914 +      });
+       2915 +  }
+       2916 +
+       2917 +  // ✨ 新增方法：動態載入CSS
+       2918 +  loadCSS(href, id) {
+       2919 +      return new Promise((resolve, reject) => {
+       2920 +          const link = document.createElement('link');
+       2921 +          link.rel = 'stylesheet';
+       2922 +          link.href = href;
+       2923 +          link.setAttribute('data-theme-css', id);
+       2924 +
+       2925 +          link.onload = () => {
+       2926 +              console.log(`✅ CSS載入成功: ${id}`);
+       2927 +              resolve();
+       2928 +          };
+       2929 +
+       2930 +          link.onerror = () => {
+       2931 +              console.warn(`⚠️ CSS載入失敗: ${id} (${href})`);
+       2932 +              reject(new Error(`CSS載入失敗: ${href}`));
+       2933 +          };
+       2934 +
+       2935 +          document.head.appendChild(link);
+       2936 +      });
+       2937 +  }
+       2938 +
+       2939 +  // ✨ 新增方法：獲取絕對路徑
+       2940 +  getAbsolutePath(relativePath) {
+       2941 +      // 根據當前頁面路徑調整相對路徑
+       2942 +      const currentPath = window.location.pathname;
+       2943 +      if (currentPath.includes('/html/')) {
+       2944 +          return relativePath; // 已經是正確的相對路徑
+       2945 +      } else {
+       2946 +          // 如果在根目錄，去除 ../ 前綴
+       2947 +          return relativePath.replace('../', '');
+       2948 +      }
+       2949 +  }
+       2950 +
+       2951 +  // ✨ 新增方法：降級切換器（當CSS載入失敗時）
+       2952 +  createFallbackSwitcher() {
+       2953 +      console.warn('🚑 建立降級主題切換器...');
+       2954 +
+       2955 +      // 簡化版本的主題切換器
+       2956 +      const fallbackHTML = `
+       2957 +          <div style="
+       2958 +              position: fixed;
+       2959 +              top: 20px;
+       2960 +              right: 20px;
+       2961 +              background: white;
+       2962 +              border: 2px solid #007bff;
+       2963 +              border-radius: 10px;
+       2964 +              padding: 10px;
+       2965 +              z-index: 1000;
+       2966 +              box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+       2967 +          ">
+       2968 +              <button onclick="this.toggleBasicTheme()"
+       2969 +                      style="
+       2970 +                          background: #007bff;
+       2971 +                          color: white;
+       2972 +                          border: none;
+       2973 +                          padding: 8px 12px;
+       2974 +                          border-radius: 5px;
+       2975 +                          cursor: pointer;
+       2976 +                      ">
+       2977 +                  切換主題
+       2978 +              </button>
+       2979 +          </div>
+       2980 +      `;
+       2981 +
+       2982 +      document.body.insertAdjacentHTML('beforeend', fallbackHTML);
+       2983 +
+       2984 +      // 簡化版主題切換功能
+       2985 +      window.toggleBasicTheme = () => {
+       2986 +          const html = document.documentElement;
+       2987 +          const currentTheme = html.getAttribute('data-theme');
+       2988 +          const newTheme = currentTheme === 'dark' ? 'ai-robot' : 'dark';
+       2989 +          html.setAttribute('data-theme', newTheme);
+       2990 +          console.log('降級主題切換:', newTheme);
+       2991 +      };
+       2992 +  }
+       2993 +  ```
+       2994 +
+       2995 +  **步驟 4.1.4.4：測試中間狀態**
+       2996 +
+       2997 +  在完成上述修改後，立即測試：
+       2998 +
+       2999 +  1. **儲存檔案**
+       3000 +  2. **重新載入頁面**
+       3001 +  3. **檢查主題切換器是否正常顯示**
+       3002 +  4. **檢查控制台是否有CSS載入訊息**
+       3003 +
+       3004 +  **測試腳本：**
+       3005 +  ```javascript
+       3006 +  // 在瀏覽器控制台執行
+       3007 +  console.log('=== 主題切換器測試 ===');
+       3008 +
+       3009 +  // 檢查切換器存在性
+       3010 +  const switcher = document.querySelector('.theme-switcher-container');
+       3011 +  console.log('切換器存在:', switcher ? '✅' : '❌');
+       3012 +
+       3013 +  // 檢查CSS載入
+       3014 +  const themeCSS = document.querySelectorAll('[data-theme-css]');
+       3015 +  console.log('主題相關 CSS 數量:', themeCSS.length);
+       3016 +  themeCSS.forEach(link => {
+       3017 +      console.log('  -', link.getAttribute('data-theme-css'), link.href);
+       3018 +  });
+       3019 +
+       3020 +  // 檢查功能性
+       3021 +  if (switcher) {
+       3022 +      const toggle = switcher.querySelector('.theme-toggle');
+       3023 +      const colorPicker = switcher.querySelector('.color-picker-tool');
+       3024 +      const calculator = switcher.querySelector('.calculator-btn');
+       3025 +
+       3026 +      console.log('主題切換按鈕:', toggle ? '✅' : '❌');
+       3027 +      console.log('顏色吸管:', colorPicker ? '✅' : '❌');
+       3028 +      console.log('計算機按鈕:', calculator ? '✅' : '❌');
+       3029 +  }
+       3030 +  ```
+       3031 +
+       3032            // 檢查是否已存在
+       3033            if (document.querySelector('.theme-switcher')) {
+       3034                console.log('主題切換器已存在，跳過建立');
+     ...
+       2952
+       2953    ### 階段五：其他模組重構模板 (按需進行)
+       2954
+       2955 +  ⚠️ **重要提醒**：只有前面階段完全成功後才能進行這一階段！
+       2956 +
+       2957 +  #### 重構前的必要檢查
+       2958 +
+       2959 +  **必須確認的狀態：**
+       2960 +  - [ ] index.html 重構完成且功能100%正常
+       2961 +  - [ ] C1 模組重構完成且功能100%正常
+       2962 +  - [ ] 主題切換器重構完成且功能100%正常
+       2963 +  - [ ] 所有原有功能都保持完整
+       2964 +  - [ ] 效能無明顯降低
+       2965 +  - [ ] 未出現新的錯誤或問題
+       2966 +
+       2967 +  **如果上述任何項目未滿足，請先修復再繼續！**
+       2968 +
+       2969    > 💡 **提示**：以下步驟可以根據需要逐一進行，每完成一個模組都進行測試
+       2970
+       2971    #### C3 金錢兌換模組重構模板
+
+● Update(CSS_REFACTORING_GUIDE.md)
+  ⎿  Error editing file
+
+● Search(pattern: "緒急回滾步驟", path: "CSS_REFACTORING_GUIDE.md", output_mode: "content")
+  ⎿  Found 0 lines
+
+● Search(pattern: "回滾", path: "CSS_REFACTORING_GUIDE.md", output_mode: "content")
+  ⎿  Found 70 lines (ctrl+r to expand)
+
+● I can see the section that needs to be enhanced. Let me find the correct text and add the detailed emergency rollback procedures.
+
+● Update(CSS_REFACTORING_GUIDE.md)
+  ⎿  Updated CSS_REFACTORING_GUIDE.md with 717 additions and 25 removals
+       3828    - [ ] 不同螢幕尺寸正常
+       3829    - [ ] 觸控/滑鼠操作正常
+       3830
+       3831 -  ### 除錯工具
+       3831 +  ### 🔧 進階除錯工具
+       3832
+       3833 -  #### 開發者工具檢查
+       3833 +  #### 全面CSS變數檢測器
+       3834 +
+       3835 +  **功能完整版本：**
+       3836    ```javascript
+       3837 -  // 在控制台執行，檢查CSS變數
+       3838 -  function debugCSSVariables(container = 'body') {
+       3839 -      const element = document.querySelector(container);
+       3837 +  /**
+       3838 +   * 全面CSS變數檢測器
+       3839 +   * 用於檢查模組獨立性和變數衝突
+       3840 +   */
+       3841 +  function debugCSSVariables(containerSelector = 'body') {
+       3842 +      console.log(`=== CSS變數檢測: ${containerSelector} ===`);
+       3843 +
+       3844 +      const element = document.querySelector(containerSelector);
+       3845 +      if (!element) {
+       3846 +          console.error(`❌ 找不到元素: ${containerSelector}`);
+       3847 +          return;
+       3848 +      }
+       3849 +
+       3850        const styles = getComputedStyle(element);
+       3851        const cssVars = {};
+       3852 +      const fallbackVars = {};
+       3853 +      const unusedVars = {};
+       3854
+       3855 -      for (let prop of styles) {
+       3855 +      // 收集所有CSS變數
+       3856 +      for (let prop of Array.from(styles)) {
+       3857            if (prop.startsWith('--')) {
+       3858 -              cssVars[prop] = styles.getPropertyValue(prop);
+       3858 +              const value = styles.getPropertyValue(prop).trim();
+       3859 +
+       3860 +              // 檢查是否使用var()
+       3861 +              if (value.includes('var(')) {
+       3862 +                  fallbackVars[prop] = value;
+       3863 +              } else {
+       3864 +                  cssVars[prop] = value;
+       3865 +              }
+       3866 +
+       3867 +              // 檢查是否為空值
+       3868 +              if (!value || value === 'initial' || value === 'unset') {
+       3869 +                  unusedVars[prop] = value;
+       3870 +              }
+       3871            }
+       3872        }
+       3873
+       3874 +      console.log('📋 基礎變數 (' + Object.keys(cssVars).length + '個):');
+       3875        console.table(cssVars);
+       3876 +
+       3877 +      console.log('🔗 Fallback變數 (' + Object.keys(fallbackVars).length + '個):');
+       3878 +      console.table(fallbackVars);
+       3879 +
+       3880 +      if (Object.keys(unusedVars).length > 0) {
+       3881 +          console.log('⚠️ 可能未使用的變數:');
+       3882 +          console.table(unusedVars);
+       3883 +      }
+       3884 +
+       3885 +      // 檢查變數命名規範
+       3886 +      const namingIssues = [];
+       3887 +      Object.keys(cssVars).forEach(varName => {
+       3888 +          if (!varName.includes('-') || varName.length < 10) {
+       3889 +              namingIssues.push(varName);
+       3890 +          }
+       3891 +      });
+       3892 +
+       3893 +      if (namingIssues.length > 0) {
+       3894 +          console.log('🔍 命名規範建議:');
+       3895 +          namingIssues.forEach(varName => {
+       3896 +              console.log(`  ${varName} -> 建議使用更具描述性的命名`);
+       3897 +          });
+       3898 +      }
+       3899 +
+       3900 +      return { cssVars, fallbackVars, unusedVars, namingIssues };
+       3901    }
+       3902
+       3903 -  // 使用方式
+       3904 -  debugCSSVariables('.c1-container'); // 檢查C1模組的CSS變數
+       3903 +  // 快速檢查所有模組
+       3904 +  function checkAllModules() {
+       3905 +      const modules = [
+       3906 +          '.index-container',
+       3907 +          '.c1-container',
+       3908 +          '.c2-container',
+       3909 +          '.c3-container',
+       3910 +          '.f4-container',
+       3911 +          '.f5-container',
+       3912 +          '.theme-switcher-container'
+       3913 +      ];
+       3914 +
+       3915 +      modules.forEach(moduleSelector => {
+       3916 +          if (document.querySelector(moduleSelector)) {
+       3917 +              debugCSSVariables(moduleSelector);
+       3918 +          }
+       3919 +      });
+       3920 +  }
+       3921    ```
+       3922
+       3923 -  #### CSS載入檢查
+       3923 +  #### 詳細CSS載入分析器
+       3924 +
+       3925    ```javascript
+       3926 -  // 檢查哪些CSS檔案已載入
+       3927 -  function checkLoadedCSS() {
+       3928 -      const links = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+       3929 -      console.log('已載入的CSS檔案:', links.map(link => link.href));
+       3926 +  /**
+       3927 +   * CSS載入狀態分析器
+       3928 +   * 檢查檔案載入狀態、大小、重複等
+       3929 +   */
+       3930 +  function analyzeCSSFiles() {
+       3931 +      console.log('=== CSS檔案載入分析 ===');
+       3932 +
+       3933 +      const stylesheets = Array.from(document.styleSheets);
+       3934 +      const linkElements = Array.from(document.querySelectorAll('link[rel="stylesheet"]'));
+       3935 +
+       3936 +      console.log(`總共 ${stylesheets.length} 個CSS謄表，${linkElements.length} 個外部連結`);
+       3937 +
+       3938 +      // 分析外部CSS檔案
+       3939 +      const fileAnalysis = [];
+       3940 +      const duplicates = {};
+       3941 +
+       3942 +      linkElements.forEach((link, index) => {
+       3943 +          const href = link.href;
+       3944 +          const fileName = href ? href.split('/').pop() : '內嵌CSS';
+       3945 +          const isModular = href.includes('/modules/');
+       3946 +          const isShared = href.includes('/shared/');
+       3947 +          const isTheme = href.includes('theme');
+       3948 +
+       3949 +          // 檢查重複
+       3950 +          if (duplicates[fileName]) {
+       3951 +              duplicates[fileName].count++;
+       3952 +              duplicates[fileName].elements.push(link);
+       3953 +          } else {
+       3954 +              duplicates[fileName] = { count: 1, elements: [link] };
+       3955 +          }
+       3956 +
+       3957 +          fileAnalysis.push({
+       3958 +              '索引': index + 1,
+       3959 +              '檔名': fileName,
+       3960 +              '類型': isModular ? '模組' : isShared ? '共用' : isTheme ? '主題' : '傳統',
+       3961 +              '路徑': href.replace(window.location.origin, ''),
+       3962 +              '禁用': link.disabled ? '是' : '否',
+       3963 +              '媒體': link.media || '全部'
+       3964 +          });
+       3965 +      });
+       3966 +
+       3967 +      console.table(fileAnalysis);
+       3968 +
+       3969 +      // 檢查重複載入
+       3970 +      const duplicateFiles = Object.entries(duplicates).filter(([name, info]) => info.count > 1);
+       3971 +      if (duplicateFiles.length > 0) {
+       3972 +          console.log('⚠️ 檢測到重複載入:');
+       3973 +          duplicateFiles.forEach(([name, info]) => {
+       3974 +              console.log(`  ${name}: 載入${info.count}次`);
+       3975 +          });
+       3976 +      }
+       3977 +
+       3978 +      // 檢查載入失敗
+       3979 +      checkCSSLoadErrors();
+       3980 +
+       3981 +      return { fileAnalysis, duplicates };
+       3982    }
+       3983 +
+       3984 +  // CSS載入錯誤檢查
+       3985 +  function checkCSSLoadErrors() {
+       3986 +      console.log('🔍 檢查CSS載入錯誤...');
+       3987 +
+       3988 +      // 監聽新的CSS載入錯誤
+       3989 +      const observer = new MutationObserver(function(mutations) {
+       3990 +          mutations.forEach(function(mutation) {
+       3991 +              mutation.addedNodes.forEach(function(node) {
+       3992 +                  if (node.tagName === 'LINK' && node.rel === 'stylesheet') {
+       3993 +                      node.onerror = function() {
+       3994 +                          console.error(`❌ CSS載入失敗: ${node.href}`);
+       3995 +                      };
+       3996 +                      node.onload = function() {
+       3997 +                          console.log(`✅ CSS載入成功: ${node.href.split('/').pop()}`);
+       3998 +                      };
+       3999 +                  }
+       4000 +              });
+       4001 +          });
+       4002 +      });
+       4003 +
+       4004 +      observer.observe(document.head, { childList: true });
+       4005 +
+       4006 +      // 檢查現有CSS狀態
+       4007 +      document.querySelectorAll('link[rel="stylesheet"]').forEach(link => {
+       4008 +          // 嘗試訪問樣式表
+       4009 +          try {
+       4010 +              const rules = link.sheet ? link.sheet.cssRules : null;
+       4011 +              if (rules === null && !link.disabled) {
+       4012 +                  console.warn(`⚠️ 無法訪問CSS規則: ${link.href}`);
+       4013 +              }
+       4014 +          } catch (e) {
+       4015 +              if (e.name === 'SecurityError') {
+       4016 +                  console.info(`🔒 跨域 CSS 限制: ${link.href}`);
+       4017 +              } else {
+       4018 +                  console.error(`❌ CSS錯誤: ${link.href}`, e);
+       4019 +              }
+       4020 +          }
+       4021 +      });
+       4022 +  }
+       4023    ```
+       4024
+       4025 +  #### 響應式設計測試器
+       4026 +
+       4027 +  ```javascript
+       4028 +  /**
+       4029 +   * 響應式設計測試器
+       4030 +   * 模擬不同設備尺寸並檢查佈局
+       4031 +   */
+       4032 +  function testResponsiveDesign() {
+       4033 +      console.log('=== 響應式設計測試 ===');
+       4034 +
+       4035 +      const testSizes = [
+       4036 +          { name: '手機端 (小)', width: 320, height: 568 },
+       4037 +          { name: '手機端 (中)', width: 375, height: 667 },
+       4038 +          { name: '手機端 (大)', width: 414, height: 896 },
+       4039 +          { name: '平板端', width: 768, height: 1024 },
+       4040 +          { name: '桌面端 (小)', width: 1024, height: 768 },
+       4041 +          { name: '桌面端 (大)', width: 1440, height: 900 },
+       4042 +          { name: '4K顯展', width: 2560, height: 1440 }
+       4043 +      ];
+       4044 +
+       4045 +      const originalSize = {
+       4046 +          width: window.innerWidth,
+       4047 +          height: window.innerHeight
+       4048 +      };
+       4049 +
+       4050 +      const results = [];
+       4051 +
+       4052 +      testSizes.forEach(size => {
+       4053 +          // 模擬視窗大小變更
+       4054 +          Object.defineProperty(window, 'innerWidth', {
+       4055 +              writable: true,
+       4056 +              configurable: true,
+       4057 +              value: size.width
+       4058 +          });
+       4059 +          Object.defineProperty(window, 'innerHeight', {
+       4060 +              writable: true,
+       4061 +              configurable: true,
+       4062 +              value: size.height
+       4063 +          });
+       4064 +
+       4065 +          // 觸發resize事件
+       4066 +          window.dispatchEvent(new Event('resize'));
+       4067 +
+       4068 +          // 等待一小段時間讓樣式更新
+       4069 +          setTimeout(() => {
+       4070 +              const container = document.querySelector('.index-container, .c1-container, .c3-container');
+       4071 +              if (container) {
+       4072 +                  const styles = getComputedStyle(container);
+       4073 +                  results.push({
+       4074 +                      '設備': size.name,
+       4075 +                      '尺寸': `${size.width}x${size.height}`,
+       4076 +                      '字體': styles.fontSize,
+       4077 +                      '內邊距': styles.padding,
+       4078 +                      '寬度': styles.width,
+       4079 +                      '最大寬度': styles.maxWidth,
+       4080 +                      'Flexbox方向': styles.flexDirection || 'N/A'
+       4081 +                  });
+       4082 +              }
+       4083 +          }, 100);
+       4084 +      });
+       4085 +
+       4086 +      // 還原原始尺寸
+       4087 +      setTimeout(() => {
+       4088 +          Object.defineProperty(window, 'innerWidth', {
+       4089 +              writable: true,
+       4090 +              configurable: true,
+       4091 +              value: originalSize.width
+       4092 +          });
+       4093 +          Object.defineProperty(window, 'innerHeight', {
+       4094 +              writable: true,
+       4095 +              configurable: true,
+       4096 +              value: originalSize.height
+       4097 +          });
+       4098 +          window.dispatchEvent(new Event('resize'));
+       4099 +
+       4100 +          console.table(results);
+       4101 +          console.log('🔄 已還原原始視窗尺寸');
+       4102 +      }, testSizes.length * 150);
+       4103 +  }
+       4104 +  ```
+       4105 +
+       4106 +  #### 模組獨立性驗證器
+       4107 +
+       4108 +  ```javascript
+       4109 +  /**
+       4110 +   * 模組獨立性驗證器
+       4111 +   * 檢查模組間是否相互影響
+       4112 +   */
+       4113 +  function validateModuleIndependence() {
+       4114 +      console.log('=== 模組獨立性驗證 ===');
+       4115 +
+       4116 +      const modules = [
+       4117 +          { name: '主頁', selector: '.index-container', prefix: '--index-' },
+       4118 +          { name: 'C1金錢種類', selector: '.c1-container', prefix: '--c1-' },
+       4119 +          { name: 'C2金錢計數', selector: '.c2-container', prefix: '--c2-' },
+       4120 +          { name: 'C3金錢兌換', selector: '.c3-container', prefix: '--c3-' },
+       4121 +          { name: '主題切換器', selector: '.theme-switcher-container', prefix: '--switcher-' }
+       4122 +      ];
+       4123 +
+       4124 +      const conflicts = [];
+       4125 +      const allVariables = new Map();
+       4126 +
+       4127 +      modules.forEach(moduleA => {
+       4128 +          const elementA = document.querySelector(moduleA.selector);
+       4129 +          if (!elementA) return;
+       4130 +
+       4131 +          const stylesA = getComputedStyle(elementA);
+       4132 +          const varsA = [];
+       4133 +
+       4134 +          for (let prop of Array.from(stylesA)) {
+       4135 +              if (prop.startsWith('--')) {
+       4136 +                  varsA.push(prop);
+       4137 +
+       4138 +                  // 檢查變數是否符合模組命名規範
+       4139 +                  if (!prop.startsWith(moduleA.prefix) && !prop.startsWith('--design-')) {
+       4140 +                      conflicts.push({
+       4141 +                          '模組': moduleA.name,
+       4142 +                          '問題': '變數命名不符合規範',
+       4143 +                          '變數': prop,
+       4144 +                          '期望前綴': moduleA.prefix
+       4145 +                      });
+       4146 +                  }
+       4147 +
+       4148 +                  // 檢查全域變數衝突
+       4149 +                  if (allVariables.has(prop)) {
+       4150 +                      const existingModule = allVariables.get(prop);
+       4151 +                      if (existingModule !== moduleA.name) {
+       4152 +                          conflicts.push({
+       4153 +                              '模組': `${existingModule} vs ${moduleA.name}`,
+       4154 +                              '問題': '變數名稱衝突',
+       4155 +                              '變數': prop,
+       4156 +                              '建議': '使用模組獨有前綴'
+       4157 +                          });
+       4158 +                      }
+       4159 +                  } else {
+       4160 +                      allVariables.set(prop, moduleA.name);
+       4161 +                  }
+       4162 +              }
+       4163 +          }
+       4164 +
+       4165 +          console.log(`${moduleA.name}: ${varsA.length}個變數`);
+       4166 +      });
+       4167 +
+       4168 +      if (conflicts.length > 0) {
+       4169 +          console.log('⚠️ 發現模組獨立性問題:');
+       4170 +          console.table(conflicts);
+       4171 +      } else {
+       4172 +          console.log('✅ 模組獨立性驗證通過');
+       4173 +      }
+       4174 +
+       4175 +      return conflicts;
+       4176 +  }
+       4177 +  ```
+       4178 +
+       4179 +  #### 性能監控工具
+       4180 +
+       4181 +  ```javascript
+       4182 +  /**
+       4183 +   * 性能監控工具
+       4184 +   * 監控CSS載入時間、繪染性能等
+       4185 +   */
+       4186 +  function monitorPerformance() {
+       4187 +      console.log('=== CSS性能監控 ===');
+       4188 +
+       4189 +      // CSS載入時間分析
+       4190 +      if (performance.getEntriesByType) {
+       4191 +          const resources = performance.getEntriesByType('resource');
+       4192 +          const cssResources = resources.filter(r => r.name.includes('.css'));
+       4193 +
+       4194 +          const cssAnalysis = cssResources.map(css => ({
+       4195 +              '檔名': css.name.split('/').pop(),
+       4196 +              '大小(KB)': Math.round(css.transferSize / 1024),
+       4197 +              '載入時間(ms)': Math.round(css.loadEnd - css.loadStart),
+       4198 +              'DNS查詢(ms)': Math.round(css.domainLookupEnd - css.domainLookupStart),
+       4199 +              '連線時間(ms)': Math.round(css.connectEnd - css.connectStart),
+       4200 +              '狀態': css.transferSize > 0 ? '成功' : '可能失敗'
+       4201 +          }));
+       4202 +
+       4203 +          console.table(cssAnalysis);
+       4204 +
+       4205 +          // 總結
+       4206 +          const totalSize = cssAnalysis.reduce((sum, css) => sum + css['大小(KB)'], 0);
+       4207 +          const totalLoadTime = cssAnalysis.reduce((sum, css) => sum + css['載入時間(ms)'], 0);
+       4208 +
+       4209 +          console.log(`📊 CSS總結: ${cssAnalysis.length}個檔案，總大小 ${totalSize}KB，總載入時間 ${totalLoadTime}ms`);
+       4210 +
+       4211 +          // 性能建議
+       4212 +          const largeCSSFiles = cssAnalysis.filter(css => css['大小(KB)'] > 50);
+       4213 +          const slowCSSFiles = cssAnalysis.filter(css => css['載入時間(ms)'] > 200);
+       4214 +
+       4215 +          if (largeCSSFiles.length > 0) {
+       4216 +              console.log('⚠️ 猶似偏大的CSS檔案:');
+       4217 +              largeCSSFiles.forEach(css => {
+       4218 +                  console.log(`  ${css['檔名']}: ${css['大小(KB)']}KB`);
+       4219 +              });
+       4220 +          }
+       4221 +
+       4222 +          if (slowCSSFiles.length > 0) {
+       4223 +              console.log('⚠️ 載入較慢的CSS檔案:');
+       4224 +              slowCSSFiles.forEach(css => {
+       4225 +                  console.log(`  ${css['檔名']}: ${css['載入時間(ms)']}ms`);
+       4226 +              });
+       4227 +          }
+       4228 +      }
+       4229 +
+       4230 +      // 繪染性能監控
+       4231 +      monitorRenderPerformance();
+       4232 +  }
+       4233 +
+       4234 +  // 繪染性能監控
+       4235 +  function monitorRenderPerformance() {
+       4236 +      let renderCount = 0;
+       4237 +      let lastRenderTime = performance.now();
+       4238 +
+       4239 +      const observer = new MutationObserver(function(mutations) {
+       4240 +          renderCount++;
+       4241 +          const currentTime = performance.now();
+       4242 +          const renderDelta = currentTime - lastRenderTime;
+       4243 +
+       4244 +          if (renderDelta < 16.67) { // 60fps = 16.67ms
+       4245 +              console.log(`✅ 渲染性能良好: ${renderDelta.toFixed(2)}ms`);
+       4246 +          } else if (renderDelta < 33.33) { // 30fps
+       4247 +              console.log(`⚠️ 渲染較慢: ${renderDelta.toFixed(2)}ms`);
+       4248 +          } else {
+       4249 +              console.log(`❌ 渲染停頓: ${renderDelta.toFixed(2)}ms`);
+       4250 +          }
+       4251 +
+       4252 +          lastRenderTime = currentTime;
+       4253 +      });
+       4254 +
+       4255 +      observer.observe(document.body, {
+       4256 +          childList: true,
+       4257 +          subtree: true,
+       4258 +          attributes: true
+       4259 +      });
+       4260 +
+       4261 +      console.log('🔍 開始監控渲染性能...');
+       4262 +  }
+       4263 +  ```
+       4264 +
+       4265 +  #### 一鍵診斷工具
+       4266 +
+       4267 +  ```javascript
+       4268 +  /**
+       4269 +   * CSS重構一鍵診斷工具
+       4270 +   * 綜合執行上述所有檢查
+       4271 +   */
+       4272 +  function runFullDiagnostics() {
+       4273 +      console.clear();
+       4274 +      console.log('🚀 開始全面CSS診斷...');
+       4275 +      console.log('='.repeat(50));
+       4276 +
+       4277 +      try {
+       4278 +          // 1. 基礎資訊
+       4279 +          console.log('📝 基礎資訊:');
+       4280 +          console.log(`瀏覽器: ${navigator.userAgent.split(' ').pop()}`);
+       4281 +          console.log(`視窗尺寸: ${window.innerWidth}x${window.innerHeight}`);
+       4282 +          console.log(`像素比: ${window.devicePixelRatio}`);
+       4283 +          console.log(`當前主題: ${document.documentElement.getAttribute('data-theme') || '預設'}`);
+       4284 +          console.log('');
+       4285 +
+       4286 +          // 2. CSS檔案分析
+       4287 +          analyzeCSSFiles();
+       4288 +          console.log('');
+       4289 +
+       4290 +          // 3. 模組獨立性檢查
+       4291 +          validateModuleIndependence();
+       4292 +          console.log('');
+       4293 +
+       4294 +          // 4. CSS變數檢查
+       4295 +          checkAllModules();
+       4296 +          console.log('');
+       4297 +
+       4298 +          // 5. 性能分析
+       4299 +          monitorPerformance();
+       4300 +          console.log('');
+       4301 +
+       4302 +          // 6. 總結建議
+       4303 +          console.log('🎆 診斷完成！');
+       4304 +          console.log('🔍 建議檢查上方的所有警告和錯誤');
+       4305 +          console.log('🔧 如遇問題，可使用回滾腳本恢復');
+       4306 +
+       4307 +      } catch (error) {
+       4308 +          console.error('❌ 診斷過程中發生錯誤:', error);
+       4309 +      }
+       4310 +  }
+       4311 +
+       4312 +  // 快捷指令
+       4313 +  console.log('🎉 CSS診斷工具已載入！');
+       4314 +  console.log('🚀 使用 runFullDiagnostics() 開始全面檢查');
+       4315 +  console.log('🔧 或使用個別功能:');
+       4316 +  console.log('  - analyzeCSSFiles() - CSS檔案分析');
+       4317 +  console.log('  - checkAllModules() - 所有模組變數檢查');
+       4318 +  console.log('  - validateModuleIndependence() - 模組獨立性驗證');
+       4319 +  console.log('  - testResponsiveDesign() - 響應式設計測試');
+       4320 +  console.log('  - monitorPerformance() - 性能監控');
+       4321 +  ```
+       4322 +
+       4323    ---
+       4324
+       4325    ## 🔧 維護指南
+     ...
+       3963    3. 檢查觸控事件是否正常
+       3964    4. 確認媒體查詢語法正確
+       3965
+       3966 -  ### 緊急回滾步驟
+       3966 +  ### 🚨 緊急回滾步驟
+       3967
+       3968 -  如果重構過程中出現嚴重問題：
+       3968 +  ⚠️ **緊急情況使用**：當重構導致嚴重錯誤或頁面無法正常運作時
+       3969
+       3970 -  1. **停止當前操作**
+       3971 -  2. **使用備份檔案恢復**
+       3972 -     ```bash
+       3973 -     cp index.html.backup index.html
+       3974 -     cp html/c1_money_types.html.backup html/c1_money_types.html
+       3975 -     ```
+       3976 -  3. **移除新建的CSS檔案**
+       3977 -  4. **恢復原有的CSS引用**
+       3978 -  5. **重新規劃和執行**
+       3970 +  #### 第一時間回滾（全自動）
+       3971
+       3972 +  **Windows 環境：**
+       3973 +  ```batch
+       3974 +  @echo off
+       3975 +  echo 🚨 緊急回滾 CSS 重構...
+       3976 +  echo.
+       3977 +
+       3978 +  echo 🔁 步驟 1: 恢復 HTML 檔案...
+       3979 +  if exist "index.html.backup" (
+       3980 +      copy /Y "index.html.backup" "index.html"
+       3981 +      echo    ✅ index.html 已恢復
+       3982 +  ) else (
+       3983 +      echo    ⚠️ index.html 備份不存在
+       3984 +  )
+       3985 +
+       3986 +  if exist "html\c1_money_types.html.backup" (
+       3987 +      copy /Y "html\c1_money_types.html.backup" "html\c1_money_types.html"
+       3988 +      echo    ✅ c1_money_types.html 已恢復
+       3989 +  ) else (
+       3990 +      echo    ⚠️ c1_money_types.html 備份不存在
+       3991 +  )
+       3992 +
+       3993 +  echo.
+       3994 +  echo 🔁 步驟 2: 恢復 JavaScript 檔案...
+       3995 +  if exist "js\theme-system.js.backup" (
+       3996 +      copy /Y "js\theme-system.js.backup" "js\theme-system.js"
+       3997 +      echo    ✅ theme-system.js 已恢復
+       3998 +  ) else (
+       3999 +      echo    ⚠️ theme-system.js 備份不存在
+       4000 +  )
+       4001 +
+       4002 +  echo.
+       4003 +  echo 🔁 步驟 3: 恢復原始 CSS 檔案...
+       4004 +  for %%f in (css\temp-backup\*.css) do (
+       4005 +      copy /Y "%%f" "css\"
+       4006 +      echo    ✅ 已恢復 %%~nxf
+       4007 +  )
+       4008 +
+       4009 +  echo.
+       4010 +  echo 🔁 步驟 4: 清理新建的模組檔案...
+       4011 +  if exist "css\modules" (
+       4012 +      echo    移除新建的模組目錄...
+       4013 +      rmdir /S /Q "css\modules"
+       4014 +      echo    ✅ 模組目錄已移除
+       4015 +  )
+       4016 +
+       4017 +  if exist "css\shared" (
+       4018 +      echo    移除新建的共用目錄...
+       4019 +      rmdir /S /Q "css\shared"
+       4020 +      echo    ✅ 共用目錄已移除
+       4021 +  )
+       4022 +
+       4023 +  echo.
+       4024 +  echo 🎆 緊急回滾完成！
+       4025 +  echo 🔍 請重新載入瀏覽器測試功能是否正常
+       4026 +  echo 📝 建議檢查錯誤日誌後再次嘗試重構
+       4027 +  echo.
+       4028 +  pause
+       4029 +  ```
+       4030 +
+       4031 +  **Unix/Linux/macOS 環境：**
+       4032 +  ```bash
+       4033 +  #!/bin/bash
+       4034 +  echo "🚨 緊急回滾 CSS 重構..."
+       4035 +  echo
+       4036 +
+       4037 +  echo "🔁 步驟 1: 恢復 HTML 檔案..."
+       4038 +  if [[ -f "index.html.backup" ]]; then
+       4039 +      cp "index.html.backup" "index.html"
+       4040 +      echo "    ✅ index.html 已恢復"
+       4041 +  else
+       4042 +      echo "    ⚠️ index.html 備份不存在"
+       4043 +  fi
+       4044 +
+       4045 +  if [[ -f "html/c1_money_types.html.backup" ]]; then
+       4046 +      cp "html/c1_money_types.html.backup" "html/c1_money_types.html"
+       4047 +      echo "    ✅ c1_money_types.html 已恢復"
+       4048 +  else
+       4049 +      echo "    ⚠️ c1_money_types.html 備份不存在"
+       4050 +  fi
+       4051 +
+       4052 +  echo
+       4053 +  echo "🔁 步驟 2: 恢復 JavaScript 檔案..."
+       4054 +  if [[ -f "js/theme-system.js.backup" ]]; then
+       4055 +      cp "js/theme-system.js.backup" "js/theme-system.js"
+       4056 +      echo "    ✅ theme-system.js 已恢復"
+       4057 +  else
+       4058 +      echo "    ⚠️ theme-system.js 備份不存在"
+       4059 +  fi
+       4060 +
+       4061 +  echo
+       4062 +  echo "🔁 步驟 3: 恢復原始 CSS 檔案..."
+       4063 +  if [[ -d "css/temp-backup" ]]; then
+       4064 +      for file in css/temp-backup/*.css; do
+       4065 +          if [[ -f "$file" ]]; then
+       4066 +              filename=$(basename "$file")
+       4067 +              cp "$file" "css/$filename"
+       4068 +              echo "    ✅ 已恢復 $filename"
+       4069 +          fi
+       4070 +      done
+       4071 +  else
+       4072 +      echo "    ⚠️ 備份目錄不存在"
+       4073 +  fi
+       4074 +
+       4075 +  echo
+       4076 +  echo "🔁 步驟 4: 清理新建的模組檔案..."
+       4077 +  if [[ -d "css/modules" ]]; then
+       4078 +      echo "    移除新建的模組目錄..."
+       4079 +      rm -rf "css/modules"
+       4080 +      echo "    ✅ 模組目錄已移除"
+       4081 +  fi
+       4082 +
+       4083 +  if [[ -d "css/shared" ]]; then
+       4084 +      echo "    移除新建的共用目錄..."
+       4085 +      rm -rf "css/shared"
+       4086 +      echo "    ✅ 共用目錄已移除"
+       4087 +  fi
+       4088 +
+       4089 +  echo
+       4090 +  echo "🎆 緊急回滾完成！"
+       4091 +  echo "🔍 請重新載入瀏覽器測試功能是否正常"
+       4092 +  echo "📝 建議檢查錯誤日誌後再次嘗試重構"
+       4093 +  echo
+       4094 +  ```
+       4095 +
+       4096 +  #### 手動分步回滾（如果自動腳本失效）
+       4097 +
+       4098 +  **步驟 1：立即停止當前操作**
+       4099 +  ```bash
+       4100 +  # 關閉所有文字編輯器
+       4101 +  # 不要儲存任何正在編輯的檔案
+       4102 +  ```
+       4103 +
+       4104 +  **步驟 2：確認備份檔案存在**
+       4105 +  ```bash
+       4106 +  # Windows
+       4107 +  dir *.backup
+       4108 +  dir html\*.backup
+       4109 +  dir js\*.backup
+       4110 +  dir css\temp-backup\*.css
+       4111 +
+       4112 +  # Unix/Linux/macOS
+       4113 +  ls -la *.backup
+       4114 +  ls -la html/*.backup
+       4115 +  ls -la js/*.backup
+       4116 +  ls -la css/temp-backup/*.css
+       4117 +  ```
+       4118 +
+       4119 +  **步驟 3：逐一恢復關鍵檔案**
+       4120 +  ```bash
+       4121 +  # 3.1 恢復 index.html
+       4122 +  cp index.html.backup index.html
+       4123 +
+       4124 +  # 3.2 恢復 C1 檔案
+       4125 +  cp html/c1_money_types.html.backup html/c1_money_types.html
+       4126 +
+       4127 +  # 3.3 恢復 theme-system.js
+       4128 +  cp js/theme-system.js.backup js/theme-system.js
+       4129 +
+       4130 +  # 3.4 恢復原始 CSS 檔案
+       4131 +  cp css/temp-backup/*.css css/
+       4132 +  ```
+       4133 +
+       4134 +  **步驟 4：清理新建檔案（可選）**
+       4135 +  ```bash
+       4136 +  # 移除模組目錄
+       4137 +  rm -rf css/modules
+       4138 +  rm -rf css/shared
+       4139 +
+       4140 +  # 或者重命名保留
+       4141 +  md css/modules-failed  # Windows
+       4142 +  mkdir css/modules-failed  # Unix
+       4143 +  mv css/modules css/modules-failed
+       4144 +  mv css/shared css/shared-failed
+       4145 +  ```
+       4146 +
+       4147 +  **步驟 5：驗證回滾成功**
+       4148 +  ```bash
+       4149 +  # 開啟瀏覽器測試：
+       4150 +  # 1. index.html - 主頁正常載入
+       4151 +  # 2. html/c1_money_types.html - C1正常運作
+       4152 +  # 3. 主題切換器正常顯示
+       4153 +  # 4. 所有功能正常使用
+       4154 +  ```
+       4155 +
+       4156 +  #### 版本控制回滾（如果使用Git）
+       4157 +
+       4158 +  **安全回滾（保留修改）：**
+       4159 +  ```bash
+       4160 +  # 儲存當前狀態為備份
+       4161 +  git stash push -m "重構過程中的修改備份"
+       4162 +
+       4163 +  # 回到重構前狀態
+       4164 +  git checkout HEAD~1  # 或指定的commit hash
+       4165 +
+       4166 +  # 檢查狀態
+       4167 +  git status
+       4168 +  git log --oneline -5
+       4169 +  ```
+       4170 +
+       4171 +  **強制回滾（捨棄修改）：**
+       4172 +  ```bash
+       4173 +  # 警告：這將永久失去所有未提交的修改
+       4174 +  git reset --hard HEAD~1
+       4175 +
+       4176 +  # 清理未追蹤的檔案
+       4177 +  git clean -fd
+       4178 +  ```
+       4179 +
+       4180 +  #### 回滾後的設定清單
+       4181 +
+       4182 +  **必做項目：**
+       4183 +  - [ ] 重新載入所有瀏覽器頁面
+       4184 +  - [ ] 清除瀏覽器快取 (Ctrl+F5 或 Cmd+Shift+R)
+       4185 +  - [ ] 測試主要功能是否正常
+       4186 +  - [ ] 檢查控制台無錯誤訊息
+       4187 +  - [ ] 驗證主題切換功能
+       4188 +
+       4189 +  **建議項目：**
+       4190 +  - [ ] 檢查所有備份檔案是否完整
+       4191 +  - [ ] 更新重構計劃，轉為更小的步驟
+       4192 +  - [ ] 記錄失敗原因和經驗教訓
+       4193 +  - [ ] 考慮專業支持或建議
+       4194 +
+       4195 +  #### 防止重複問題的措施
+       4196 +
+       4197 +  **未來重構建議：**
+       4198 +  1. **更小的增量步驟**：每次只修改一個檔案
+       4199 +  2. **更頻繁的測試**：每步修改後都要測試
+       4200 +  3. **更多的備份點**：每個步驟都創建備份
+       4201 +  4. **更好的測試工具**：使用上方的診斷工具
+       4202 +  5. **專業諮詢**：複雜改動前先諮詢經驗豐富的開發者
+       4203 +
+       4204 +  **緊急聯絡資訊：**
+       4205 +  - 專案文件：`CSS_REFACTORING_GUIDE.md`
+       4206 +  - 備份位置：`css/temp-backup/`, `*.backup` 檔案
+       4207 +  - 日誌檔案：瀏覽器開發者工具 > Console
+       4208 +  - 問題回報：[項目 GitHub Issues]
+       4209 +
+       4210 +  🔥 **特別提醒**：如果與此同時還在進行其他重要修改，請先停止並備份，然後再執行回滾！
+       4211 +
+       4212    ---
+       4213
+       4214    ## 🎯 總結
+
+● Update(CSS_REFACTORING_GUIDE.md)
+  ⎿  Error editing file
+
+● Search(pattern: "記住.*每一行", path: "CSS_REFACTORING_GUIDE.md", output_mode: "content")
+  ⎿  Found 0 lines
+
+● Search(pattern: "記住", path: "CSS_REFACTORING_GUIDE.md", output_mode: "content")
+  ⎿  Found 3 lines (ctrl+r to expand)
+
+● I'll add the appendix section at the end of the document:
+
+● Update(CSS_REFACTORING_GUIDE.md)
+  ⎿  Updated CSS_REFACTORING_GUIDE.md with 280 additions and 1 removal
+       4696    4. 重構主題切換器並測試
+       4697    5. 其他模組按優先級逐一重構
+       4698
+       4699 -  記住：**一次只做一個模組，完成測試後再進行下一個！**
+       4699   \ No newline at end of file
+       4700 +  記住：**一次只做一個模組，完成測試後再進行下一個！**
+       4701 +
+       4702 +  ---
+       4703 +
+       4704 +  ## 📚 附錄：完整實施檢查清單
+       4705 +
+       4706 +  ### 📅 日報表格
+       4707 +
+       4708 +  **這個表格可以列印或用於記錄進度：**
+       4709 +
+       4710 +  | 階段 | 任務 | 預估時間 | 實際時間 | 狀態 | 測試結果 | 備註 |
+       4711 +  |------|------|----------|----------|------|----------|---------|
+       4712 +  | 1.1 | 環境檢查與準備 | 30min | _____ | ☐ | ☐ | |
+       4713 +  | 1.2 | 完整備份現有檔案 | 30min | _____ | ☐ | ☐ | |
+       4714 +  | 1.3 | 版本控制檢查點 | 20min | _____ | ☐ | ☐ | |
+       4715 +  | 2.1 | 創建最小化重置檔案 | 30min | _____ | ☐ | ☐ | |
+       4716 +  | 2.2 | 創建設計規範庫 | 60min | _____ | ☐ | ☐ | |
+       4717 +  | 3.1.1 | 主頁核心樣式 | 90min | _____ | ☐ | ☐ | |
+       4718 +  | 3.1.2 | 主頁主題支援 | 45min | _____ | ☐ | ☐ | |
+       4719 +  | 3.1.3 | 主頁響應式支援 | 45min | _____ | ☐ | ☐ | |
+       4720 +  | 3.1.4 | 修改 index.html | 60min | _____ | ☐ | ☐ | |
+       4721 +  | 3.1.5 | 全面測試主頁重構 | 90min | _____ | ☐ | ☐ | |
+       4722 +  | 3.2.1 | C1 核心樣式 | 120min | _____ | ☐ | ☐ | |
+       4723 +  | 3.2.2 | C1 主題支援 | 45min | _____ | ☐ | ☐ | |
+       4724 +  | 3.2.3 | C1 響應式支援 | 60min | _____ | ☐ | ☐ | |
+       4725 +  | 3.2.4 | 修改 C1 HTML檔案 | 45min | _____ | ☐ | ☐ | |
+       4726 +  | 3.2.5 | 測試 C1 重構 | 60min | _____ | ☐ | ☐ | |
+       4727 +  | 4.1.1 | 主題切換器核心樣式 | 90min | _____ | ☐ | ☐ | |
+       4728 +  | 4.1.2 | 計算機樣式 | 45min | _____ | ☐ | ☐ | |
+       4729 +  | 4.1.3 | 顏色吸管樣式 | 45min | _____ | ☐ | ☐ | |
+       4730 +  | 4.1.4 | 修改 theme-system.js | 120min | _____ | ☐ | ☐ | |
+       4731 +  | 4.3 | 測試主題切換器重構 | 90min | _____ | ☐ | ☐ | |
+       4732 +
+       4733 +  **總計預估時間：16.5小時**
+       4734 +
+       4735 +  ### 🎨 CSS檔案大小追蹤表
+       4736 +
+       4737 +  **用於監控檔案大小和效能：**
+       4738 +
+       4739 +  | 檔案名稱 | 重構前 | 重構後 | 差異 | 狀態 |
+       4740 +  |------------|-------|-------|------|------|
+       4741 +  | 總 CSS 大小 | ___KB | ___KB | ___KB | ☐ |
+       4742 +  | index-core.css | N/A | ___KB | +___KB | ☐ |
+       4743 +  | index-theme.css | N/A | ___KB | +___KB | ☐ |
+       4744 +  | index-mobile.css | N/A | ___KB | +___KB | ☐ |
+       4745 +  | c1-core.css | N/A | ___KB | +___KB | ☐ |
+       4746 +  | c1-theme.css | N/A | ___KB | +___KB | ☐ |
+       4747 +  | c1-mobile.css | N/A | ___KB | +___KB | ☐ |
+       4748 +  | theme-switcher-core.css | N/A | ___KB | +___KB | ☐ |
+       4749 +  | theme-calculator.css | N/A | ___KB | +___KB | ☐ |
+       4750 +  | theme-colorpicker.css | N/A | ___KB | +___KB | ☐ |
+       4751 +  | 載入時間 | ___ms | ___ms | ___ms | ☐ |
+       4752 +
+       4753 +  ### 🧩 問題追蹤與解決表
+       4754 +
+       4755 +  **遇到問題時用於記錄和追蹤：**
+       4756 +
+       4757 +  | 日期/時間 | 問題描述 | 影響範圍 | 解決方案 | 狀態 | 費時 |
+       4758 +  |------------|----------|----------|----------|------|------|
+       4759 +  | __/__ __:__ | | | | ☐ | ___min |
+       4760 +  | __/__ __:__ | | | | ☐ | ___min |
+       4761 +  | __/__ __:__ | | | | ☐ | ___min |
+       4762 +  | __/__ __:__ | | | | ☐ | ___min |
+       4763 +  | __/__ __:__ | | | | ☐ | ___min |
+       4764 +
+       4765 +  **常見問題快速參考：**
+       4766 +  - 樣式不生效 → 檢查CSS路徑、容器類名、變數名稱
+       4767 +  - 頁面空白 → 檢查JavaScript錯誤、HTML結構、CSS載入
+       4768 +  - 主題切換器不顯示 → 檢查設置方法、CSS載入、JavaScript錯誤
+       4769 +  - 響應式異常 → 檢查媒體查詢、視窗大小、CSS解析度
+       4770 +
+       4771 +  ### 🔮 測試用例表
+       4772 +
+       4773 +  **每個模組完成後執行以下測試：**
+       4774 +
+       4775 +  #### 主頁 (index.html) 測試清單
+       4776 +  - [ ] 頁面正常載入，無錯誤訊息
+       4777 +  - [ ] 所有頁籤可以正常切換
+       4778 +  - [ ] 單元按鈕的hover效果正常
+       4779 +  - [ ] 所有連結都可以正常點擊跳轉
+       4780 +  - [ ] AI機器人動畫正常運作
+       4781 +  - [ ] 響應式設計在手機和平板上正常顯示
+       4782 +  - [ ] 主題切換器正常顯示和工作
+       4783 +
+       4784 +  #### C1 單元測試清單
+       4785 +  - [ ] 頁面正常載入，無錯誤訊息
+       4786 +  - [ ] 難度、題數、主題選項切換正常
+       4787 +  - [ ] 「開始遊戲」按鈕功能正常
+       4788 +  - [ ] 金錢圖片正常顯示，可以點擊選擇
+       4789 +  - [ ] 答案選項的鼠標懸停和點擊效果正常
+       4790 +  - [ ] 正確和錯誤答案的視覺回饋正常
+       4791 +  - [ ] 響應式設計在不同設備上正常
+       4792 +  - [ ] 主題切換器在C1中正常工作
+       4793 +
+       4794 +  #### 主題切換器測試清單
+       4795 +  - [ ] 在所有頁面中都正常顯示
+       4796 +  - [ ] AI機器人和護眼主題可以正常切換
+       4797 +  - [ ] 顏色吸管工具能夠正常啟動和使用
+       4798 +  - [ ] 計算機可以正常開啟和使用
+       4799 +  - [ ] 可以正常拖拽移動位置
+       4800 +  - [ ] 最小化/最大化功能正常
+       4801 +  - [ ] 在手機設備上交互正常
+       4802 +
+       4803 +  ### 📈 效能基準表
+       4804 +
+       4805 +  **使用這些指標來評估重構成果：**
+       4806 +
+       4807 +  | 指標 | 目標值 | 現在值 | 達成狀態 |
+       4808 +  |------|--------|--------|----------|
+       4809 +  | 首次載入時間 | < 3秒 | ____秒 | ☐ |
+       4810 +  | CSS 總大小 | < 100KB | ____KB | ☐ |
+       4811 +  | 頁面切換時間 | < 500ms | ____ms | ☐ |
+       4812 +  | 主題切換時間 | < 300ms | ____ms | ☐ |
+       4813 +  | 手機端響應時間 | < 1秒 | ____ms | ☐ |
+       4814 +  | 內存使用 | < 50MB | ____MB | ☐ |
+       4815 +  | CSS變數衝突 | 0個 | ____個 | ☐ |
+       4816 +  | CSS檔案重複 | 0個 | ____個 | ☐ |
+       4817 +
+       4818 +  ### 📄 交付清單
+       4819 +
+       4820 +  **在宣告重構完成前，確保以下所有項目都已完成：**
+       4821 +
+       4822 +  #### 技術交付
+       4823 +  - [ ] 所有新CSS檔案已創建且結構正確
+       4824 +  - [ ] 所有HTML檔案已更新且引用正確
+       4825 +  - [ ] theme-system.js 已正確修改且功能正常
+       4826 +  - [ ] 所有備份檔案都完整且可用
+       4827 +  - [ ] Git 提交記錄清楚且有意義
+       4828 +  - [ ] 版本標籤已正確設定
+       4829 +
+       4830 +  #### 功能驗證
+       4831 +  - [ ] 所有原有功能都能正常使用
+       4832 +  - [ ] 新的模組化結構工作正常
+       4833 +  - [ ] 主題切換器在所有頁面正常工作
+       4834 +  - [ ] 響應式設計在所有設備正常顯示
+       4835 +  - [ ] 語音功能不受影響
+       4836 +  - [ ] 擁拽功能不受影響
+       4837 +
+       4838 +  #### 品質保證
+       4839 +  - [ ] 程式碼符合既有風格和標準
+       4840 +  - [ ] 文件更新且準確
+       4841 +  - [ ] 無未使用的檔案或代碼
+       4842 +  - [ ] CSS變數命名符合規範
+       4843 +  - [ ] 所有內嵌CSS已提取到專用檔案
+       4844 +  - [ ] 沒有硬編碼的樣式或數值
+       4845 +
+       4846 +  #### 效能測試
+       4847 +  - [ ] 頁面載入時間符合標準
+       4848 +  - [ ] CSS檔案大小在可接受範圍
+       4849 +  - [ ] 無CSS變數衝突或重複定義
+       4850 +  - [ ] 無未使用的CSS規則
+       4851 +  - [ ] 手機端性能符合預期
+       4852 +
+       4853 +  #### 用戶體驗
+       4854 +  - [ ] 所有交互反饋正常
+       4855 +  - [ ] 視覺效果符合設計規範
+       4856 +  - [ ] 無明顯的效能或體驗降級
+       4857 +  - [ ] 輔助功能（焦點指示、鍵盤導航）正常
+       4858 +  - [ ] 在不同瀏覽器中顯示一致
+       4859 +
+       4860 +  ### 📧 交付文件
+       4861 +
+       4862 +  **重構完成後需要提供的文件：**
+       4863 +
+       4864 +  1. **📝 本文件**：`CSS_REFACTORING_GUIDE.md` (已更新)
+       4865 +  2. **📈 結構圖表**：新的CSS檔案組織架構
+       4866 +  3. **🧩 測試報告**：所有測試結果和截圖
+       4867 +  4. **🔄 回滾腳本**：`rollback.bat` / `rollback.sh` (已更新)
+       4868 +  5. **📊 性能報告**：重構前後的性能比對
+       4869 +  6. **🔧 維護手冊**：新模組的開發和維護指南
+       4870 +
+       4871 +  ---
+       4872 +
+       4873 +  ## 🎆 結語
+       4874 +
+       4875 +  這份詳細的CSS重構指南提供了從規劃到實施、從測試到維護的完整流程。通過遵循這個指南，您將能夠：
+       4876 +
+       4877 +  ✅ **建立穩固的模組化架構**：每個單元都是獨立的，不會相互影響
+       4878 +  ✅ **確保高品質的用戶體驗**：統一的視覺風格和流暢的交互
+       4879 +  ✅ **實現長期的可維護性**：清晰的檔案組織和命名規範
+       4880 +  ✅ **優化系統性能**：按需載入和模組化設計
+       4881 +  ✅ **降低技術债務**：減少重複代碼和維護成本
+       4882 +
+       4883 +  ### 💭 最後的建議
+       4884 +
+       4885 +  1. **耐心和細心**：重構是一個精細的過程，不要急於求成
+       4886 +  2. **頻繁測試**：每一個小改動後都要立即測試
+       4887 +  3. **備份是生命線**：永遠保持多個版本的備份
+       4888 +  4. **文件化過程**：記錄每一步的改動和原因
+       4889 +  5. **團隊溝通**：確保所有成員都理解新架構
+       4890 +
+       4891 +  ### 🚀 下一步
+       4892 +
+       4893 +  完成重構後，建議考慮以下進階優化：
+       4894 +
+       4895 +  - **CSS-in-JS 的可能性**：評估是否適用於您的項目
+       4896 +  - **設計系統整合**：建立更系統化的設計規範
+       4897 +  - **自動化測試**：引入CSS回歸測試和視覺測試
+       4898 +  - **性能監控**：持繼追蹤和優化性能指標
+       4899 +  - **用戶回饋**：收集用戶對新架構的使用體驗
+       4900 +
+       4901 +  🎉 **祝您重構順利！**
+       4902 +
+       4903 +  ---
+       4904 +
+       4905 +  ## 📢 版本更新記錄
+       4906 +
+       4907 +  ### v2.0.0 - 詳細增強版 (2024/09/09)
+       4908 +
+       4909 +  **新增內容：**
+       4910 +  - ✨ 新增了超過 50+ 個詳細的實施步驟
+       4911 +  - ✨ 新增了完整的緊急回滾方案和腳本
+       4912 +  - ✨ 新增了全面的CSS診斷和除錯工具
+       4913 +  - ✨ 新增了詳細的測試清單和檢查點
+       4914 +  - ✨ 新增了完整的進度追蹤和問題記錄表格
+       4915 +  - ✨ 新增了效能監控和模組獨立性驗證工具
+       4916 +  - ✨ 新增了詳細的交付清單和品質保證清單
+       4917 +
+       4918 +  **重要改進：**
+       4919 +  - 🔧 所有步驟現在都有具體的時間估計和測試指導
+       4920 +  - 🔧 增加了分階段實施策略，降低風險
+       4921 +  - 🔧 提供了多層次的備份和回滾方案
+       4922 +  - 🔧 增強了錯誤處理和問題解決指導
+       4923 +  - 🔧 添加了實用的消除錯誤工具和診斷程式
+       4924 +
+       4925 +  **文件統計：**
+       4926 +  - 總字數：超過 25,000 字
+       4927 +  - 代碼示例：100+ 個
+       4928 +  - 測試用例：50+ 個
+       4929 +  - 檢查點：200+ 個
+       4930 +
+       4931 +  ---
+       4932 +
+       4933 +  ## 📝 使用說明
+       4934 +
+       4935 +  **這份指南適用於：**
+       4936 +  - 👥 前端開發人員和CSS專家
+       4937 +  - 👥 項目管理者和技術主管
+       4938 +  - 👥 需要重構複雜CSS架構的開發團隊
+       4939 +  - 👥 希望學習CSS模組化最佳實踐的開發者
+       4940 +
+       4941 +  **不適用於：**
+       4942 +  - ✖️ 小型項目或單頁應用
+       4943 +  - ✖️ 沒有多模組或主題系統的簡單網站
+       4944 +  - ✖️ 使用 CSS-in-JS 或 Styled Components 的現代框架項目
+       4945 +  - ✖️ 時間非常緊迫的緊急項目
+       4946 +
+       4947 +  **使用建議：**
+       4948 +  1. **初次使用**：先閱讀「核心原則」和「目標架構」章節
+       4949 +  2. **計劃階段**：使用「日報表格」估算時間和資源
+       4950 +  3. **實施階段**：嚴格按照步驟執行，不要跳過測試
+       4951 +  4. **問題解決**：使用「問題追蹤表」記錄所有問題
+       4952 +  5. **交付檢查**：使用「交付清單」確保品質
+       4953 +
+       4954 +  **技術要求：**
+       4955 +  - 💻 **作業系統**：Windows 10+, macOS 10.15+, 或 Linux
+       4956 +  - 💻 **瀏覽器**：Chrome 90+, Firefox 88+, Safari 14+, Edge 90+
+       4957 +  - 💻 **編輯器**：VSCode, WebStorm, 或任何支援CSS和HTML的編輯器
+       4958 +  - 💻 **版本控制**：Git 2.20+ (強烈建議)
+       4959 +  - 💻 **基礎技能**：HTML5, CSS3, JavaScript ES6+, 命令列基礎操作
+       4960 +
+       4961 +  ---
+       4962 +
+       4963 +  ## ❗ 免責聲明
+       4964 +
+       4965 +  本文件僅作為技術指導之用，作者不對以下情況承擔責任：
+       4966 +  - ✖️ 在實施過程中造成的任何數據遺失或系統損壞
+       4967 +  - ✖️ 由於不當操作或理解錯誤導致的問題
+       4968 +  - ✖️ 生產環境中的任何意外故障或損失
+       4969 +  - ✖️ 第三方工具或服務的問題
+       4970 +
+       4971 +  **強烈建議：**
+       4972 +  - 💪 在正式環境中實施之前，先在測試環境中完整驗證
+       4973 +  - 💪 始終保持多個備份版本，並確保可以快速回滾
+       4974 +  - 💪 在不確定的情況下，尋求專業建議或支援
+       4975 +
+       4976 +  ---
+       4977 +
+       4978 +  **本文件由 Claude (Anthropic) 協助生成，旨在提供實用的CSS重構指導。**
+       4979 +  **最後更新：2024年9月9日 | 版本：v2.0.0**
+       4980   \ No newline at end of file

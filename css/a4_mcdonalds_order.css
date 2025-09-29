@@ -1,0 +1,854 @@
+/* =================================================================
+ * A4麥當勞自助點餐系統 - 主要樣式表
+ * 基於原有設計並遵循專案架構標準
+ * ================================================================= */
+
+/* CSS變數定義 - 麥當勞主題色彩 */
+:root {
+    --mcd-primary: #ffcc02;           /* 麥當勞金黃色 */
+    --mcd-secondary: #ff8f00;         /* 橘色 */
+    --mcd-accent: #c62d42;            /* 麥當勞紅色 */
+    --mcd-success: #4caf50;           /* 成功綠色 */
+    --mcd-warning: #f44336;           /* 警告紅色 */
+    --mcd-text-dark: #333333;         /* 深色文字 */
+    --mcd-text-light: #ffffff;        /* 白色文字 */
+    --mcd-bg-light: #ffffff;          /* 白色背景 */
+    --mcd-bg-gray: #f5f5f5;           /* 淺灰背景 */
+    --mcd-shadow: rgba(255, 204, 2, 0.2); /* 主題陰影色 */
+    --mcd-border: #e0e0e0;           /* 邊框色 */
+}
+
+/* 載入畫面樣式 */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, var(--mcd-primary), var(--mcd-secondary));
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: var(--mcd-text-dark);
+}
+
+.loading-spinner {
+    width: 60px;
+    height: 60px;
+    border: 6px solid rgba(51, 51, 51, 0.3);
+    border-top: 6px solid var(--mcd-text-dark);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading-text {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+}
+
+/* 錯誤邊界樣式 */
+.error-boundary {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+}
+
+.error-content {
+    background: white;
+    padding: 40px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    margin: 20px;
+}
+
+.error-content h2 {
+    color: var(--mcd-warning);
+    margin-bottom: 20px;
+}
+
+.reload-btn {
+    background: var(--mcd-primary);
+    color: var(--mcd-text-dark);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 20px;
+    transition: background-color 0.3s ease;
+}
+
+.reload-btn:hover {
+    background: var(--mcd-secondary);
+}
+
+/* 標題列樣式 */
+.mcdonalds-title-bar {
+    background: linear-gradient(135deg, var(--mcd-primary), var(--mcd-secondary));
+    color: var(--mcd-text-dark);
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--mcd-shadow);
+    position: relative;
+}
+
+.mcdonalds-title-bar h1 {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 900;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+.mcdonalds-subtitle {
+    margin: 10px 0 0 0;
+    font-size: 1.1em;
+    opacity: 0.9;
+    font-weight: 600;
+}
+
+/* 主標題區域 */
+.main-header {
+    background: linear-gradient(135deg, var(--mcd-primary), var(--mcd-secondary));
+    padding: 30px 20px;
+    text-align: center;
+    box-shadow: 0 4px 15px var(--mcd-shadow);
+    border-bottom: 4px solid var(--mcd-accent);
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.logo img {
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+}
+
+.logo h1 {
+    font-size: 2.5em;
+    font-weight: 900;
+    color: var(--mcd-text-dark);
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.header-message {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 15px;
+    border-radius: 25px;
+    display: inline-block;
+}
+
+.header-message p {
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: var(--mcd-text-dark);
+}
+
+/* 主內容區域 */
+.main-content {
+    display: flex;
+    min-height: calc(100vh - 200px);
+}
+
+.menu-container {
+    flex: 2;
+    background: var(--mcd-bg-light);
+    display: flex;
+    flex-direction: column;
+}
+
+/* 分類導航 */
+.category-nav {
+    background: var(--mcd-bg-gray);
+    padding: 20px;
+    border-bottom: 2px solid var(--mcd-border);
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.category-btn {
+    background: white;
+    color: var(--mcd-text-dark);
+    border: 2px solid var(--mcd-primary);
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+.category-btn:hover,
+.category-btn.active {
+    background: var(--mcd-primary);
+    color: var(--mcd-text-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--mcd-shadow);
+}
+
+/* 商品網格 */
+.item-grid {
+    flex: 1;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    overflow-y: auto;
+}
+
+/* 商品卡片 */
+.menu-item {
+    background: white;
+    border: 2px solid var(--mcd-border);
+    border-radius: 15px;
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.menu-item:hover {
+    border-color: var(--mcd-primary);
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px var(--mcd-shadow);
+}
+
+.menu-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--mcd-primary), var(--mcd-secondary));
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+}
+
+.menu-item:hover::before {
+    transform: scaleX(1);
+}
+
+.item-image {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 15px;
+    background: var(--mcd-bg-gray);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4em;
+}
+
+.item-info h3 {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--mcd-text-dark);
+    margin: 0 0 10px 0;
+}
+
+.item-description {
+    font-size: 0.9em;
+    color: #666;
+    margin: 0 0 15px 0;
+    line-height: 1.5;
+}
+
+.item-price {
+    font-size: 1.5em;
+    font-weight: 900;
+    color: var(--mcd-accent);
+    margin-bottom: 15px;
+}
+
+.add-to-cart-btn {
+    background: var(--mcd-primary);
+    color: var(--mcd-text-dark);
+    border: none;
+    padding: 12px 25px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+.add-to-cart-btn:hover {
+    background: var(--mcd-secondary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px var(--mcd-shadow);
+}
+
+/* 側邊欄購物車 */
+.sidebar {
+    flex: 1;
+    min-width: 350px;
+    background: var(--mcd-bg-gray);
+    border-left: 3px solid var(--mcd-primary);
+    display: flex;
+    flex-direction: column;
+}
+
+.cart {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+}
+
+.cart h2 {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--mcd-text-dark);
+    text-align: center;
+    margin: 0 0 20px 0;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--mcd-primary);
+}
+
+/* 購物車項目 */
+.cart-items {
+    flex: 1;
+    overflow-y: auto;
+    margin-bottom: 20px;
+}
+
+.empty-cart-message {
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    padding: 40px 20px;
+    font-size: 1.1em;
+}
+
+.cart-item {
+    background: white;
+    border: 1px solid var(--mcd-border);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.cart-item:hover {
+    box-shadow: 0 4px 15px var(--mcd-shadow);
+}
+
+.cart-item-info {
+    flex: 1;
+}
+
+.cart-item-name {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: var(--mcd-text-dark);
+    margin-bottom: 5px;
+}
+
+.cart-item-price {
+    font-size: 1em;
+    font-weight: 700;
+    color: var(--mcd-accent);
+}
+
+.cart-item-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    background: var(--mcd-primary);
+    color: var(--mcd-text-dark);
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.quantity-btn:hover {
+    background: var(--mcd-secondary);
+    transform: scale(1.1);
+}
+
+.quantity-display {
+    font-size: 16px;
+    font-weight: 600;
+    min-width: 30px;
+    text-align: center;
+}
+
+.remove-btn {
+    background: var(--mcd-warning);
+    color: white;
+    border: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.remove-btn:hover {
+    background: #d32f2f;
+    transform: scale(1.1);
+}
+
+/* 購物車摘要 */
+.cart-summary {
+    border-top: 2px solid var(--mcd-primary);
+    padding-top: 20px;
+}
+
+.total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--mcd-text-dark);
+    margin-bottom: 20px;
+    padding: 15px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.checkout-btn {
+    background: var(--mcd-accent);
+    color: var(--mcd-text-light);
+    border: none;
+    padding: 15px 30px;
+    border-radius: 25px;
+    font-size: 18px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-family: 'Noto Sans TC', sans-serif;
+}
+
+.checkout-btn:hover:not(:disabled) {
+    background: #a02033;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(198, 45, 66, 0.3);
+}
+
+.checkout-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* 動畫效果 */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideInFromLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideInFromRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.fade-in {
+    animation: fadeIn 0.6s ease-out;
+}
+
+.slide-in-left {
+    animation: slideInFromLeft 0.6s ease-out;
+}
+
+.slide-in-right {
+    animation: slideInFromRight 0.6s ease-out;
+}
+
+/* 加入購物車動畫 */
+.add-to-cart-animation {
+    animation: addToCartPulse 0.6s ease;
+}
+
+@keyframes addToCartPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); background: var(--mcd-success); }
+    100% { transform: scale(1); }
+}
+
+/* 手機端觸控優化 */
+.touchable {
+    -webkit-tap-highlight-color: rgba(255, 204, 2, 0.3);
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.touchable:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+}
+
+/* 改善觸控目標大小 */
+.menu-item,
+.category-btn,
+.add-to-cart-btn,
+.quantity-btn,
+.checkout-btn {
+    min-height: 44px; /* iOS 建議最小觸控目標 */
+    min-width: 44px;
+}
+
+.category-btn {
+    min-height: 50px;
+    padding: 12px 25px;
+}
+
+.add-to-cart-btn,
+.checkout-btn {
+    min-height: 50px;
+    padding: 15px 30px;
+}
+
+.quantity-btn {
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+}
+
+/* 響應式設計 */
+@media (max-width: 1200px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .sidebar {
+        min-width: auto;
+        max-height: 400px;
+        border-left: none;
+        border-top: 3px solid var(--mcd-primary);
+    }
+
+    .logo {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .logo h1 {
+        font-size: 2em;
+    }
+
+    .item-grid {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .item-grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        padding: 15px;
+        gap: 15px;
+    }
+
+    .category-nav {
+        padding: 15px;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    .category-btn {
+        padding: 12px 20px;
+        font-size: 16px;
+        min-height: 50px;
+        border-radius: 25px;
+    }
+
+    .cart {
+        padding: 15px;
+    }
+
+    .logo h1 {
+        font-size: 1.8em;
+    }
+
+    .header-message p {
+        font-size: 1em;
+    }
+
+    .menu-item {
+        padding: 20px;
+        min-height: 300px;
+    }
+
+    .item-image {
+        width: 100px;
+        height: 100px;
+        font-size: 3em;
+    }
+
+    /* 購物車優化 */
+    .cart-item {
+        padding: 15px;
+        border-radius: 12px;
+    }
+
+    .cart-item-controls {
+        gap: 12px;
+    }
+
+    .quantity-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+
+    .remove-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 600px) {
+    .item-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .menu-item {
+        padding: 25px;
+        min-height: 320px;
+    }
+
+    .item-info h3 {
+        font-size: 1.4em;
+    }
+
+    .item-price {
+        font-size: 1.6em;
+    }
+
+    .add-to-cart-btn {
+        font-size: 18px;
+        padding: 18px 35px;
+        min-height: 56px;
+    }
+
+    .category-nav {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .category-btn {
+        width: 100%;
+        font-size: 18px;
+        padding: 15px;
+        min-height: 56px;
+    }
+
+    .checkout-btn {
+        font-size: 20px;
+        padding: 20px;
+        min-height: 60px;
+    }
+
+    /* 購物車項目堆疊 */
+    .cart-item {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .cart-item-controls {
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .quantity-btn,
+    .remove-btn {
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
+    }
+
+    .quantity-display {
+        font-size: 18px;
+        min-width: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-header {
+        padding: 20px 15px;
+    }
+
+    .logo {
+        gap: 8px;
+    }
+
+    .logo h1 {
+        font-size: 1.6em;
+    }
+
+    .header-message p {
+        font-size: 0.9em;
+    }
+
+    .menu-item {
+        padding: 20px;
+        min-height: 280px;
+    }
+
+    .item-image {
+        width: 80px;
+        height: 80px;
+        font-size: 2.5em;
+    }
+
+    .item-info h3 {
+        font-size: 1.2em;
+    }
+
+    .item-description {
+        font-size: 0.85em;
+        line-height: 1.4;
+    }
+
+    .item-price {
+        font-size: 1.4em;
+    }
+
+    .cart h2 {
+        font-size: 1.5em;
+    }
+
+    .total {
+        font-size: 1.3em;
+        padding: 12px;
+    }
+
+    /* 改善小螢幕上的間距 */
+    .category-nav {
+        padding: 12px;
+    }
+
+    .item-grid {
+        padding: 12px;
+        gap: 15px;
+    }
+
+    .cart {
+        padding: 12px;
+    }
+}
+
+/* 橫向模式優化 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .main-header {
+        padding: 15px 20px;
+    }
+
+    .logo h1 {
+        font-size: 1.5em;
+    }
+
+    .header-message {
+        display: none; /* 橫向模式下隱藏次要訊息 */
+    }
+
+    .item-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .menu-item {
+        padding: 15px;
+        min-height: 240px;
+    }
+
+    .item-image {
+        width: 70px;
+        height: 70px;
+        font-size: 2em;
+    }
+}
+
+/* 無障礙設計 */
+.sr-only {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
+}
+
+/* 高對比模式支援 */
+@media (prefers-contrast: high) {
+    .menu-item,
+    .cart-item {
+        border-width: 3px;
+    }
+
+    .category-btn,
+    .add-to-cart-btn,
+    .checkout-btn {
+        border: 2px solid var(--mcd-text-dark);
+    }
+}
