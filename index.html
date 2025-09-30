@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>生活數學王</title>
+    <link rel="stylesheet" href="css/ai-theme.css">
+    
+    <style>
+        /* CSS 變數定義，方便管理主題顏色 */
+        :root {
+            --bg-primary: #f0f7ff;
+            --text-primary: #334e68;
+            --primary-color: #007bff;
+            --secondary-color: #ffc107;
+            --accent-color: #28a745;
+            --card-bg: #ffffff;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --radius: 12px;
+            --transition: all 0.3s ease-in-out;
+        }
+        
+        /* 深色主題變數 */
+        [data-theme="dark"] {
+            --bg-primary: #1a1a2e;
+            --text-primary: #e2e8f0;
+            --primary-color: #6366f1;
+            --secondary-color: #fbbf24;
+            --accent-color: #10b981;
+            --card-bg: #2d2d44;
+            --card-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            --card-hover-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            --radius: 12px;
+            --transition: all 0.3s ease-in-out;
+        }
+
+        /* 基礎樣式 */
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            font-family: 'Helvetica Neue', Arial, 'Microsoft JhengHei', sans-serif;
+            min-height: 100vh;
+            transition: var(--transition);
+        }
+
+        .container {
+            padding: 30px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* 標題 */
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 3em;
+            font-weight: 700;
+            text-shadow: 2px 2px 5px rgba(0, 123, 255, 0.1);
+        }
+
+        /* 頁籤導覽列 */
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            background-color: var(--card-bg);
+            padding: 10px;
+            border-radius: 50px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .tab-btn {
+            background: transparent;
+            color: var(--text-primary);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 30px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .tab-btn:hover {
+            color: var(--primary-color);
+        }
+
+        .tab-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        }
+        
+        /* 頁籤內容面板 */
+        .tab-content {
+            display: none; /* 預設隱藏 */
+            width: 100%;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block; /* 啟用時顯示 */
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* 單元網格佈局 */
+        .unit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        /* 單元按鈕樣式 */
+        .unit-btn {
+            background: var(--card-bg);
+            color: var(--text-primary);
+            text-decoration: none;
+            padding: 25px;
+            border-radius: var(--radius);
+            border: 1px solid #e0e0e0;
+            box-shadow: var(--card-shadow);
+            text-align: left;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .unit-btn:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-5px);
+            box-shadow: var(--card-hover-shadow);
+        }
+        
+        .unit-icon {
+            font-size: 2.5em;
+            width: 50px;
+            text-align: center;
+        }
+        
+        .unit-text .code {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .unit-text .title {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        
+        .unit-text .subtitle {
+            font-size: 0.8em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        /* AI功能標籤樣式 */
+        .ai-feature {
+            font-size: 0.7em;
+            color: var(--primary-color);
+            background: rgba(102, 126, 234, 0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            margin-top: 4px;
+            display: inline-block;
+            font-weight: 500;
+        }
+        
+        /* 頁面標題區域 */
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .ai-assistant-intro {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .ai-avatar {
+            font-size: 3em;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        
+        .ai-speech-bubble {
+            background: var(--card-bg);
+            padding: 15px 20px;
+            border-radius: 20px 20px 20px 5px;
+            box-shadow: var(--card-shadow);
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .ai-speech-bubble::before {
+            content: '';
+            position: absolute;
+            left: -10px;
+            bottom: 10px;
+            width: 0;
+            height: 0;
+            border: 10px solid transparent;
+            border-right-color: var(--card-bg);
+        }
+        
+        .ai-speech-bubble p {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+        
+
+        /* 禁用/即將推出樣式 */
+        .unit-btn.disabled {
+            background-color: #f8f9fa;
+            cursor: not-allowed;
+            opacity: 0.6;
+            pointer-events: none; /* 讓連結不可點擊 */
+        }
+        
+        .unit-btn.disabled:hover {
+            transform: none;
+            box-shadow: var(--card-shadow);
+            border-color: #e0e0e0;
+        }
+        
+        /* 主題過渡動畫 */
+        .theme-transitioning * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        /* 顏色拾取器高亮效果 */
+        .color-picker-highlight {
+            box-shadow: 0 0 10px 2px rgba(102, 126, 234, 0.6) !important;
+            position: relative;
+            z-index: 1000;
+        }
+        
+        /* 響應式設計 */
+        @media (max-width: 768px) {
+            h1 { font-size: 2.5em; }
+            .tabs { flex-direction: column; border-radius: var(--radius); gap: 5px; }
+            .tab-btn { width: 100%; text-align: center; }
+            .unit-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1>🤖 AI數學王</h1>
+            <div class="ai-assistant-intro">
+                <div class="ai-avatar">🤖</div>
+                <div class="ai-speech-bubble">
+                    <p>你好！我是你的AI數學助教，讓我們一起學習金錢數學吧！</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <button class="tab-btn active" data-target="part1">第一部分：基礎技能</button>
+            <button class="tab-btn" data-target="part2">第二部分：核心課程</button>
+            <button class="tab-btn" data-target="part3">第三部分：進階應用</button>
+        </div>
+        
+        <div id="part1" class="tab-content active">
+            <div class="unit-grid">
+                <a href="html/f1_object_correspondence.html" class="unit-btn">
+                    <div class="unit-icon">🤖</div>
+                    <div class="unit-text">
+                        <div class="code">F1</div>
+                        <div class="title">數與物的對應</div>
+                        <div class="ai-feature">AI智能拖拽</div>
+                    </div>
+                </a>
+                <a href="html/f2_rote_and_rational_counting.html" class="unit-btn">
+                    <div class="unit-icon">🎙️</div>
+                    <div class="unit-text">
+                        <div class="code">F2</div>
+                        <div class="title">數量與點數</div>
+                        <div class="ai-feature">AI語音助手</div>
+                    </div>
+                </a>
+                <a href="html/f3_number_recognition.html" class="unit-btn">
+                    <div class="unit-icon">🎯</div>
+                    <div class="unit-text">
+                        <div class="code">F3</div>
+                        <div class="title">認識數字與數量</div>
+                        <div class="ai-feature">AI視覺識別</div>
+                    </div>
+                </a>
+                <a href="html/f4_number_sorting.html" class="unit-btn">
+                    <div class="unit-icon">🧠</div>
+                    <div class="unit-text">
+                        <div class="code">F4</div>
+                        <div class="title">數字排序</div>
+                        <div class="ai-feature">AI邏輯推理</div>
+                    </div>
+                </a>
+                <a href="html/f5_quantity_comparison.html" class="unit-btn">
+                    <div class="unit-icon">⚡</div>
+                    <div class="unit-text">
+                        <div class="code">F5</div>
+                        <div class="title">數量大小的比較</div>
+                        <div class="ai-feature">AI快速比對</div>
+                    </div>
+                </a>
+                <a href="f6_number_composition.html" class="unit-btn disabled">
+                    <div class="unit-icon">🧩</div>
+                    <div class="unit-text">
+                        <div class="code">F6</div>
+                        <div class="title">數的合成與分解</div>
+                        <div class="subtitle">敬請期待</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <div id="part2" class="tab-content">
+            <div class="unit-grid">
+                <a href="html/c1_money_types.html" class="unit-btn">
+                    <div class="unit-icon">🤖</div>
+                    <div class="unit-text">
+                        <div class="code">C1</div>
+                        <div class="title">金錢的種類與幣值</div>
+                        <div class="ai-feature">AI幣值識別</div>
+                    </div>
+                </a>
+                <a href="html/c2_money_counting.html" class="unit-btn">
+                    <div class="unit-icon">🧮</div>
+                    <div class="unit-text">
+                        <div class="code">C2</div>
+                        <div class="title">金錢的點數與加總</div>
+                        <div class="ai-feature">AI智能計數</div>
+                    </div>
+                </a>
+                <a href="html/c3_money_exchange.html" class="unit-btn">
+                    <div class="unit-icon">🔄</div>
+                    <div class="unit-text">
+                        <div class="code">C3</div>
+                        <div class="title">金錢幣值的兌換</div>
+                        <div class="ai-feature">AI換算助手</div>
+                    </div>
+                </a>
+                <a href="html/c4_correct_amount.html" class="unit-btn">
+                    <div class="unit-icon">🎯</div>
+                    <div class="unit-text">
+                        <div class="code">C4</div>
+                        <div class="title">正確的金額</div>
+                        <div class="ai-feature">AI精準驗證</div>
+                    </div>
+                </a>
+                <a href="html/c5_sufficient_payment.html" class="unit-btn">
+                    <div class="unit-icon">💰</div>
+                    <div class="unit-text">
+                        <div class="code">C5</div>
+                        <div class="title">足額付款</div>
+                        <div class="ai-feature">AI付款顧問</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+        
+        <div id="part3" class="tab-content">
+            <div class="unit-grid">
+                <a href="html/a1_simulated_shopping.html" class="unit-btn">
+                    <div class="unit-icon">🛍️</div>
+                    <div class="unit-text">
+                        <div class="code">A1</div>
+                        <div class="title">模擬購物</div>
+                        <div class="ai-feature">AI購物助手</div>
+                    </div>
+                </a>
+                <a href="html/a2_atm_simulator.html" class="unit-btn">
+                    <div class="unit-icon">🏧</div>
+                    <div class="unit-text">
+                        <div class="code">A2</div>
+                        <div class="title">模擬提款</div>
+                        <div class="ai-feature">AI金融模擬</div>
+                    </div>
+                </a>
+                <a href="html/a3_barber_shop_kiosk.html" class="unit-btn">
+                    <div class="unit-icon">✂️</div>
+                    <div class="unit-text">
+                        <div class="code">A3</div>
+                        <div class="title">理髮店售票機</div>
+                        <div class="ai-feature">AI售票體驗</div>
+                    </div>
+                </a>
+                <a href="html/a4_mcdonalds_order.html" class="unit-btn">
+                    <div class="unit-icon">🍔</div>
+                    <div class="unit-text">
+                        <div class="code">A4</div>
+                        <div class="title">麥當勞自助點餐</div>
+                        <div class="ai-feature">AI點餐系統</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const tabsContainer = document.querySelector('.tabs');
+            
+            tabsContainer.addEventListener('click', (event) => {
+                const clickedButton = event.target.closest('.tab-btn');
+                if (!clickedButton) return;
+
+                // 處理按鈕的 active 狀態
+                tabsContainer.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                clickedButton.classList.add('active');
+
+                // 處理內容面板的顯示
+                const targetId = clickedButton.dataset.target;
+                document.querySelectorAll('.tab-content').forEach(panel => {
+                    panel.classList.remove('active');
+                });
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+    
+    <script src="js/audio-unlocker.js"></script>
+    <script src="js/theme-system.js"></script>
+    <script src="js/mobile-debug-panel.js"></script>
+
+</body>
+</html>
